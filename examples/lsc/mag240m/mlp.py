@@ -87,7 +87,12 @@ if __name__ == '__main__':
 
     torch.manual_seed(12345)
     gpus = [0,1,2,3,4,5,6,7]
-    device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
+    if torch.cuda.is_available():
+        device = f'cuda:{args.device}'
+    else:
+        device = 'cpu'
+        print('cpu')
+
 
     dataset = MAG240MDataset(ROOT)
     evaluator = MAG240MEvaluator()
