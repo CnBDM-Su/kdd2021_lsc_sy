@@ -86,6 +86,7 @@ if __name__ == '__main__':
     print(args)
 
     torch.manual_seed(12345)
+    gpus = [0,1,2,3,4,5,6,7]
     device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
 
     dataset = MAG240MDataset(ROOT)
@@ -119,6 +120,9 @@ if __name__ == '__main__':
     model = MLP(dataset.num_paper_features, args.hidden_channels,
                 dataset.num_classes, args.num_layers, args.dropout,
                 not args.no_batch_norm, args.relu_last).to(device)
+
+    if args.parallel == True:
+        model = torch.nn.DataParallel(model, device_ids=gpus)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     num_params = sum([p.numel() for p in model.parameters()])
     print(f'#Params: {num_params}')
