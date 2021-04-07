@@ -73,6 +73,7 @@ def test(model, x_eval, y_eval, evaluator):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', type=int, default=0)
+    parser.add_argument('--parallel', type=bool, default=False)
     parser.add_argument('--hidden_channels', type=int, default=512)
     parser.add_argument('--num_layers', type=int, default=2),
     parser.add_argument('--no_batch_norm', action='store_true')
