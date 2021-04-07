@@ -74,6 +74,7 @@ def test(model, x_eval, y_eval, evaluator):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', type=int, default=0)
+    parser.add_argument('--parallel', type=bool, default=False)
     parser.add_argument('--layer', type=int, default=3)
     parser.add_argument('--hidden_channels', type=int, default=512)
     parser.add_argument('--num_layers', type=int, default=3),
@@ -87,7 +88,12 @@ if __name__ == '__main__':
     print(args)
 
     torch.manual_seed(12345)
-    device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
+    gpus = [0, 1, 2, 3, 4, 5, 6, 7]
+    if torch.cuda.is_available():
+        device = f'cuda:{args.device}'
+    else:
+        device = 'cpu'
+        print('cpu')
 
     dataset = MAG240MDataset(ROOT)
     evaluator = MAG240MEvaluator()
@@ -114,6 +120,8 @@ if __name__ == '__main__':
     model = MLP(dataset.num_paper_features, args.hidden_channels,
                 dataset.num_classes, args.num_layers, args.dropout,
                 not args.no_batch_norm, args.relu_last).to(device)
+    if args.parallel == True:
+        model = torch.nn.DataParallel(model, device_ids=gpus)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     num_params = sum([p.numel() for p in model.parameters()])
     print(f'#Params: {num_params}')
