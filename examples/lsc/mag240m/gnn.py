@@ -211,6 +211,7 @@ if __name__ == '__main__':
                         choices=['gat', 'graphsage'])
     parser.add_argument('--sizes', type=str, default='25-15')
     parser.add_argument('--device', type=str, default='0')
+    parser.add_argument('--parallel', type=bool, default=False)
     parser.add_argument('--evaluate', action='store_true')
     args = parser.parse_args()
     args.sizes = [int(i) for i in args.sizes.split('-')]
@@ -225,9 +226,15 @@ if __name__ == '__main__':
                     num_layers=len(args.sizes), dropout=args.dropout)
         print(f'#Params {sum([p.numel() for p in model.parameters()])}')
         checkpoint_callback = ModelCheckpoint(monitor='val_acc', save_top_k=1)
-        trainer = Trainer(gpus=args.device, max_epochs=args.epochs,
-                          callbacks=[checkpoint_callback],
-                          default_root_dir=f'logs/{args.model}')
+        if args.parallel==True:
+            gpus = [0,1,2,3,4,5,6,7]
+            trainer = Trainer(gpus=gpus, max_epochs=args.epochs,
+                              callbacks=[checkpoint_callback],
+                              default_root_dir=f'logs/{args.model}')
+        else:
+            trainer = Trainer(gpus=args.device, max_epochs=args.epochs,
+                              callbacks=[checkpoint_callback],
+                              default_root_dir=f'logs/{args.model}')
         trainer.fit(model, datamodule=datamodule)
 
     if args.evaluate:
@@ -236,8 +243,11 @@ if __name__ == '__main__':
         logdir = f'logs/{args.model}/lightning_logs/version_{version}'
         print(f'Evaluating saved model in {logdir}...')
         ckpt = glob.glob(f'{logdir}/checkpoints/*')[0]
-
-        trainer = Trainer(gpus=args.device, resume_from_checkpoint=ckpt)
+        if args.parallel==True:
+            gpus = [0,1,2,3,4,5,6,7]
+            trainer = Trainer(gpus=gpus, resume_from_checkpoint=ckpt)
+        else:
+            trainer = Trainer(gpus=args.device, resume_from_checkpoint=ckpt)
         model = GNN.load_from_checkpoint(checkpoint_path=ckpt,
                                          hparams_file=f'{logdir}/hparams.yaml')
 
