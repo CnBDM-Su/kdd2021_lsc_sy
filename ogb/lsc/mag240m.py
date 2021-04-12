@@ -24,7 +24,7 @@ class MAG240MDataset(object):
         if isinstance(root, str):
             root = osp.expanduser(osp.normpath(root))
         self.root = root
-        self.dir = osp.join(root, 'mag240m_kddcup2021')
+        self.dir = osp.join(root, '/app/kdd/data/mag240m_kddcup2021')
 
         if osp.isdir(self.dir) and (not osp.exists(
                 osp.join(self.dir, f'RELEASE_v{self.version}.txt'))):
