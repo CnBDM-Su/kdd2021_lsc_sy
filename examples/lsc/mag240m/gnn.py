@@ -82,7 +82,7 @@ class MAG240M(LightningDataModule):
         self.test_idx = torch.from_numpy(dataset.get_idx_split('test'))
         self.test_idx.share_memory_()
 
-        self.x = dataset.paper_feat
+        self.x = self.all_paper_feat
         self.y = torch.from_numpy(dataset.all_paper_label)
 
         path = f'{dataset.dir}/paper_to_paper_symmetric.pt'
