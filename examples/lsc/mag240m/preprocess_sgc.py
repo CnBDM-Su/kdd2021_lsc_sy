@@ -12,7 +12,6 @@ from torch_sparse import SparseTensor
 from torch_geometric.nn.conv.gcn_conv import gcn_norm
 from ogb.lsc import MAG240MDataset
 from root import ROOT
-from joblib import Parallel, delayed
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -52,7 +51,7 @@ if __name__ == '__main__':
     pbar = tqdm(total=args.num_layers * (num_features // 128))
     pbar.set_description('Pre-processing node features')
 
-    def multi(j):
+    for j in range(0, num_features, 128):  # Run spmm in column-wise chunks...
         x = dataset.paper_feat[:, j:min(j + 128, num_features)]
         x = torch.from_numpy(x.astype(np.float32))
 
@@ -62,9 +61,6 @@ if __name__ == '__main__':
             np.save(f'{dataset.dir}/x_valid_{i}_{j}.npy', x[valid_idx].numpy())
             np.save(f'{dataset.dir}/x_test_{i}_{j}.npy', x[test_idx].numpy())
             pbar.update(1)
-
-
-    Parallel(n_jobs=-1)(delayed(multi)(j) for j in range(0, num_features, 128))  # Run spmm in column-wise chunks...
     pbar.close()
 
     t = time.perf_counter()
