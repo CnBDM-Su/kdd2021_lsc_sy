@@ -245,19 +245,19 @@ class MAG240M(LightningDataModule):
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
                                batch_size=self.batch_size, shuffle=True,
-                               num_workers=4)
+                               num_workers=8)
 
     def val_dataloader(self):
         return NeighborSampler(self.adj_t, node_idx=self.val_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
-                               batch_size=self.batch_size, num_workers=2)
+                               batch_size=self.batch_size, num_workers=4)
 
     def test_dataloader(self):  # Test best validation model once again.
         return NeighborSampler(self.adj_t, node_idx=self.val_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
-                               batch_size=self.batch_size, num_workers=2)
+                               batch_size=self.batch_size, num_workers=4)
 
     def hidden_test_dataloader(self):
         return NeighborSampler(self.adj_t, node_idx=self.test_idx,
@@ -389,6 +389,7 @@ if __name__ == '__main__':
     parser.add_argument('--device', type=str, default='0')
     parser.add_argument('--parallel', type=bool, default=False)
     parser.add_argument('--evaluate', action='store_true')
+    parser.add_argument('--consume', type=bool, default=False)
     args = parser.parse_args()
     args.sizes = [int(i) for i in args.sizes.split('-')]
     print(args)
@@ -409,9 +410,17 @@ if __name__ == '__main__':
                               callbacks=[checkpoint_callback],
                               default_root_dir=f'logs/{args.model}')
         else:
-            trainer = Trainer(gpus=args.device, max_epochs=args.epochs,
-                              callbacks=[checkpoint_callback],
-                              default_root_dir=f'logs/{args.model}')
+            if args.consume==False:
+                trainer = Trainer(gpus=args.device, max_epochs=args.epochs,
+                                  callbacks=[checkpoint_callback],
+                                  default_root_dir=f'logs/{args.model}')
+            else:
+                dirs = glob.glob(f'logs/{args.model}/lightning_logs/*')
+                version = max([int(x.split(os.sep)[-1].split('_')[-1]) for x in dirs])
+                logdir = f'logs/{args.model}/lightning_logs/version_{version}'
+                ckpt = glob.glob(f'{logdir}/checkpoints/*')[0]
+                print('consume nodel version:',version)
+                trainer = Trainer(gpus=args.device, resume_from_checkpoint=ckpt)
 
         trainer.fit(model, datamodule=datamodule)
 

@@ -228,9 +228,9 @@ if __name__ == '__main__':
         checkpoint_callback = ModelCheckpoint(monitor='val_acc', save_top_k=1)
         if args.parallel==True:
             gpus = [0,1,2,3,4,5,6,7]
-            trainer = Trainer(gpus=gpus, max_epochs=args.epochs,
+            trainer = Trainer(gpus=8, max_epochs=args.epochs,
                               callbacks=[checkpoint_callback],
-                              default_root_dir=f'logs/{args.model}',distributed_backend="ddp")
+                              default_root_dir=f'logs/{args.model}')
         else:
             trainer = Trainer(gpus=args.device, max_epochs=args.epochs,
                               callbacks=[checkpoint_callback],
