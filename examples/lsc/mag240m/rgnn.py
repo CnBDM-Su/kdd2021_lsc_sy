@@ -389,7 +389,7 @@ if __name__ == '__main__':
     parser.add_argument('--device', type=str, default='0')
     parser.add_argument('--parallel', type=bool, default=False)
     parser.add_argument('--evaluate', action='store_true')
-    parser.add_argument('--consume', type=bool, default=False)
+    parser.add_argument('--resume', type=bool, default=False)
     args = parser.parse_args()
     args.sizes = [int(i) for i in args.sizes.split('-')]
     print(args)
@@ -410,7 +410,7 @@ if __name__ == '__main__':
                               callbacks=[checkpoint_callback],
                               default_root_dir=f'logs/{args.model}')
         else:
-            if args.consume==False:
+            if args.resume==False:
                 trainer = Trainer(gpus=args.device, max_epochs=args.epochs,
                                   callbacks=[checkpoint_callback],
                                   default_root_dir=f'logs/{args.model}')
