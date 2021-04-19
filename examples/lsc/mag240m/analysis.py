@@ -104,14 +104,14 @@ if __name__ == '__main__':
     t = time.perf_counter()
     print('Reading training node features...', end=' ', flush=True)
     x_train = dataset.paper_feat[train_idx]
-    x_train = torch.from_numpy(x_train).to(torch.float).to(device)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
     t = time.perf_counter()
     print('Reading validation node features...', end=' ', flush=True)
     x_valid = dataset.paper_feat[valid_idx]
-    x_valid = torch.from_numpy(x_valid).to(torch.float).to(device)
+    x = np.concatenate([x_train, x_valid],0)
+    x = torch.from_numpy(x).to(torch.float).to(device)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    t = time.perf_counter()
+    # t = time.perf_counter()
     # print('Reading test node features...', end=' ', flush=True)
     # x_test = dataset.paper_feat[test_idx]
     # x_test = torch.from_numpy(x_test).to(torch.float).to(device)
@@ -134,16 +134,15 @@ if __name__ == '__main__':
 
     best_valid_acc = 0
     for epoch in range(1, args.epochs + 1):
-        loss = train(model, x_train, y_train, args.batch_size, optimizer)
-        train_acc = test(model, x_train, y, evaluator)
+        loss = train(model, x, y, args.batch_size, optimizer)
+        train_acc = test(model, x, y, evaluator)
         # valid_acc = test(model, x_valid, y_valid, evaluator)
-        if valid_acc > best_valid_acc:
-            best_valid_acc = valid_acc
-            with torch.no_grad():
-                model.eval()
-                res = {'y_pred': model(x_test).argmax(dim=-1)}
-                evaluator.save_test_submission(res, 'results/mlp')
+        # if valid_acc > best_valid_acc:
+            # best_valid_acc = valid_acc
+        with torch.no_grad():
+            model.eval()
+            res = {'y_pred': model(x).argmax(dim=-1)}
+            evaluator.save_test_submission(res, 'results/mlp')
         if epoch % 1 == 0:
             print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
-                  f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
-                  f'Best: {best_valid_acc:.4f}')
+                  f'Train: {train_acc:.4f}')
