@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torch.nn import ModuleList, Linear, BatchNorm1d, Identity
 
-from ogb.lsc import MAG240MDataset, MAG240MEvaluator
+from ogb.lsc import MAG240MDataset
 from root import ROOT
 
 
@@ -70,6 +70,37 @@ def test(model, x_eval, y_eval, evaluator):
     return evaluator.eval({'y_true': y_eval, 'y_pred': y_pred})['acc']
 
 
+
+class MAG240MEvaluator:
+    def eval(self, input_dict):
+        assert 'y_pred' in input_dict and 'y_true' in input_dict
+
+        y_pred, y_true = input_dict['y_pred'], input_dict['y_true']
+
+        if not isinstance(y_pred, torch.Tensor):
+            y_pred = torch.from_numpy(y_pred)
+        if not isinstance(y_true, torch.Tensor):
+            y_true = torch.from_numpy(y_true)
+
+        assert (y_true.numel() == y_pred.numel())
+        assert (y_true.dim() == y_pred.dim() == 1)
+
+        return {'acc': int((y_true == y_pred).sum()) / y_true.numel()}
+
+    def save_test_submission(self, input_dict, dir_path):
+        assert 'y_pred' in input_dict
+        y_pred = input_dict['y_pred']
+        # assert y_pred.shape == (146818, )
+
+        if isinstance(y_pred, torch.Tensor):
+            y_pred = y_pred.cpu().numpy()
+        y_pred = y_pred.astype(np.short)
+
+        makedirs(dir_path)
+        filename = osp.join(dir_path, 'y_pred_mag240m')
+        np.savez_compressed(filename, y_pred=y_pred)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', type=int, default=0)
@@ -121,6 +152,8 @@ if __name__ == '__main__':
     y_valid = torch.from_numpy(np.zeros(dataset.paper_label[valid_idx].shape))
     y = torch.cat([y_train,y_valid],0)
     y = y.to(device, torch.long)
+    print('x_shape:',x.shape)
+    print('y_shape:',y.shape)
 
     model = MLP(dataset.num_paper_features, args.hidden_channels,
                 dataset.num_classes, args.num_layers, args.dropout,
