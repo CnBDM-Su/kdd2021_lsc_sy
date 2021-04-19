@@ -389,7 +389,7 @@ if __name__ == '__main__':
     parser.add_argument('--device', type=str, default='0')
     parser.add_argument('--parallel', type=bool, default=False)
     parser.add_argument('--evaluate', action='store_true')
-    parser.add_argument('--resume', type=bool, default=False)
+    parser.add_argument('--resume', type=int, default=None)
     args = parser.parse_args()
     args.sizes = [int(i) for i in args.sizes.split('-')]
     print(args)
@@ -410,13 +410,13 @@ if __name__ == '__main__':
                               callbacks=[checkpoint_callback],
                               default_root_dir=f'logs/{args.model}')
         else:
-            if args.resume==False:
+            if args.resume==None:
                 trainer = Trainer(gpus=args.device, max_epochs=args.epochs,
                                   callbacks=[checkpoint_callback],
                                   default_root_dir=f'logs/{args.model}')
             else:
                 dirs = glob.glob(f'logs/{args.model}/lightning_logs/*')
-                version = max([int(x.split(os.sep)[-1].split('_')[-1]) for x in dirs])
+                version = args.resume
                 logdir = f'logs/{args.model}/lightning_logs/version_{version}'
                 ckpt = glob.glob(f'{logdir}/checkpoints/*')[0]
                 print('consume nodel version:',version)
