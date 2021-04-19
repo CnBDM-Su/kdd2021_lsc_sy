@@ -8,6 +8,12 @@ from torch.nn import ModuleList, Linear, BatchNorm1d, Identity
 
 from ogb.lsc import MAG240MDataset
 from root import ROOT
+import os.path as osp
+
+import torch
+import numpy as np
+
+from ogb.utils.url import makedirs
 
 
 class MLP(torch.nn.Module):
@@ -175,7 +181,7 @@ if __name__ == '__main__':
         with torch.no_grad():
             model.eval()
             res = {'y_pred': model(x).argmax(dim=-1)}
-            evaluator.save_test_submission(res, 'results/mlp')
+            evaluator.save_test_submission(res, 'results/analysis')
         if epoch % 1 == 0:
             print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
                   f'Train: {train_acc:.4f}')
