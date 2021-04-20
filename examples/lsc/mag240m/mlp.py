@@ -141,7 +141,7 @@ if __name__ == '__main__':
             best_valid_acc = valid_acc
             with torch.no_grad():
                 model.eval()
-                res = {'y_pred': model(x_test).argmax(dim=-1)}
+                res = {'y_pred': model(x_test).argmax(dim=-1),'y_pred_valid': model(x_valid).argmax(dim=-1)}
                 evaluator.save_test_submission(res, 'results/mlp')
         if epoch % 1 == 0:
             print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
