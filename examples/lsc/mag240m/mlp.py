@@ -8,7 +8,8 @@ from torch.nn import ModuleList, Linear, BatchNorm1d, Identity
 
 from ogb.lsc import MAG240MDataset
 from root import ROOT
-
+import numpy as np
+from ogb.utils.url import makedirs
 
 class MLP(torch.nn.Module):
     def __init__(self, in_channels: int, hidden_channels: int,

@@ -23,9 +23,9 @@ from torch_sparse import SparseTensor
 from torch_geometric.nn import SAGEConv, GATConv
 from torch_geometric.data import NeighborSampler
 
-from ogb.lsc import MAG240MDataset, MAG240MEvaluator
+from ogb.lsc import MAG240MDataset
 from root import ROOT
-
+from ogb.utils.url import makedirs
 
 class Batch(NamedTuple):
     x: Tensor
