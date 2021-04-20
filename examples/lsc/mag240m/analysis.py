@@ -177,13 +177,13 @@ if __name__ == '__main__':
         loss = train(model, x, y, args.batch_size, optimizer)
         train_acc = test(model, x, y, evaluator)
         # valid_acc = test(model, x_valid, y_valid, evaluator)
-        # if valid_acc > best_valid_acc:
-            # best_valid_acc = valid_acc
-        with torch.no_grad():
-            model.eval()
-            res = {'y_pred': model(x)}
-            # res = {'y_pred': model(x).argmax(dim=-1)}
-            evaluator.save_test_submission(res, 'results/analysis')
+        if train_acc > best_valid_acc:
+            best_valid_acc = train_acc
+            with torch.no_grad():
+                model.eval()
+                res = {'y_pred': model(x)}
+                # res = {'y_pred': model(x).argmax(dim=-1)}
+                evaluator.save_test_submission(res, 'results/analysis')
         if epoch % 1 == 0:
             print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
                   f'Train: {train_acc:.4f}')
