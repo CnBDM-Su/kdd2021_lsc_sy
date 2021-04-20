@@ -135,9 +135,9 @@ if __name__ == '__main__':
     evaluator = MAG240MEvaluator()
 
     train_idx = dataset.get_idx_split('train')
-    # valid_idx = dataset.get_idx_split('valid')
+    valid_idx = dataset.get_idx_split('valid')
     # test_idx = dataset.get_idx_split('test')
-    valid_idx = dataset.get_idx_split('test')
+    #valid_idx = dataset.get_idx_split('test')
 
     t = time.perf_counter()
     print('Reading training node features...', end=' ', flush=True)
@@ -156,7 +156,7 @@ if __name__ == '__main__':
     # print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     y_train = torch.from_numpy(np.zeros(dataset.paper_label[train_idx].shape))
-    y_valid = torch.from_numpy(np.zeros(dataset.paper_label[valid_idx].shape))
+    y_valid = torch.from_numpy(np.ones(dataset.paper_label[valid_idx].shape))
     y = torch.cat([y_train,y_valid],0)
     y = y.to(device, torch.long)
     print('x_shape:',x.shape)
