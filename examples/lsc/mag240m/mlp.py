@@ -5,7 +5,7 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torch.nn import ModuleList, Linear, BatchNorm1d, Identity
-
+import os.path as osp
 from ogb.lsc import MAG240MDataset
 from root import ROOT
 import numpy as np
