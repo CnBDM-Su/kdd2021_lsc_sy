@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
-from torch.nn import ModuleList, Linear, BatchNorm1d, Identity
+from torch.nn import ModuleList, Linear, BatchNorm1d, Identity, Softmax
 
 from ogb.lsc import MAG240MDataset
 from root import ROOT
@@ -50,7 +50,7 @@ class MLP(torch.nn.Module):
             else:
                 x = batch_norm(x.relu_())
             x = F.dropout(x, p=self.dropout, training=self.training)
-        x = self.lins[-1](x)
+            x = self.lins[-1](x)
         return x
 
 
@@ -181,7 +181,7 @@ if __name__ == '__main__':
             best_valid_acc = train_acc
             with torch.no_grad():
                 model.eval()
-                res = {'y_pred': model(x)}
+                res = {'y_pred': Softmax(model(x))}
                 # res = {'y_pred': model(x).argmax(dim=-1)}
                 evaluator.save_test_submission(res, 'results/analysis')
         if epoch % 1 == 0:
