@@ -181,7 +181,7 @@ if __name__ == '__main__':
             best_valid_acc = train_acc
             with torch.no_grad():
                 model.eval()
-                res = {'y_pred': Softmax(model(x)).numpy()}
+                res = {'y_pred': model(x)}
                 # res = {'y_pred': model(x).argmax(dim=-1)}
                 evaluator.save_test_submission(res, 'results/analysis')
         if epoch % 1 == 0:
