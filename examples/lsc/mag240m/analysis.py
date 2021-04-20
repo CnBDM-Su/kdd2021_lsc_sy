@@ -163,7 +163,7 @@ if __name__ == '__main__':
     print('y_shape:',y.shape)
 
     model = MLP(dataset.num_paper_features, args.hidden_channels,
-                dataset.num_classes, args.num_layers, args.dropout,
+                2, args.num_layers, args.dropout,
                 not args.no_batch_norm, args.relu_last).to(device)
 
     if args.parallel == True:

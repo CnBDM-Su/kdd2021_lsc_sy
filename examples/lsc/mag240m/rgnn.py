@@ -376,6 +376,40 @@ class RGNN(LightningModule):
         scheduler = StepLR(optimizer, step_size=25, gamma=0.25)
         return [optimizer], [scheduler]
 
+class MAG240MEvaluator:
+    def eval(self, input_dict):
+        assert 'y_pred' in input_dict and 'y_true' in input_dict
+
+        y_pred, y_true = input_dict['y_pred'], input_dict['y_true']
+
+        if not isinstance(y_pred, torch.Tensor):
+            y_pred = torch.from_numpy(y_pred)
+        if not isinstance(y_true, torch.Tensor):
+            y_true = torch.from_numpy(y_true)
+
+        assert (y_true.numel() == y_pred.numel())
+        assert (y_true.dim() == y_pred.dim() == 1)
+
+        return {'acc': int((y_true == y_pred).sum()) / y_true.numel()}
+
+    def save_test_submission(self, input_dict, dir_path):
+        assert 'y_pred' in input_dict
+        y_pred = input_dict['y_pred']
+        y_pred_valid = input_dict['y_pred_valid']
+        # assert y_pred.shape == (146818, )
+
+        if isinstance(y_pred, torch.Tensor):
+            y_pred = y_pred.cpu().numpy()
+        y_pred = y_pred.astype(np.short)
+
+        if isinstance(y_pred_valid, torch.Tensor):
+            y_pred_valid = y_pred_valid.cpu().numpy()
+        y_pred_valid = y_pred_valid.astype(np.short)
+
+        makedirs(dir_path)
+        filename = osp.join(dir_path, 'y_pred_mag240m')
+        np.savez_compressed(filename, y_pred=y_pred, y_pred_valid=y_pred_valid)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -446,13 +480,20 @@ if __name__ == '__main__':
 
         evaluator = MAG240MEvaluator()
         loader = datamodule.hidden_test_dataloader()
+        loader1 = datamodule.val_dataloader()
 
         model.eval()
         y_preds = []
+        y_preds_valid = []
         for batch in tqdm(loader):
             batch = batch.to(int(args.device))
             with torch.no_grad():
                 out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
                 y_preds.append(out)
-        res = {'y_pred': torch.cat(y_preds, dim=0)}
+        for batch in tqdm(loader1):
+            batch = batch.to(int(args.device))
+            with torch.no_grad():
+                out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
+                y_preds_valid.append(out)
+        res = {'y_pred': torch.cat(y_preds, dim=0),'y_pred_valid': torch.cat(y_preds_valid, dim=0)}
         evaluator.save_test_submission(res, f'results/{args.model}')
