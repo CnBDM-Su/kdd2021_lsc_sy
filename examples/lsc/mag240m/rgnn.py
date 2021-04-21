@@ -263,7 +263,7 @@ class MAG240M(LightningDataModule):
         return NeighborSampler(self.adj_t, node_idx=self.test_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
-                               batch_size=self.batch_size, num_workers=3)
+                               batch_size=self.batch_size, num_workers=4)
 
     def convert_batch(self, batch_size, n_id, adjs):
         x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
@@ -424,6 +424,7 @@ if __name__ == '__main__':
     parser.add_argument('--parallel', type=bool, default=False)
     parser.add_argument('--evaluate', action='store_true')
     parser.add_argument('--resume', type=int, default=None)
+    parser.add_argument('--valid_result', type=bool, default=False)
     args = parser.parse_args()
     args.sizes = [int(i) for i in args.sizes.split('-')]
     print(args)
@@ -460,7 +461,7 @@ if __name__ == '__main__':
 
     if args.evaluate:
         dirs = glob.glob(f'logs/{args.model}/lightning_logs/*')
-        version = max([int(x.split(os.sep)[-1].split('_')[-1]) for x in dirs])
+        version = args.resume
         logdir = f'logs/{args.model}/lightning_logs/version_{version}'
         print(f'Evaluating saved model in {logdir}...')
         ckpt = glob.glob(f'{logdir}/checkpoints/*')[0]
@@ -479,21 +480,36 @@ if __name__ == '__main__':
         trainer.test(model=model, datamodule=datamodule)
 
         evaluator = MAG240MEvaluator()
-        loader = datamodule.hidden_test_dataloader()
-        loader1 = datamodule.val_dataloader()
 
-        model.eval()
-        y_preds = []
-        y_preds_valid = []
-        for batch in tqdm(loader):
-            batch = batch.to(int(args.device))
-            with torch.no_grad():
-                out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
-                y_preds.append(out)
-        for batch in tqdm(loader1):
-            batch = batch.to(int(args.device))
-            with torch.no_grad():
-                out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
-                y_preds_valid.append(out)
-        res = {'y_pred': torch.cat(y_preds, dim=0),'y_pred_valid': torch.cat(y_preds_valid, dim=0)}
-        evaluator.save_test_submission(res, f'results/{args.model}')
+        if args.valid_result:
+            loader = datamodule.hidden_test_dataloader()
+            loader1 = datamodule.val_dataloader()
+
+            model.eval()
+            y_preds = []
+            y_preds_valid = []
+            for batch in tqdm(loader):
+                batch = batch.to(int(args.device))
+                with torch.no_grad():
+                    out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
+                    y_preds.append(out)
+            for batch in tqdm(loader1):
+                batch = batch.to(int(args.device))
+                with torch.no_grad():
+                    out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
+                    y_preds_valid.append(out)
+            res = {'y_pred': torch.cat(y_preds, dim=0),'y_pred_valid': torch.cat(y_preds_valid, dim=0)}
+            evaluator.save_test_submission(res, f'results/{args.model}')
+
+        else:
+            loader = datamodule.hidden_test_dataloader()
+
+            model.eval()
+            y_preds = []
+            for batch in tqdm(loader):
+                batch = batch.to(int(args.device))
+                with torch.no_grad():
+                    out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
+                    y_preds.append(out)
+            res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
+            evaluator.save_test_submission(res, f'results/{args.model}')
