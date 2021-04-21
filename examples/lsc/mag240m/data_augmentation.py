@@ -1,6 +1,6 @@
 import time
 import argparse
-
+import random
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
@@ -137,7 +137,10 @@ if __name__ == '__main__':
     valid_idx = dataset.get_idx_split('valid')
     test_idx = dataset.get_idx_split('test')
     label_idx = np.concatenate([train_idx,valid_idx,test_idx],0)
-    no_idx = np.array(list(set(np.arange(121751666//10).tolist()) - set(label_idx.tolist())))
+
+
+    rand = random.randint(0, 98)
+    no_idx = np.array(list(set(np.arange(rand*121751666//100,(rand+1)*121751666//100).tolist()) - set(label_idx.tolist())))
     print('no_index:',no_idx.shape)
 
     t = time.perf_counter()
