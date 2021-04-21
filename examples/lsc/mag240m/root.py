@@ -1,1 +1,1 @@
-ROOT = '.'
+ROOT = '/app/kdd/data'
