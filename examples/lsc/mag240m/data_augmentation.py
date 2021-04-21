@@ -201,7 +201,7 @@ if __name__ == '__main__':
             with torch.no_grad():
                 model.eval()
                 res = {'y_pred': model(x_test).argmax(dim=-1),'y_pred_valid': model(x_valid).argmax(dim=-1)}
-                evaluator.save_test_submission(res, 'results/mlp')
+                evaluator.save_test_submission(res, 'results/data_aug')
         if epoch % 1 == 0:
             print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
                   f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
@@ -235,7 +235,7 @@ if __name__ == '__main__':
             with torch.no_grad():
                 model.eval()
                 res = {'y_pred': model(x_test).argmax(dim=-1),'y_pred_valid': model(x_valid).argmax(dim=-1)}
-                evaluator.save_test_submission(res, 'results/mlp')
+                evaluator.save_test_submission(res, 'results/data_aug')
         if epoch % 1 == 0:
             print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
                   f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
