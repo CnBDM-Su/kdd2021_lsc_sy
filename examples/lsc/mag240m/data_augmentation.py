@@ -136,8 +136,8 @@ if __name__ == '__main__':
     train_idx = dataset.get_idx_split('train')
     valid_idx = dataset.get_idx_split('valid')
     test_idx = dataset.get_idx_split('test')
-    label_idx = train_idx + valid_idx + test_idx
-    no_idx = set(np.arange(121751666//10).tolist()) - set(label_idx)
+    label_idx = np.concatenate([train_idx,valid_idx,test_idx],0)
+    no_idx = set(np.arange(121751666//10).tolist()) - set(label_idx.tolist())
 
     t = time.perf_counter()
     print('Reading training node features...', end=' ', flush=True)
