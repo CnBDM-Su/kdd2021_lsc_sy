@@ -129,7 +129,7 @@ if __name__ == '__main__':
         device = 'cpu'
         print('cpu')
 
-    sup = np.load(ROOT+'sup.npy')
+    sup = np.load(ROOT+'/sup.npy')
     dataset = MAG240MDataset(ROOT)
     evaluator = MAG240MEvaluator()
 
