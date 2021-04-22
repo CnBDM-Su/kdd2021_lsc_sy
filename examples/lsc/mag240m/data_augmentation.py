@@ -231,12 +231,16 @@ if __name__ == '__main__':
     del x_train
     del y_train
     x_train = torch.cat([x_train_, sup_train_x_total], 0).to(torch.float).to(device)
+    print(x_train_.shape,x_train.shape)
     y_train = torch.cat([y_train_, sup_train_y_total.squeeze()], 0).to(torch.long).to(device)
 
     del model
     model = MLP(dataset.num_paper_features, args.hidden_channels,
                 dataset.num_classes, args.num_layers, args.dropout,
                 not args.no_batch_norm, args.relu_last).to(device)
+
+    if args.parallel == True:
+        model = torch.nn.DataParallel(model, device_ids=gpus)
 
     for epoch in range(1, args.epochs + 1):
         loss = train(model, x_train, y_train, args.batch_size, optimizer)
