@@ -228,12 +228,12 @@ if __name__ == '__main__':
         else:
             sup_train_x_total = torch.cat([sup_train_x_total, sup_train_x], 0)
             sup_train_y_total = torch.cat([sup_train_y_total, sup_train_y], 0)
-    print(x_train.shape, y_train.shape)
+    print('old:',x_train.shape, y_train.shape)
     del x_train
     del y_train
     x_train = torch.cat([x_train_, sup_train_x_total], 0).to(torch.float).to(device)
-    print(x_train.shape, y_train.shape)
     y_train = torch.cat([y_train_, sup_train_y_total.squeeze()], 0).to(torch.long).to(device)
+    print('new:',x_train.shape, y_train.shape)
 
     del model
     model = MLP(dataset.num_paper_features, args.hidden_channels,
