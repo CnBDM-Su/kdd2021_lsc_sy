@@ -218,6 +218,7 @@ if __name__ == '__main__':
     sup_train_x_total = None
     for i in sup[:, 0]:
         rank = predict_prob[predict == i, i]
+        rank = rank[rank > 0.9]
         fill_num = min(rank.shape[0], sup[sup[:, 0] == i, 1][0])
         ind = torch.sort(rank, descending=True).indices[:fill_num]
         sup_train_x = x_no[predict == i, :][ind]
