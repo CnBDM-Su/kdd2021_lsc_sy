@@ -209,7 +209,7 @@ if __name__ == '__main__':
     print('-------------second round training starts-------------')
     t = time.perf_counter()
     print('Reading no label node features...', end=' ', flush=True)
-    x_no = dataset.paper_feat[no_idx]
+    x_no = dataset.paper_feat[no_idx].float()
     x_no = torch.from_numpy(x_no)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
