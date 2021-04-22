@@ -210,7 +210,7 @@ if __name__ == '__main__':
     t = time.perf_counter()
     print('Reading no label node features...', end=' ', flush=True)
     x_no = dataset.paper_feat[no_idx]
-    x_no = torch.from_numpy(x_no).to(torch.float).to(device)
+    x_no = torch.from_numpy(x_no)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     predict = model(x_no).argmax(dim=-1)
@@ -229,8 +229,8 @@ if __name__ == '__main__':
             sup_train_x_total = torch.cat([sup_train_x_total, sup_train_x], 0)
             sup_train_y_total = torch.cat([sup_train_y_total, sup_train_y], 0)
 
-    x_train = torch.cat([x_train, sup_train_x_total], 0).to(torch.float).to(device)
-    y_train = torch.cat([y_train, sup_train_y_total], 0).to(torch.float).to(device)
+    x_train = torch.cat([x_train, sup_train_x_total], 0).to(torch.float).to(f'cuda:1')
+    y_train = torch.cat([y_train, sup_train_y_total], 0).to(torch.float).to(f'cuda:1')
     for epoch in range(1, args.epochs + 1):
         loss = train(model, x_train, y_train, args.batch_size, optimizer)
         train_acc = test(model, x_train, y_train, evaluator)
