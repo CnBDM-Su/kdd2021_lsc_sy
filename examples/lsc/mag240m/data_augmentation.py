@@ -228,15 +228,12 @@ if __name__ == '__main__':
         else:
             sup_train_x_total = torch.cat([sup_train_x_total, sup_train_x], 0)
             sup_train_y_total = torch.cat([sup_train_y_total, sup_train_y], 0)
+    print(x_train.shape, y_train.shape)
     del x_train
     del y_train
     x_train = torch.cat([x_train_, sup_train_x_total], 0).to(torch.float).to(device)
-    print(x_train_.shape,x_train.shape)
+    print(x_train.shape, y_train.shape)
     y_train = torch.cat([y_train_, sup_train_y_total.squeeze()], 0).to(torch.long).to(device)
-    print(x_train[:10])
-    print(x_train[-10:])
-    print(y_train[:10])
-    print(y_train[-10:])
 
     del model
     model = MLP(dataset.num_paper_features, args.hidden_channels,
@@ -245,6 +242,10 @@ if __name__ == '__main__':
 
     if args.parallel == True:
         model = torch.nn.DataParallel(model, device_ids=gpus)
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    num_params = sum([p.numel() for p in model.parameters()])
+    print(f'#Params: {num_params}')
 
     for epoch in range(1, args.epochs + 1):
         loss = train(model, x_train, y_train, args.batch_size, optimizer)
