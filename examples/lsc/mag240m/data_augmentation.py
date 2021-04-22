@@ -154,11 +154,6 @@ if __name__ == '__main__':
     x_valid = torch.from_numpy(x_valid).to(torch.float).to(device)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
     t = time.perf_counter()
-    print('Reading no label node features...', end=' ', flush=True)
-    x_no = dataset.paper_feat[no_idx]
-    x_no = torch.from_numpy(x_no).to(torch.float).to(device)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    t = time.perf_counter()
     print('Reading test node features...', end=' ', flush=True)
     x_test = dataset.paper_feat[test_idx]
     x_test = torch.from_numpy(x_test).to(torch.float).to(device)
@@ -212,6 +207,12 @@ if __name__ == '__main__':
                   f'Best: {best_valid_acc:.4f}')
 
     print('-------------second round training starts-------------')
+    t = time.perf_counter()
+    print('Reading no label node features...', end=' ', flush=True)
+    x_no = dataset.paper_feat[no_idx]
+    x_no = torch.from_numpy(x_no).to(torch.float).to(device)
+    print(f'Done! [{time.perf_counter() - t:.2f}s]')
+
     predict = model(x_no).argmax(dim=-1)
     predict_prob = F.softmax(model(x_no),dim=1)
     sup_train_x_total = None
