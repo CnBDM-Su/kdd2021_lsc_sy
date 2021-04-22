@@ -140,8 +140,8 @@ if __name__ == '__main__':
 
 
     rand = random.randint(0, 98)
+    print('random range seed:',rand)
     no_idx = np.array(list(set(np.arange(rand*121751666//100,(rand+1)*121751666//100).tolist()) - set(label_idx.tolist())))
-    print('no_index:',no_idx.shape)
 
     t = time.perf_counter()
     print('Reading training node features...', end=' ', flush=True)
@@ -232,6 +232,12 @@ if __name__ == '__main__':
     del y_train
     x_train = torch.cat([x_train_, sup_train_x_total], 0).to(torch.float).to(device)
     y_train = torch.cat([y_train_, sup_train_y_total.squeeze()], 0).to(torch.long).to(device)
+
+    del model
+    model = MLP(dataset.num_paper_features, args.hidden_channels,
+                dataset.num_classes, args.num_layers, args.dropout,
+                not args.no_batch_norm, args.relu_last).to(device)
+
     for epoch in range(1, args.epochs + 1):
         loss = train(model, x_train, y_train, args.batch_size, optimizer)
         train_acc = test(model, x_train, y_train, evaluator)
