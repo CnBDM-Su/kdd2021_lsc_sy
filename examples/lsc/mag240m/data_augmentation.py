@@ -145,25 +145,25 @@ if __name__ == '__main__':
 
     t = time.perf_counter()
     print('Reading training node features...', end=' ', flush=True)
-    x_train = dataset.paper_feat[train_idx]
-    x_train = torch.from_numpy(x_train).to(torch.float).to(device)
+    x_train_ = torch.from_numpy(dataset.paper_feat[train_idx]).to(torch.float)
+    x_train = x_train_.to(device)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
     t = time.perf_counter()
     print('Reading validation node features...', end=' ', flush=True)
-    x_valid = dataset.paper_feat[valid_idx]
-    x_valid = torch.from_numpy(x_valid).to(torch.float).to(device)
+    x_valid_ = torch.from_numpy(dataset.paper_feat[valid_idx]).to(torch.float)
+    x_valid = x_valid_.to(device)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
     t = time.perf_counter()
     print('Reading test node features...', end=' ', flush=True)
-    x_test = dataset.paper_feat[test_idx]
-    x_test = torch.from_numpy(x_test).to(torch.float).to(device)
+    x_test_ = torch.from_numpy(dataset.paper_feat[test_idx]).to(torch.float)
+    x_test = x_test_.to(device)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
 
-    y_train = torch.from_numpy(dataset.paper_label[train_idx])
-    y_train = y_train.to(device, torch.long)
-    y_valid = torch.from_numpy(dataset.paper_label[valid_idx])
-    y_valid = y_valid.to(device, torch.long)
+    y_train_ = torch.from_numpy(dataset.paper_label[train_idx])
+    y_train = y_train_.to(device, torch.long)
+    y_valid_ = torch.from_numpy(dataset.paper_label[valid_idx])
+    y_valid = y_valid_.to(device, torch.long)
 
     model = MLP(dataset.num_paper_features, args.hidden_channels,
                 dataset.num_classes, args.num_layers, args.dropout,
@@ -228,9 +228,10 @@ if __name__ == '__main__':
         else:
             sup_train_x_total = torch.cat([sup_train_x_total, sup_train_x], 0)
             sup_train_y_total = torch.cat([sup_train_y_total, sup_train_y], 0)
-
-    x_train = torch.cat([x_train, sup_train_x_total], 0).to(torch.float).to(f'cuda:1')
-    y_train = torch.cat([y_train, sup_train_y_total], 0).to(torch.float).to(f'cuda:1')
+    del x_train
+    del y_train
+    x_train = torch.cat([x_train_, sup_train_x_total], 0).to(torch.float).to(device)
+    y_train = torch.cat([y_train_, sup_train_y_total], 0).to(torch.float).to(device)
     for epoch in range(1, args.epochs + 1):
         loss = train(model, x_train, y_train, args.batch_size, optimizer)
         train_acc = test(model, x_train, y_train, evaluator)
