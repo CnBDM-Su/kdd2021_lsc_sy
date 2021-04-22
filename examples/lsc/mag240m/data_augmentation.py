@@ -231,7 +231,7 @@ if __name__ == '__main__':
     del x_train
     del y_train
     x_train = torch.cat([x_train_, sup_train_x_total], 0).to(torch.float).to(device)
-    y_train = torch.cat([y_train_, sup_train_y_total.squeeze()], 0).to(torch.float).to(device)
+    y_train = torch.cat([y_train_, sup_train_y_total.squeeze()], 0).to(torch.long).to(device)
     for epoch in range(1, args.epochs + 1):
         loss = train(model, x_train, y_train, args.batch_size, optimizer)
         train_acc = test(model, x_train, y_train, evaluator)
