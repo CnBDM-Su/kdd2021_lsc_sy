@@ -241,13 +241,11 @@ class MAG240M(LightningDataModule):
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     def train_dataloader(self):
-        t = time.perf_counter()
         ns = NeighborSampler(self.adj_t, node_idx=self.train_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
                                batch_size=self.batch_size, shuffle=False,
                                num_workers=8)
-        print(f'Done sampling! [{time.perf_counter() - t:.2f}s]')
         return ns
 
     def val_dataloader(self):
@@ -269,8 +267,10 @@ class MAG240M(LightningDataModule):
                                batch_size=self.batch_size, num_workers=4)
 
     def convert_batch(self, batch_size, n_id, adjs):
+        t = time.perf_counter()
         x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
+        print(f'Done sampling! [{time.perf_counter() - t:.2f}s]')
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
 
@@ -337,22 +337,18 @@ class RGNN(LightningModule):
 
     def forward(self, x: Tensor, adjs_t: List[SparseTensor]) -> Tensor:
         for i, adj_t in enumerate(adjs_t):
-            t = time.perf_counter()
             x_target = x[:adj_t.size(0)]
 
             out = self.skips[i](x_target)
-            print(f'Done reading! [{time.perf_counter() - t:.2f}s]')
             for j in range(self.num_relations):
                 edge_type = adj_t.storage.value() == j
                 subadj_t = adj_t.masked_select_nnz(edge_type, layout='coo')
                 if subadj_t.nnz() > 0:
                     out += self.convs[i][j]((x, x_target), subadj_t)
 
-            print(f'Done tuning! [{time.perf_counter() - t:.2f}s]')
             x = self.norms[i](out)
             x = F.elu(x) if self.model == 'rgat' else F.relu(x)
             x = F.dropout(x, p=self.dropout, training=self.training)
-            print(f'Done regularizing! [{time.perf_counter() - t:.2f}s]')
 
         return self.mlp(x)
 
