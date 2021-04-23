@@ -234,7 +234,7 @@ class MAG240M(LightningDataModule):
 
         self.x = {}
         for i in range(1000):
-            self.x[i] = np.memmap(f'{dataset.dir}/full_feat_split/full_feat'+str(i)+'.npy', dtype=np.float16,
+            self.x[i] = np.memmap(f'{dataset.dir}/full_feat_split/full_feat_'+str(i)+'.npy', dtype=np.float16,
                            mode='r', shape=(N//1000, self.num_features))
         # self.x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
         #                    mode='r', shape=(N, self.num_features))
