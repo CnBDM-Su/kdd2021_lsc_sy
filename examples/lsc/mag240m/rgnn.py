@@ -276,8 +276,7 @@ class MAG240M(LightningDataModule):
         x = []
 
         for i in n_id.numpy():
-            num = i//self.file_batch_size
-            x.append(self.x[num][i-self.file_batch_size*num])
+            x.append(self.x[i//self.file_batch_size][i%self.file_batch_size])
         x = torch.from_numpy(np.array(x)).to(torch.float)
         # x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
