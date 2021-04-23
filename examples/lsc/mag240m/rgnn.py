@@ -232,14 +232,14 @@ class MAG240M(LightningDataModule):
 
         N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
 
-        self.x = {}
-        for i in range(1000):
-            self.x[i] = np.memmap(f'{dataset.dir}/full_feat_split/full_feat_'+str(i)+'.npy', dtype=np.float16,
-                           mode='r', shape=(N//1000, self.num_features))
-        self.x[1000] = np.memmap(f'{dataset.dir}/full_feat_split/full_feat_' + str(i) + '.npy', dtype=np.float16,
-                              mode='r', shape=(N-1000*(N//1000), self.num_features))
-        # self.x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
-        #                    mode='r', shape=(N, self.num_features))
+        # self.x = {}
+        # for i in range(1000):
+        #     self.x[i] = np.memmap(f'{dataset.dir}/full_feat_split/full_feat_'+str(i)+'.npy', dtype=np.float16,
+        #                    mode='r', shape=(N//1000, self.num_features))
+        # self.x[1000] = np.memmap(f'{dataset.dir}/full_feat_split/full_feat_' + str(i) + '.npy', dtype=np.float16,
+        #                       mode='r', shape=(N-1000*(N//1000), self.num_features))
+        self.x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
+                           mode='r', shape=(N, self.num_features))
         self.y = torch.from_numpy(dataset.all_paper_label)
         self.file_batch_size = N//1000
 
@@ -275,12 +275,12 @@ class MAG240M(LightningDataModule):
 
     def convert_batch(self, batch_size, n_id, adjs):
         t = time.perf_counter()
-        x = []
-
-        for i in n_id.numpy():
-            x.append(self.x[i//self.file_batch_size][i%self.file_batch_size])
-        x = torch.from_numpy(np.array(x)).to(torch.float)
-        # x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
+        # x = []
+        #
+        # for i in n_id.numpy():
+        #     x.append(self.x[i//self.file_batch_size][i%self.file_batch_size])
+        # x = torch.from_numpy(np.array(x)).to(torch.float)
+        x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
         print(f'Done sampling! [{time.perf_counter() - t:.2f}s]')
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
