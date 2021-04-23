@@ -4,7 +4,7 @@ import glob
 import argparse
 import os.path as osp
 from tqdm import tqdm
-
+import sys
 from typing import Optional, List, NamedTuple
 
 import numpy as np
@@ -282,6 +282,7 @@ class MAG240M(LightningDataModule):
         # x = torch.from_numpy(np.array(x)).to(torch.float)
         print(n_id.shape)
         x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
+        print(sys.getsizeof(x))
         y = self.y[n_id[:batch_size]].to(torch.long)
         print(f'Done sampling! [{time.perf_counter() - t:.2f}s]')
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
