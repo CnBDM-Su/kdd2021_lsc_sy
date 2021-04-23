@@ -245,7 +245,7 @@ class MAG240M(LightningDataModule):
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
                                batch_size=self.batch_size, shuffle=True,
-                               num_workers=8)
+                               num_workers=16)
 
     def val_dataloader(self):
         return NeighborSampler(self.adj_t, node_idx=self.val_idx,
