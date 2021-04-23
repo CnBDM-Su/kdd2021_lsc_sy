@@ -241,11 +241,14 @@ class MAG240M(LightningDataModule):
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     def train_dataloader(self):
-        return NeighborSampler(self.adj_t, node_idx=self.train_idx,
+        t = time.perf_counter()
+        ns = NeighborSampler(self.adj_t, node_idx=self.train_idx,
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
                                batch_size=self.batch_size, shuffle=False,
                                num_workers=8)
+        print(f'Done sampling! [{time.perf_counter() - t:.2f}s]')
+        return ns
 
     def val_dataloader(self):
         return NeighborSampler(self.adj_t, node_idx=self.val_idx,
