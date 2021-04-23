@@ -334,18 +334,22 @@ class RGNN(LightningModule):
 
     def forward(self, x: Tensor, adjs_t: List[SparseTensor]) -> Tensor:
         for i, adj_t in enumerate(adjs_t):
+            t = time.perf_counter()
             x_target = x[:adj_t.size(0)]
 
             out = self.skips[i](x_target)
+            print(f'Done reading! [{time.perf_counter() - t:.2f}s]')
             for j in range(self.num_relations):
                 edge_type = adj_t.storage.value() == j
                 subadj_t = adj_t.masked_select_nnz(edge_type, layout='coo')
                 if subadj_t.nnz() > 0:
                     out += self.convs[i][j]((x, x_target), subadj_t)
 
+            print(f'Done tuning! [{time.perf_counter() - t:.2f}s]')
             x = self.norms[i](out)
             x = F.elu(x) if self.model == 'rgat' else F.relu(x)
             x = F.dropout(x, p=self.dropout, training=self.training)
+            print(f'Done regularizing! [{time.perf_counter() - t:.2f}s]')
 
         return self.mlp(x)
 
