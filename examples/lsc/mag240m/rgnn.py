@@ -280,13 +280,11 @@ class MAG240M(LightningDataModule):
         # for i in n_id.numpy():
         #     x.append(self.x[i//self.file_batch_size][i%self.file_batch_size])
         # x = torch.from_numpy(np.array(x)).to(torch.float)
+        print(n_id.shape)
         x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
         print(f'Done sampling! [{time.perf_counter() - t:.2f}s]')
-        t = time.perf_counter()
-        res = Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
-        print(f'Done batching! [{time.perf_counter() - t:.2f}s]')
-        return res
+        return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
 
 class RGNN(LightningModule):
