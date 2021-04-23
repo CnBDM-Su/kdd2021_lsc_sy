@@ -21,7 +21,7 @@ from pytorch_lightning import (LightningDataModule, LightningModule, Trainer,
 
 from torch_sparse import SparseTensor
 from torch_geometric.nn import SAGEConv, GATConv
-from torch_geometric.data import NeighborSampler
+# from torch_geometric.data import NeighborSampler
 
 from ogb.lsc import MAG240MDataset
 from root import ROOT
@@ -232,8 +232,12 @@ class MAG240M(LightningDataModule):
 
         N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
 
-        self.x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
-                           mode='r', shape=(N, self.num_features))
+        self.x = {}
+        for i in range(1000):
+            self.x[i] = np.memmap(f'{dataset.dir}/full_feat_split/full_feat'+str(i)+'.npy', dtype=np.float16,
+                           mode='r', shape=(N//1000, self.num_features))
+        # self.x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
+        #                    mode='r', shape=(N, self.num_features))
         self.y = torch.from_numpy(dataset.all_paper_label)
 
         path = f'{dataset.dir}/full_adj_t.pt'
@@ -268,7 +272,12 @@ class MAG240M(LightningDataModule):
 
     def convert_batch(self, batch_size, n_id, adjs):
         t = time.perf_counter()
-        x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
+        x = []
+        for i in n_id.numpy():
+            num = i//1000
+            x.append(self.x[num][i-1000*num])
+        x = torch.from_numpy(np.array(x)).to(torch.float)
+        # x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
         print(f'Done sampling! [{time.perf_counter() - t:.2f}s]')
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
