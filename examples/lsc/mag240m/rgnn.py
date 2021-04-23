@@ -239,6 +239,7 @@ class MAG240M(LightningDataModule):
         # self.x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
         #                    mode='r', shape=(N, self.num_features))
         self.y = torch.from_numpy(dataset.all_paper_label)
+        self.file_batch_size = N//1000
 
         path = f'{dataset.dir}/full_adj_t.pt'
         self.adj_t = torch.load(path)
@@ -273,9 +274,10 @@ class MAG240M(LightningDataModule):
     def convert_batch(self, batch_size, n_id, adjs):
         t = time.perf_counter()
         x = []
+
         for i in n_id.numpy():
-            num = i//1000
-            x.append(self.x[num][i-1000*num])
+            num = i//self.file_batch_size
+            x.append(self.x[num][i-self.file_batch_size*num])
         x = torch.from_numpy(np.array(x)).to(torch.float)
         # x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
         y = self.y[n_id[:batch_size]].to(torch.long)
