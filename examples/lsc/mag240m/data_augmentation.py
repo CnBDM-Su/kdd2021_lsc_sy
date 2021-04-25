@@ -218,8 +218,8 @@ if __name__ == '__main__':
         x_no = dataset.paper_feat[no_idx]
         x_no = torch.from_numpy(x_no).to(torch.float)
         with torch.no_grad():
-            predict = model(x_no).argmax(dim=-1).cpu()
-            predict_prob = F.softmax(model(x_no), dim=1).cpu()
+            predict = model(x_no).argmax(dim=-1)
+            predict_prob = F.softmax(model(x_no), dim=1)
         # if predict == None:
         #     predict = predict_.cpu()
         # else:
@@ -250,11 +250,13 @@ if __name__ == '__main__':
                 if rank.shape[0] >= sup[sup[:, 0] == i, 1][0]:
                     record.append(i)
 
+        del predict
+        del predict_prob
         sup[:,-1] = sup[:,-1]-accu_list
 
         for i in record:
             sup = np.delete(sup,np.where(sup[:, 0]==i)[0][0],0)
-        del rank
+
         torch.cuda.empty_cache()
         print(sup.shape[0])
         if sup.shape[0]==0:
