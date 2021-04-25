@@ -237,7 +237,7 @@ if __name__ == '__main__':
                 record.append(1)
             else:
                 record.append(0)
-        if record.sum() == len(record):
+        if sum(record) == len(record):
             break
 
 
