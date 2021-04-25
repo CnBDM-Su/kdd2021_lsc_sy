@@ -207,9 +207,6 @@ if __name__ == '__main__':
                   f'Best: {best_valid_acc:.4f}')
 
     print('-------------second round training starts-------------')
-    del x_train
-    del x_valid
-    del x_test
     t = time.perf_counter()
     print('Reading no label node features...', end=' ', flush=True)
     predict = None
@@ -220,39 +217,38 @@ if __name__ == '__main__':
             list(set(np.arange(rand * 121751666 // 120, (rand + 1) * 121751666 // 120).tolist()) - set(label_idx.tolist())))
         x_no = dataset.paper_feat[no_idx]
         x_no = torch.from_numpy(x_no).to(torch.float).cpu()
-
-        predict_ = model(x_no).argmax(dim=-1).cpu()
+        with torch.no_grad():
+            predict_ = model(x_no).argmax(dim=-1)
+            predict_prob_ = F.softmax(model(x_no), dim=1)
         if predict == None:
-            predict = predict_.cpu()
+            predict = predict_
         else:
-            predict = torch.cat([predict,predict_],0).cpu()
-        predict_prob_ = F.softmax(model(x_no),dim=1).cpu()
+            predict = torch.cat([predict,predict_],0)
         del x_no
         if predict_prob == None:
-            predict_prob = predict_prob_.cpu()
+            predict_prob = predict_prob_
         else:
-            predict_prob = torch.cat([predict_prob,predict_prob_],0).cpu()
+            predict_prob = torch.cat([predict_prob,predict_prob_],0)
         del predict_
         del predict_prob_
         record = []
         for i in sup[:, 0]:
-            rank = predict_prob[predict == i, i].cpu()
-            rank = rank[rank > 0.9].cpu()
+            rank = predict_prob[predict == i, i]
+            rank = rank[rank > 0.9]
             if rank.shape[0]>=sup[sup[:, 0] == i, 1][0]:
                 record.append(1)
             else:
                 record.append(0)
-
+        del rank
         torch.cuda.empty_cache()
         if sum(record) == len(record):
             break
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-
     sup_train_x_total = None
     for i in sup[:, 0]:
-        # rank = predict_prob[predict == i, i]
-        # rank = rank[rank > 0.9]
+        rank = predict_prob[predict == i, i]
+        rank = rank[rank > 0.9]
         fill_num = min(rank.shape[0], sup[sup[:, 0] == i, 1][0])
         ind = torch.sort(rank, descending=True).indices[:fill_num]
         sup_train_x = x_no[predict == i, :][ind]
@@ -266,20 +262,6 @@ if __name__ == '__main__':
     print('old:',x_train.shape, y_train.shape)
     del x_train
     del y_train
-    print('Reading training node features...', end=' ', flush=True)
-    x_train_ = torch.from_numpy(dataset.paper_feat[train_idx]).to(torch.float)
-    x_train = x_train_.to(device)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    t = time.perf_counter()
-    print('Reading validation node features...', end=' ', flush=True)
-    x_valid_ = torch.from_numpy(dataset.paper_feat[valid_idx]).to(torch.float)
-    x_valid = x_valid_.to(device)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    t = time.perf_counter()
-    print('Reading test node features...', end=' ', flush=True)
-    x_test_ = torch.from_numpy(dataset.paper_feat[test_idx]).to(torch.float)
-    x_test = x_test_.to(device)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
     x_train = torch.cat([x_train_, sup_train_x_total], 0).to(torch.float).to(device)
     y_train = torch.cat([y_train_, sup_train_y_total.squeeze()], 0).to(torch.long).to(device)
     print('new:',x_train.shape, y_train.shape)
