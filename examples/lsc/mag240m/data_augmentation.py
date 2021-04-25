@@ -221,20 +221,25 @@ if __name__ == '__main__':
             predict_ = model(x_no).argmax(dim=-1)
             predict_prob_ = F.softmax(model(x_no), dim=1)
         if predict == None:
-            predict = predict_
+            predict = predict_.cpu()
         else:
             predict = torch.cat([predict,predict_],0)
+            print(predict_.device())
+            print(predict.device())
         del x_no
         if predict_prob == None:
-            predict_prob = predict_prob_
+            predict_prob = predict_prob_.cpu()
         else:
             predict_prob = torch.cat([predict_prob,predict_prob_],0)
+            print(predict_prob_.device())
+            print(predict_prob.device())
         del predict_
         del predict_prob_
         record = []
         for i in sup[:, 0]:
             rank = predict_prob[predict == i, i]
             rank = rank[rank > 0.9]
+            print(rank.device())
             if rank.shape[0]>=sup[sup[:, 0] == i, 1][0]:
                 record.append(1)
             else:
