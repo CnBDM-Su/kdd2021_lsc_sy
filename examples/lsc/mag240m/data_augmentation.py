@@ -224,29 +224,26 @@ if __name__ == '__main__':
             predict = predict_.cpu()
         else:
             predict = torch.cat([predict,predict_],0)
-            print(predict_.device)
-            print(predict.device)
         del x_no
         if predict_prob == None:
             predict_prob = predict_prob_.cpu()
         else:
             predict_prob = torch.cat([predict_prob,predict_prob_],0)
-            print(predict_prob_.device)
-            print(predict_prob.device)
         del predict_
         del predict_prob_
         record = []
         for i in sup[:, 0]:
             rank = predict_prob[predict == i, i]
             rank = rank[rank > 0.9]
-            print(rank.device)
             if rank.shape[0]>=sup[sup[:, 0] == i, 1][0]:
                 record.append(1)
             else:
                 record.append(0)
         del rank
         torch.cuda.empty_cache()
+        print(record)
         if sum(record) == len(record):
+            print('apply {} batchs for data augmentation'.format (rand+1))
             break
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
