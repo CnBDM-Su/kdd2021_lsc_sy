@@ -239,7 +239,7 @@ if __name__ == '__main__':
             else:
                 record.append(0)
         del rank
-        torch.cuda.empty_cache()
+        # torch.cuda.empty_cache()
         print(record)
         if sum(record) == len(record):
             print('apply {} batchs for data augmentation'.format (rand+1))
