@@ -218,8 +218,8 @@ if __name__ == '__main__':
         x_no = dataset.paper_feat[no_idx]
         x_no = torch.from_numpy(x_no).to(torch.float).cpu()
         with torch.no_grad():
-            predict_ = model(x_no).argmax(dim=-1)
-            predict_prob_ = F.softmax(model(x_no), dim=1)
+            predict_ = model(x_no).argmax(dim=-1).cpu()
+            predict_prob_ = F.softmax(model(x_no), dim=1).cpu()
         if predict == None:
             predict = predict_.cpu()
         else:
