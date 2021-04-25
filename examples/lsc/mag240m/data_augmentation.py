@@ -139,9 +139,9 @@ if __name__ == '__main__':
     label_idx = np.concatenate([train_idx,valid_idx,test_idx],0)
 
 
-    rand = random.randint(0, 98)
-    print('random range seed:',rand)
-    no_idx = np.array(list(set(np.arange(rand*121751666//100,(rand+1)*121751666//100).tolist()) - set(label_idx.tolist())))
+    # rand = random.randint(0, 98)
+    # print('random range seed:',rand)
+    # no_idx = np.array(list(set(np.arange(rand*121751666//100,(rand+1)*121751666//100).tolist()) - set(label_idx.tolist())))
 
     t = time.perf_counter()
     print('Reading training node features...', end=' ', flush=True)
@@ -209,16 +209,42 @@ if __name__ == '__main__':
     print('-------------second round training starts-------------')
     t = time.perf_counter()
     print('Reading no label node features...', end=' ', flush=True)
-    x_no = dataset.paper_feat[no_idx]
-    x_no = torch.from_numpy(x_no).to(torch.float)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    predict = None
+    predict_prob = None
+    for rand in range(98):
+        no_idx = np.array(
+            list(set(np.arange(rand * 121751666 // 100, (rand + 1) * 121751666 // 100).tolist()) - set(label_idx.tolist())))
+        x_no = dataset.paper_feat[no_idx]
+        x_no = torch.from_numpy(x_no).to(torch.float)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-    predict = model(x_no).argmax(dim=-1)
-    predict_prob = F.softmax(model(x_no),dim=1)
+        predict_ = model(x_no).argmax(dim=-1)
+        if predict == None:
+            predict = predict_
+        else:
+            predict = torch.cat([predict,predict_],0)
+        predict_prob_ = F.softmax(model(x_no),dim=1)
+        if predict_prob == None:
+            predict_prob_ = predict_prob_
+        else:
+            predict_prob = torch.cat([predict_prob,predict_prob_],0)
+
+        record = []
+        for i in sup[:, 0]:
+            rank = predict_prob[predict == i, i]
+            rank = rank[rank > 0.9]
+            if rank.shape[0]>=sup[sup[:, 0] == i, 1][0]:
+                record.append(1)
+            else:
+                record.append(0)
+        if record.sum() == len(record):
+            break
+
+
     sup_train_x_total = None
     for i in sup[:, 0]:
-        rank = predict_prob[predict == i, i]
-        rank = rank[rank > 0.9]
+        # rank = predict_prob[predict == i, i]
+        # rank = rank[rank > 0.9]
         fill_num = min(rank.shape[0], sup[sup[:, 0] == i, 1][0])
         ind = torch.sort(rank, descending=True).indices[:fill_num]
         sup_train_x = x_no[predict == i, :][ind]
