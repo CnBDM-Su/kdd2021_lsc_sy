@@ -225,7 +225,7 @@ if __name__ == '__main__':
             predict = torch.cat([predict,predict_],0)
         predict_prob_ = F.softmax(model(x_no),dim=1)
         if predict_prob == None:
-            predict_prob_ = predict_prob_
+            predict_prob = predict_prob_
         else:
             predict_prob = torch.cat([predict_prob,predict_prob_],0)
 
