@@ -211,6 +211,7 @@ if __name__ == '__main__':
     print('Reading no label node features...', end=' ', flush=True)
     predict = None
     predict_prob = None
+    sup_train_x_total = None
     for rand in range(119):
         no_idx = np.array(
             list(set(np.arange(rand * 121751666 // 120, (rand + 1) * 121751666 // 120).tolist()) - set(label_idx.tolist())))
@@ -223,7 +224,6 @@ if __name__ == '__main__':
             predict = predict_.cpu()
         else:
             predict = torch.cat([predict,predict_],0)
-        del x_no
         if predict_prob == None:
             predict_prob = predict_prob_.cpu()
         else:
@@ -235,31 +235,43 @@ if __name__ == '__main__':
             rank = predict_prob[predict == i, i]
             rank = rank[rank > 0.9]
             if rank.shape[0]>=sup[sup[:, 0] == i, 1][0]:
-                record.append(1)
-            else:
-                record.append(0)
+                fill_num = min(rank.shape[0], sup[sup[:, 0] == i, 1][0])
+                ind = torch.sort(rank, descending=True).indices[:fill_num]
+                sup_train_x = x_no[predict == i, :][ind]
+                sup_train_y = torch.ones(fill_num).reshape(-1, 1) * i
+                if sup_train_x_total == None:
+                    sup_train_x_total = sup_train_x
+                    sup_train_y_total = sup_train_y
+                else:
+                    sup_train_x_total = torch.cat([sup_train_x_total, sup_train_x], 0)
+                    sup_train_y_total = torch.cat([sup_train_y_total, sup_train_y], 0)
+
+                record.append(i)
+
+        for i in record:
+            sup = np.delete(sup,np.where(sup[:, 0]==i)[0][0],0)
         del rank
-        # torch.cuda.empty_cache()
-        print(record)
-        if sum(record) == len(record):
+        torch.cuda.empty_cache()
+        print(sup.shape[0])
+        if sup.shape[0]==0:
             print('apply {} batchs for data augmentation'.format (rand+1))
             break
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-    sup_train_x_total = None
-    for i in sup[:, 0]:
-        rank = predict_prob[predict == i, i]
-        rank = rank[rank > 0.9]
-        fill_num = min(rank.shape[0], sup[sup[:, 0] == i, 1][0])
-        ind = torch.sort(rank, descending=True).indices[:fill_num]
-        sup_train_x = x_no[predict == i, :][ind]
-        sup_train_y = torch.ones(fill_num).reshape(-1, 1) * i
-        if sup_train_x_total == None:
-            sup_train_x_total = sup_train_x
-            sup_train_y_total = sup_train_y
-        else:
-            sup_train_x_total = torch.cat([sup_train_x_total, sup_train_x], 0)
-            sup_train_y_total = torch.cat([sup_train_y_total, sup_train_y], 0)
+    # sup_train_x_total = None
+    # for i in sup[:, 0]:
+    #     rank = predict_prob[predict == i, i]
+    #     rank = rank[rank > 0.9]
+    #     fill_num = min(rank.shape[0], sup[sup[:, 0] == i, 1][0])
+    #     ind = torch.sort(rank, descending=True).indices[:fill_num]
+    #     sup_train_x = x_no[predict == i, :][ind]
+    #     sup_train_y = torch.ones(fill_num).reshape(-1, 1) * i
+    #     if sup_train_x_total == None:
+    #         sup_train_x_total = sup_train_x
+    #         sup_train_y_total = sup_train_y
+    #     else:
+    #         sup_train_x_total = torch.cat([sup_train_x_total, sup_train_x], 0)
+    #         sup_train_y_total = torch.cat([sup_train_y_total, sup_train_y], 0)
     print('old:',x_train.shape, y_train.shape)
     del x_train
     del y_train
