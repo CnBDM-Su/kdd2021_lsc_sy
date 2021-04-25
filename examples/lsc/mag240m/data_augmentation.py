@@ -212,6 +212,7 @@ if __name__ == '__main__':
     predict = None
     predict_prob = None
     sup_train_x_total = None
+    finish_record = []
     for rand in range(119):
         no_idx = np.array(
             list(set(np.arange(rand * 121751666 // 120, (rand + 1) * 121751666 // 120).tolist()) - set(label_idx.tolist())))
@@ -249,6 +250,7 @@ if __name__ == '__main__':
 
                 if rank.shape[0] >= sup[sup[:, 0] == i, 1][0]:
                     record.append(i)
+                    finish_record.append(i)
 
         del predict
         del predict_prob
@@ -261,6 +263,7 @@ if __name__ == '__main__':
         print(sup.shape[0])
         if sup.shape[0]==0:
             print('apply {} batchs for data augmentation'.format (rand+1))
+            print('finished class contains:',finish_record)
             break
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
