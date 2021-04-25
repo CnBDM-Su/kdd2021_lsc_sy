@@ -212,10 +212,11 @@ if __name__ == '__main__':
     predict = None
     predict_prob = None
     for rand in range(119):
+        print(rand)
         no_idx = np.array(
             list(set(np.arange(rand * 121751666 // 120, (rand + 1) * 121751666 // 120).tolist()) - set(label_idx.tolist())))
         x_no = dataset.paper_feat[no_idx]
-        x_no = torch.from_numpy(x_no).to(torch.float)
+        x_no = torch.from_numpy(x_no).to(torch.float).cpu()
 
         predict_ = model(x_no).argmax(dim=-1).cpu()
         if predict == None:
