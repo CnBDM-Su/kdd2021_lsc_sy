@@ -219,25 +219,25 @@ if __name__ == '__main__':
         no_idx = np.array(
             list(set(np.arange(rand * 121751666 // 120, (rand + 1) * 121751666 // 120).tolist()) - set(label_idx.tolist())))
         x_no = dataset.paper_feat[no_idx]
-        x_no = torch.from_numpy(x_no).to(torch.float)
+        x_no = torch.from_numpy(x_no).to(torch.float).cpu()
 
-        predict_ = model(x_no).argmax(dim=-1)
+        predict_ = model(x_no).argmax(dim=-1).cpu()
         if predict == None:
-            predict = predict_
+            predict = predict_.cpu()
         else:
-            predict = torch.cat([predict,predict_],0)
+            predict = torch.cat([predict,predict_],0).cpu()
         predict_prob_ = F.softmax(model(x_no),dim=1)
         del x_no
         if predict_prob == None:
-            predict_prob = predict_prob_
+            predict_prob = predict_prob_.cpu()
         else:
-            predict_prob = torch.cat([predict_prob,predict_prob_],0)
+            predict_prob = torch.cat([predict_prob,predict_prob_],0).cpu()
         del predict_
         del predict_prob_
         record = []
         for i in sup[:, 0]:
-            rank = predict_prob[predict == i, i]
-            rank = rank[rank > 0.9]
+            rank = predict_prob[predict == i, i].cpu()
+            rank = rank[rank > 0.9].cpu()
             if rank.shape[0]>=sup[sup[:, 0] == i, 1][0]:
                 record.append(1)
             else:
