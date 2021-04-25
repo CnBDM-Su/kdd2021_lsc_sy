@@ -216,18 +216,17 @@ if __name__ == '__main__':
             list(set(np.arange(rand * 121751666 // 100, (rand + 1) * 121751666 // 100).tolist()) - set(label_idx.tolist())))
         x_no = dataset.paper_feat[no_idx]
         x_no = torch.from_numpy(x_no).to(torch.float)
-        print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
         predict_ = model(x_no).argmax(dim=-1)
         if predict == None:
             predict = predict_
         else:
-            predict = torch.cat([predict,predict_],0)
+            predict = torch.cat([predict,predict_],0).cpu()
         predict_prob_ = F.softmax(model(x_no),dim=1)
         if predict_prob == None:
             predict_prob = predict_prob_
         else:
-            predict_prob = torch.cat([predict_prob,predict_prob_],0)
+            predict_prob = torch.cat([predict_prob,predict_prob_],0).cpu()
 
         record = []
         for i in sup[:, 0]:
@@ -239,6 +238,7 @@ if __name__ == '__main__':
                 record.append(0)
         if sum(record) == len(record):
             break
+    print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
 
     sup_train_x_total = None
