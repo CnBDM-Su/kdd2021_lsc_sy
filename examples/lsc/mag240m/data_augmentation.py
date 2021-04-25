@@ -234,6 +234,7 @@ if __name__ == '__main__':
         for i in sup[:, 0]:
             rank = predict_prob[predict == i, i]
             rank = rank[rank > 0.9]
+            print(rank.shape)
             if rank.shape[0]>=sup[sup[:, 0] == i, 1][0]:
                 fill_num = min(rank.shape[0], sup[sup[:, 0] == i, 1][0])
                 ind = torch.sort(rank, descending=True).indices[:fill_num]
@@ -247,7 +248,7 @@ if __name__ == '__main__':
                     sup_train_y_total = torch.cat([sup_train_y_total, sup_train_y], 0)
 
                 record.append(i)
-
+        print(record)
         for i in record:
             sup = np.delete(sup,np.where(sup[:, 0]==i)[0][0],0)
         del rank
