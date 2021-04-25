@@ -207,6 +207,9 @@ if __name__ == '__main__':
                   f'Best: {best_valid_acc:.4f}')
 
     print('-------------second round training starts-------------')
+    del x_train
+    del x_valid
+    del x_test
     t = time.perf_counter()
     print('Reading no label node features...', end=' ', flush=True)
     predict = None
@@ -261,6 +264,20 @@ if __name__ == '__main__':
     print('old:',x_train.shape, y_train.shape)
     del x_train
     del y_train
+    print('Reading training node features...', end=' ', flush=True)
+    x_train_ = torch.from_numpy(dataset.paper_feat[train_idx]).to(torch.float)
+    x_train = x_train_.to(device)
+    print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    t = time.perf_counter()
+    print('Reading validation node features...', end=' ', flush=True)
+    x_valid_ = torch.from_numpy(dataset.paper_feat[valid_idx]).to(torch.float)
+    x_valid = x_valid_.to(device)
+    print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    t = time.perf_counter()
+    print('Reading test node features...', end=' ', flush=True)
+    x_test_ = torch.from_numpy(dataset.paper_feat[test_idx]).to(torch.float)
+    x_test = x_test_.to(device)
+    print(f'Done! [{time.perf_counter() - t:.2f}s]')
     x_train = torch.cat([x_train_, sup_train_x_total], 0).to(torch.float).to(device)
     y_train = torch.cat([y_train_, sup_train_y_total.squeeze()], 0).to(torch.long).to(device)
     print('new:',x_train.shape, y_train.shape)
