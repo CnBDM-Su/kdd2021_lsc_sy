@@ -218,18 +218,18 @@ if __name__ == '__main__':
         x_no = dataset.paper_feat[no_idx]
         x_no = torch.from_numpy(x_no).to(torch.float)
         with torch.no_grad():
-            predict_ = model(x_no).argmax(dim=-1).cpu()
-            predict_prob_ = F.softmax(model(x_no), dim=1).cpu()
-        if predict == None:
-            predict = predict_.cpu()
-        else:
-            predict = torch.cat([predict,predict_],0)
-        if predict_prob == None:
-            predict_prob = predict_prob_.cpu()
-        else:
-            predict_prob = torch.cat([predict_prob,predict_prob_],0)
-        del predict_
-        del predict_prob_
+            predict = model(x_no).argmax(dim=-1).cpu()
+            predict_prob = F.softmax(model(x_no), dim=1).cpu()
+        # if predict == None:
+        #     predict = predict_.cpu()
+        # else:
+        #     predict = torch.cat([predict,predict_],0)
+        # if predict_prob == None:
+        #     predict_prob = predict_prob_.cpu()
+        # else:
+        #     predict_prob = torch.cat([predict_prob,predict_prob_],0)
+        # del predict_
+        # del predict_prob_
         record = []
         for i in sup[:, 0]:
             rank = predict_prob[predict == i, i]
