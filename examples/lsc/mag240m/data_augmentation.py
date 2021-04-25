@@ -215,7 +215,7 @@ if __name__ == '__main__':
         no_idx = np.array(
             list(set(np.arange(rand * 121751666 // 120, (rand + 1) * 121751666 // 120).tolist()) - set(label_idx.tolist())))
         x_no = dataset.paper_feat[no_idx]
-        x_no = torch.from_numpy(x_no).to(torch.float).cpu()
+        x_no = torch.from_numpy(x_no).to(torch.float)
         with torch.no_grad():
             predict_ = model(x_no).argmax(dim=-1).cpu()
             predict_prob_ = F.softmax(model(x_no), dim=1).cpu()
