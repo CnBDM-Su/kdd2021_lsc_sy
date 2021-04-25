@@ -226,7 +226,7 @@ if __name__ == '__main__':
             predict = predict_.cpu()
         else:
             predict = torch.cat([predict,predict_],0).cpu()
-        predict_prob_ = F.softmax(model(x_no),dim=1)
+        predict_prob_ = F.softmax(model(x_no),dim=1).cpu()
         del x_no
         if predict_prob == None:
             predict_prob = predict_prob_.cpu()
