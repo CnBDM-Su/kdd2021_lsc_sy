@@ -255,9 +255,7 @@ if __name__ == '__main__':
         del predict
         del predict_prob
         sup[:,-1] = sup[:,-1]-accu_list
-
-        for i in record:
-            sup = np.delete(sup,np.where(sup[:, 0]==i)[0][0],0)
+        sup = sup[sup[:, -1] > 0]
 
         torch.cuda.empty_cache()
         print(sup.shape[0])
