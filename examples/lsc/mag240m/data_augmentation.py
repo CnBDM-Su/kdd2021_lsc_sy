@@ -231,7 +231,6 @@ if __name__ == '__main__':
         #     predict_prob = torch.cat([predict_prob,predict_prob_],0)
         # del predict_
         # del predict_prob_
-        record = []
         accu_list = []
         for i in sup[:, 0]:
             rank = predict_prob[predict == i, i]
@@ -249,7 +248,6 @@ if __name__ == '__main__':
                 sup_train_y_total = torch.cat([sup_train_y_total, sup_train_y], 0)
 
                 if rank.shape[0] >= sup[sup[:, 0] == i, 1][0]:
-                    record.append(i)
                     finish_record.append(i)
 
         del predict
