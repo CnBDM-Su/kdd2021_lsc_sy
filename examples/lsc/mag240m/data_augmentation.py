@@ -213,7 +213,7 @@ if __name__ == '__main__':
     predict_prob = None
     sup_train_x_total = None
     finish_record = []
-    for rand in range(119):
+    for rand in range(30):
         no_idx = np.array(
             list(set(np.arange(rand * 121751666 // 120, (rand + 1) * 121751666 // 120).tolist()) - set(label_idx.tolist())))
         x_no = dataset.paper_feat[no_idx]
@@ -265,6 +265,8 @@ if __name__ == '__main__':
             print('apply {} batchs for data augmentation'.format (rand+1))
             print('finished class contains:',finish_record)
             break
+    print('apply {} batchs for data augmentation'.format(rand + 1))
+    print('finished class contains:', finish_record)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     # sup_train_x_total = None
