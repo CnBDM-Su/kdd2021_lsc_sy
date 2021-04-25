@@ -231,24 +231,27 @@ if __name__ == '__main__':
         # del predict_
         # del predict_prob_
         record = []
+        accu_list = []
         for i in sup[:, 0]:
             rank = predict_prob[predict == i, i]
             rank = rank[rank > 0.9]
-            print(rank.shape)
-            if rank.shape[0]>=sup[sup[:, 0] == i, 1][0]:
-                fill_num = min(rank.shape[0], sup[sup[:, 0] == i, 1][0])
-                ind = torch.sort(rank, descending=True).indices[:fill_num]
-                sup_train_x = x_no[predict == i, :][ind]
-                sup_train_y = torch.ones(fill_num).reshape(-1, 1) * i
-                if sup_train_x_total == None:
-                    sup_train_x_total = sup_train_x
-                    sup_train_y_total = sup_train_y
-                else:
-                    sup_train_x_total = torch.cat([sup_train_x_total, sup_train_x], 0)
-                    sup_train_y_total = torch.cat([sup_train_y_total, sup_train_y], 0)
+            accu_list.append(rank.shape[0])
+            fill_num = min(rank.shape[0], sup[sup[:, 0] == i, 1][0])
+            ind = torch.sort(rank, descending=True).indices[:fill_num]
+            sup_train_x = x_no[predict == i, :][ind]
+            sup_train_y = torch.ones(fill_num).reshape(-1, 1) * i
+            if sup_train_x_total == None:
+                sup_train_x_total = sup_train_x
+                sup_train_y_total = sup_train_y
+            else:
+                sup_train_x_total = torch.cat([sup_train_x_total, sup_train_x], 0)
+                sup_train_y_total = torch.cat([sup_train_y_total, sup_train_y], 0)
 
-                record.append(i)
-        print(record)
+                if rank.shape[0] >= sup[sup[:, 0] == i, 1][0]:
+                    record.append(i)
+
+        sup[:,-1] = sup[:,-1]-accu_list
+
         for i in record:
             sup = np.delete(sup,np.where(sup[:, 0]==i)[0][0],0)
         del rank
