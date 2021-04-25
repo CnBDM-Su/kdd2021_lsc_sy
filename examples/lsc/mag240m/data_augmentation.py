@@ -242,6 +242,8 @@ if __name__ == '__main__':
                 record.append(1)
             else:
                 record.append(0)
+
+        torch.cuda.empty_cache()
         if sum(record) == len(record):
             break
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
