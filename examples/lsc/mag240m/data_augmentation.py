@@ -212,10 +212,10 @@ if __name__ == '__main__':
     predict = None
     predict_prob = None
     sup_train_x_total = None
-    finish_record = []
-    for rand in range(30):
+    finish_record = {}
+    for rand in range(1):
         no_idx = np.array(
-            list(set(np.arange(rand * 121751666 // 120, (rand + 1) * 121751666 // 120).tolist()) - set(label_idx.tolist())))
+            list(set(np.arange(rand * 121751666 // 100, (rand + 1) * 121751666 // 100).tolist()) - set(label_idx.tolist())))
         x_no = dataset.paper_feat[no_idx]
         x_no = torch.from_numpy(x_no).to(torch.float)
         with torch.no_grad():
@@ -248,7 +248,10 @@ if __name__ == '__main__':
                 sup_train_y_total = torch.cat([sup_train_y_total, sup_train_y], 0)
 
                 if rank.shape[0] >= sup[sup[:, 0] == i, 1][0]:
-                    finish_record.append(i)
+                    if i not in finish_record.keys():
+                        finish_record[i] = rank.shape[0]
+                    else:
+                        finish_record[i] += rank.shape[0]
 
         del predict
         del predict_prob
