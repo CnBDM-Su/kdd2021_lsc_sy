@@ -252,7 +252,7 @@ class MAG240M(LightningDataModule):
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
                                batch_size=self.batch_size, shuffle=True,
-                               num_workers=4)
+                               num_workers=16)
         return ns
 
     def val_dataloader(self):
