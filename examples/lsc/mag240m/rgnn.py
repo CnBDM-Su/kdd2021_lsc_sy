@@ -286,6 +286,9 @@ class MAG240M(LightningDataModule):
         # print(n_id.shape)
         x = torch.from_numpy(self.x.get_orthogonal_selection((n_id.numpy(), slice(None)))).to(
             torch.float)
+        print(n_id.numpy())
+        print(x)
+        print(x.shape)
         # x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
         # print(sys.getsizeof(x.storage()))
         y = self.y[n_id[:batch_size]].to(torch.long)
