@@ -239,8 +239,10 @@ class MAG240M(LightningDataModule):
         #                    mode='r', shape=(N//1000, self.num_features))
         # self.x[1000] = np.memmap(f'{dataset.dir}/full_feat_split/full_feat_' + str(i) + '.npy', dtype=np.float16,
         #                       mode='r', shape=(N-1000*(N//1000), self.num_features))
+        print(333)
         self.x = zarr.open(f'{dataset.dir}/full_feat.zarr', mode='r',shape=(N, self.num_features) ,
                            chunks=(200000, self.num_features), dtype=np.float16)
+        print(222)
         #self.x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
                            # mode='r', shape=(N, self.num_features))
         self.y = torch.from_numpy(dataset.all_paper_label)
@@ -284,6 +286,7 @@ class MAG240M(LightningDataModule):
         #     x.append(self.x[i//self.file_batch_size][i%self.file_batch_size])
         # x = torch.from_numpy(np.array(x)).to(torch.float)
         # print(n_id.shape)
+        print(111)
         x = torch.from_numpy(self.x.get_orthogonal_selection((n_id.numpy(), slice(None)))).to(
             torch.float)
         print(n_id.numpy())
