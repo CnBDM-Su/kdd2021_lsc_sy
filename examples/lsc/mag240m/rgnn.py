@@ -26,6 +26,7 @@ from torch_geometric.data import NeighborSampler
 from ogb.lsc import MAG240MDataset
 from root import ROOT
 from ogb.utils.url import makedirs
+import zarr
 
 class Batch(NamedTuple):
     x: Tensor
@@ -238,8 +239,10 @@ class MAG240M(LightningDataModule):
         #                    mode='r', shape=(N//1000, self.num_features))
         # self.x[1000] = np.memmap(f'{dataset.dir}/full_feat_split/full_feat_' + str(i) + '.npy', dtype=np.float16,
         #                       mode='r', shape=(N-1000*(N//1000), self.num_features))
-        self.x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
-                           mode='r', shape=(N, self.num_features))
+        self.x = zarr.open(f'{dataset.dir}/full_feat.zarr', mode='r',shape=(N, self.num_features) ,
+                           chunks=(200000, self.num_features), dtype=np.float16)
+        #self.x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
+                           # mode='r', shape=(N, self.num_features))
         self.y = torch.from_numpy(dataset.all_paper_label)
         self.file_batch_size = N//1000
 
