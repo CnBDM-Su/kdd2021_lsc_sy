@@ -134,7 +134,10 @@ if __name__ == '__main__':
                 print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
                       f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
                       f'Best: {best_valid_acc:.4f}')
-
+    else:
+        model = MLP(dataset.num_paper_features, args.hidden_channels,
+                    dataset.num_classes, args.num_layers, args.dropout,
+                    not args.no_batch_norm, args.relu_last).to(device)
     model.load_state_dict(torch.load('results/cs/model.pt'))
     model.eval()
 
