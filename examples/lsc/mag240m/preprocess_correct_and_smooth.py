@@ -84,6 +84,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=0.01)
     parser.add_argument('--batch_size', type=int, default=380000)
     parser.add_argument('--epochs', type=int, default=1000)
+    parser.add_argument('--evaluate', type=bool, default=False)
     args = parser.parse_args()
     print(args)
 
@@ -96,42 +97,43 @@ if __name__ == '__main__':
     train_idx = dataset.get_idx_split('train')
     valid_idx = dataset.get_idx_split('valid')
 
-    t = time.perf_counter()
-    print('Reading training node features...', end=' ', flush=True)
-    x_train = dataset.paper_feat[train_idx]
-    x_train = torch.from_numpy(x_train).to(torch.float).to(device)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    t = time.perf_counter()
-    print('Reading validation node features...', end=' ', flush=True)
-    x_valid = dataset.paper_feat[valid_idx]
-    x_valid = torch.from_numpy(x_valid).to(torch.float).to(device)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    if args.evaluate==False:
+        t = time.perf_counter()
+        print('Reading training node features...', end=' ', flush=True)
+        x_train = dataset.paper_feat[train_idx]
+        x_train = torch.from_numpy(x_train).to(torch.float).to(device)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
+        t = time.perf_counter()
+        print('Reading validation node features...', end=' ', flush=True)
+        x_valid = dataset.paper_feat[valid_idx]
+        x_valid = torch.from_numpy(x_valid).to(torch.float).to(device)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-    y_train = torch.from_numpy(dataset.paper_label[train_idx])
-    y_train = y_train.to(device, torch.long)
-    y_valid = torch.from_numpy(dataset.paper_label[valid_idx])
-    y_valid = y_valid.to(device, torch.long)
+        y_train = torch.from_numpy(dataset.paper_label[train_idx])
+        y_train = y_train.to(device, torch.long)
+        y_valid = torch.from_numpy(dataset.paper_label[valid_idx])
+        y_valid = y_valid.to(device, torch.long)
 
-    makedirs('results/cs')
-    model = MLP(dataset.num_paper_features, args.hidden_channels,
-                dataset.num_classes, args.num_layers, args.dropout,
-                not args.no_batch_norm, args.relu_last).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-    num_params = sum([p.numel() for p in model.parameters()])
-    print(f'#Params: {num_params}')
+        makedirs('results/cs')
+        model = MLP(dataset.num_paper_features, args.hidden_channels,
+                    dataset.num_classes, args.num_layers, args.dropout,
+                    not args.no_batch_norm, args.relu_last).to(device)
+        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+        num_params = sum([p.numel() for p in model.parameters()])
+        print(f'#Params: {num_params}')
 
-    best_valid_acc = 0
-    for epoch in range(1, args.epochs + 1):
-        loss = train(model, x_train, y_train, args.batch_size, optimizer)
-        train_acc = test(model, x_train, y_train, evaluator)
-        valid_acc = test(model, x_valid, y_valid, evaluator)
-        if valid_acc > best_valid_acc:
-            best_valid_acc = valid_acc
-            torch.save(model.state_dict(), 'results/cs/model.pt')
-        if epoch % 100 == 0:
-            print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
-                  f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
-                  f'Best: {best_valid_acc:.4f}')
+        best_valid_acc = 0
+        for epoch in range(1, args.epochs + 1):
+            loss = train(model, x_train, y_train, args.batch_size, optimizer)
+            train_acc = test(model, x_train, y_train, evaluator)
+            valid_acc = test(model, x_valid, y_valid, evaluator)
+            if valid_acc > best_valid_acc:
+                best_valid_acc = valid_acc
+                torch.save(model.state_dict(), 'results/cs/model.pt')
+            if epoch % 100 == 0:
+                print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
+                      f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
+                      f'Best: {best_valid_acc:.4f}')
 
     model.load_state_dict(torch.load('results/cs/model.pt'))
     model.eval()
