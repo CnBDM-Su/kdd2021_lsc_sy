@@ -149,7 +149,7 @@ if __name__ == '__main__':
         x = dataset.paper_feat[i:min(i + args.batch_size, dataset.num_papers)]
         x = torch.from_numpy(x).to(torch.float).to(device)
         with torch.no_grad():
-            out.append(model(x).softmax(dim=-1).cpu().numpy())
+            out.append(model(x).softmax(dim=-1).cpu().numpy()..astype(np.float32))
         pbar.update(x.size(0))
     pbar.close()
     # np.save('results/cs/pred.npy', np.concatenate(out, axis=0))
