@@ -151,7 +151,7 @@ if __name__ == '__main__':
         x = torch.from_numpy(x).to(torch.float).to(device)
         with torch.no_grad():
             tmp.append(model(x).softmax(dim=-1).cpu().numpy())
-            if i//args.batch_size == 10:
+            if (i/args.batch_size)%20 == 0:
                 if out.shape[0]==0:
                     out = np.concatenate([tmp],0)
                 else:
