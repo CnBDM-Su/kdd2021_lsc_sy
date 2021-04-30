@@ -153,7 +153,7 @@ if __name__ == '__main__':
                 out = model(x).softmax(dim=-1).cpu().numpy()
             else:
                 out = np.concatenate([out,model(x).softmax(dim=-1).cpu().numpy()],0)
-            out.append()
+            # out.append()
         pbar.update(x.size(0))
     pbar.close()
     np.save('results/cs/pred.npy', out)
