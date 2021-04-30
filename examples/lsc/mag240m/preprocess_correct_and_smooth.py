@@ -144,12 +144,12 @@ if __name__ == '__main__':
     pbar = tqdm(total=dataset.num_papers)
     pbar.set_description('Saving model predictions')
 
-    out = None
+    out = np.array([])
     for i in range(0, dataset.num_papers, args.batch_size):
         x = dataset.paper_feat[i:min(i + args.batch_size, dataset.num_papers)]
         x = torch.from_numpy(x).to(torch.float).to(device)
         with torch.no_grad():
-            if out == None:
+            if out.shape[0]==0:
                 out = model(x).softmax(dim=-1).cpu().numpy()
             else:
                 out = np.concatenate([out,model(x).softmax(dim=-1).cpu().numpy()],0)
