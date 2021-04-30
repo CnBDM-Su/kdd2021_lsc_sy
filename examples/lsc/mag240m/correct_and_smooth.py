@@ -27,8 +27,9 @@ if __name__ == '__main__':
     t = time.perf_counter()
     print('Reading graph-agnostic predictions...', end=' ', flush=True)
     y_pred = np.load('results/cs/pred.npz')
+    print(y_pred)
     tmp = []
-    for i in y_pred.files():
+    for i in y_pred.files:
         tmp.append(y_pred[i])
     y_pred = torch.from_numpy(np.concatenate(tmp,0))
     # y_pred = torch.from_numpy(np.load('results/cs/pred.npy'))
