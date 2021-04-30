@@ -152,5 +152,5 @@ if __name__ == '__main__':
             out.append(model(x).softmax(dim=-1).cpu().numpy())
         pbar.update(x.size(0))
     pbar.close()
-    # np.save('results/cs/pred.npy', np.concatenate(out, axis=0))
-    np.savez('results/cs/pred.npz', *out)
+    np.save('results/cs/pred.npy', np.concatenate(out, axis=0))
+    # np.savez('results/cs/pred.npz', *out)
