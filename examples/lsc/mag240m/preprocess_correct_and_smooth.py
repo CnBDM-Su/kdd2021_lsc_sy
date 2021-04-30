@@ -153,4 +153,4 @@ if __name__ == '__main__':
         pbar.update(x.size(0))
     pbar.close()
     # np.save('results/cs/pred.npy', np.concatenate(out, axis=0))
-    np.savetxt('results/cs/pred.csv',out, delimiter = ',',fmt='%s')
+    np.savez('results/cs/pred.npz', *out)
