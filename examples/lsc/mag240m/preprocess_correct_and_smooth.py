@@ -147,7 +147,7 @@ if __name__ == '__main__':
     out = []
     for i in range(0, dataset.num_papers, args.batch_size):
         x = dataset.paper_feat[i:min(i + args.batch_size, dataset.num_papers)]
-        x = torch.from_numpy(x).to(torch.float).to(device)
+        x = torch.from_numpy(x).to(torch.float16).to(device)
         with torch.no_grad():
             out.append(model(x).softmax(dim=-1).cpu().numpy())
         pbar.update(x.size(0))
