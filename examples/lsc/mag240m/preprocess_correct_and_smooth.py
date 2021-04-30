@@ -145,14 +145,18 @@ if __name__ == '__main__':
     pbar.set_description('Saving model predictions')
 
     out = np.array([])
+    tmp = []
     for i in range(0, dataset.num_papers, args.batch_size):
         x = dataset.paper_feat[i:min(i + args.batch_size, dataset.num_papers)]
         x = torch.from_numpy(x).to(torch.float).to(device)
         with torch.no_grad():
-            if out.shape[0]==0:
-                out = model(x).softmax(dim=-1).cpu().numpy()
-            else:
-                out = np.concatenate([out,model(x).softmax(dim=-1).cpu().numpy()],0)
+            tmp.append(model(x).softmax(dim=-1).cpu().numpy())
+            if i//args.batch_size == 10:
+                if out.shape[0]==0:
+                    out = np.concatenate([tmp],0)
+                else:
+                    out = np.concatenate([out,np.concatenate([tmp],0)],0)
+                tmp=[]
             # out.append()
         pbar.update(x.size(0))
     pbar.close()
