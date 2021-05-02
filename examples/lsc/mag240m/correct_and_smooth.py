@@ -25,7 +25,7 @@ if __name__ == '__main__':
     evaluator = MAG240MEvaluator()
 
     t = time.perf_counter()
-    y_pred = torch.from_numpy(np.load('results/cs/pred.npy')).to(torch.float)
+    y_pred = torch.from_numpy(np.load('results/cs/pred.npy'))
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     print(abs((float(y_pred.sum()) / y_pred.size(0)) - 1.0))
