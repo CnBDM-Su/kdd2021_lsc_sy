@@ -26,10 +26,8 @@ if __name__ == '__main__':
 
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
-    y_pred = torch.from_numpy(np.load('results/cs/pred.npy'))
+    #y_pred = torch.from_numpy(np.load('results/cs/pred.npy'))
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
-    print(abs((float(y_pred.sum()) / y_pred.size(0)) - 1.0))
 
     t = time.perf_counter()
     print('Reading adjacency matrix...', end=' ', flush=True)
