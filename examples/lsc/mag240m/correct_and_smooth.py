@@ -24,8 +24,9 @@ if __name__ == '__main__':
     dataset = MAG240MDataset(ROOT)
     evaluator = MAG240MEvaluator()
 
+    print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
-    y_pred = torch.from_numpy(np.load('results/cs/pred.npy'))
+    y_pred = torch.from_numpy(np.load('results/cs/pred.npy')).to(torch.float16)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     print(abs((float(y_pred.sum()) / y_pred.size(0)) - 1.0))
