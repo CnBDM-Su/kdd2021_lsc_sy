@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
-    y_pred = torch.from_numpy(np.load('results/cs/pred.npy')).to(torch.float16)
+    y_pred = torch.from_numpy(np.load('results/cs/pred.npy'))
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     print(abs((float(y_pred.sum()) / y_pred.size(0)) - 1.0))
@@ -36,6 +36,7 @@ if __name__ == '__main__':
     path = f'{dataset.dir}/paper_to_paper_symmetric_gcn.pt'
     if osp.exists(path):
         adj_t = torch.load(path)
+        print(adj_t)
     else:
         path_sym = f'{dataset.dir}/paper_to_paper_symmetric.pt'
         if osp.exists(path_sym):
