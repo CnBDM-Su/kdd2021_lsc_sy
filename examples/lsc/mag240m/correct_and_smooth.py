@@ -148,8 +148,8 @@ if __name__ == '__main__':
     assert y_train.size(0) == numel
 
     if y_train.dtype == torch.long:
-        y_true = F.one_hot(y_train.view(-1), y_pred.size(-1))
-        y_true = y_true.to(y_pred.dtype)
+        y_train = F.one_hot(y_train.view(-1), y_pred.size(-1))
+        y_train = y_train.to(y_pred.dtype)
 
     y_shape = y_pred.shape
     error_ = y_train - y_pred[train_idx]
