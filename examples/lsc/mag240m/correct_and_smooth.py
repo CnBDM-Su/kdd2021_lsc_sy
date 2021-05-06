@@ -174,7 +174,19 @@ if __name__ == '__main__':
 
     t = time.perf_counter()
     print('Smoothing predictions...', end=' ', flush=True)
-    y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
+    numel = int(train_idx.sum()) if train_idx.dtype == torch.bool else train_idx.size(0)
+    assert y_train.size(0) == numel
+
+    if y_train.dtype == torch.long:
+        y_train = F.one_hot(y_train.view(-1), y_pred.size(-1))
+        y_train = y_train.to(y_pred.dtype)
+
+    y_pred[train_idx] = y_train
+
+    prop2 = LabelPropagation(args.num_smoothing_layers, args.smoothing_alpha)
+
+    y_pred = prop2(y_pred, adj_t, edge_weight=edge_weight)
+    # y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     train_acc = evaluator.eval({
