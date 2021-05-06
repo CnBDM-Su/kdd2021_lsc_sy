@@ -103,8 +103,8 @@ if __name__ == '__main__':
 
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
-    # y_pred = torch.from_numpy(np.load('results/cs/pred.npy'))
-    y_pred = torch.rand(121000000, 135)
+    y_pred = torch.from_numpy(np.load('results/cs/pred.npy'))
+    # y_pred = torch.rand(121000000, 135)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     t = time.perf_counter()
