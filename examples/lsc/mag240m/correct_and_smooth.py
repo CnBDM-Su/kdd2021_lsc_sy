@@ -154,8 +154,7 @@ if __name__ == '__main__':
     error[train_idx] = y_train - y_pred[train_idx]
     prop1 = LabelPropagation(args.num_correction_layers, args.correction_alpha)
     del y_pred
-    del y_train
-
+    edge_weight = None
     smoothed_error = prop1(error, adj_t,
                                 edge_weight=edge_weight,
                                 post_step=lambda x: x.clamp_(-1., 1.))
