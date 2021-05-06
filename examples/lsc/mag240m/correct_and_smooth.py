@@ -150,10 +150,14 @@ if __name__ == '__main__':
         y_true = F.one_hot(y_train.view(-1), y_pred.size(-1))
         y_true = y_true.to(y_pred.dtype)
 
-    error = torch.zeros_like(y_pred)
-    error[train_idx] = y_train - y_pred[train_idx]
-    prop1 = LabelPropagation(args.num_correction_layers, args.correction_alpha)
+    y_shape = y_pred.shape
+    error_ = y_train - y_pred[train_idx]
     del y_pred
+    error = torch.zeros(y_shape)
+    error[train_idx] = error_
+    # error = torch.zeros_like(y_pred)
+    # error[train_idx] = y_train - y_pred[train_idx]
+    prop1 = LabelPropagation(args.num_correction_layers, args.correction_alpha)
     edge_weight = None
     smoothed_error = prop1(error, adj_t,
                                 edge_weight=edge_weight,
