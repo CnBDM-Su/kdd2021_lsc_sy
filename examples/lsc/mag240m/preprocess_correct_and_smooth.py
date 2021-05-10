@@ -7,6 +7,8 @@ import numpy as np
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torch.nn import ModuleList, Linear, BatchNorm1d, Identity
+import random
+import os.path as osp
 
 from ogb.utils.url import makedirs
 from ogb.lsc import MAG240MDataset, MAG240MEvaluator
@@ -96,9 +98,35 @@ if __name__ == '__main__':
 
     train_idx = dataset.get_idx_split('train')
     valid_idx = dataset.get_idx_split('valid')
+    test_idx = dataset.get_idx_split('test')
+
+    path = f'{dataset.dir}/paper_relation_feat.npy'
+    if not osp.exists(path):
+        print('Generating paper relation features...')
+        t = time.perf_counter()
+        N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
+        x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
+                           mode='r', shape=(N, 768))
+        y = np.memmap(path, dtype=np.float16, mode='w+',
+                      shape=(dataset.num_papers, 1536))
+        ap_edge = dataset.edge_index('author', 'writes', 'paper')
+        fea_ = []
+        for i in range(dataset.num_papers):
+            pool = np.arange(len(ap_edge[0])).tolist()
+            pool = random.shuffle(pool)
+            fea = []
+            for j in pool:
+                if ap_edge[1,j] == i:
+                    fea.append(ap_edge[0,j]+dataset.num_papers)
+                if len(fea) > 20:
+                    break
+            fea = x[fea]
+            y[i] = np.concatenate([x[i],np.mean(fea,0)],1)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     if args.evaluate==False:
         t = time.perf_counter()
+
         print('Reading training node features...', end=' ', flush=True)
         x_train = dataset.paper_feat[train_idx]
         x_train = torch.from_numpy(x_train).to(torch.float).to(device)
@@ -108,6 +136,12 @@ if __name__ == '__main__':
         x_valid = dataset.paper_feat[valid_idx]
         x_valid = torch.from_numpy(x_valid).to(torch.float).to(device)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
+
+        idx = train_idx + valid_idx + test_idx
+        tr_num = len(train_idx)
+        val_num = len(valid_idx)
+        te_num = len(test_idx)
+
 
         y_train = torch.from_numpy(dataset.paper_label[train_idx])
         y_train = y_train.to(device, torch.long)
