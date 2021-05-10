@@ -124,24 +124,24 @@ if __name__ == '__main__':
             y[i] = np.concatenate([x[i],np.mean(fea,0)],1)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
+    else:
+        x_fr = np.memmap(path, dtype=np.float16, mode='r',
+                      shape=(dataset.num_papers, 1536))
+
     if args.evaluate==False:
         t = time.perf_counter()
 
         print('Reading training node features...', end=' ', flush=True)
-        x_train = dataset.paper_feat[train_idx]
+        # x_train = dataset.paper_feat[train_idx]
+        x_train = x_fr[train_idx]
         x_train = torch.from_numpy(x_train).to(torch.float).to(device)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
         t = time.perf_counter()
         print('Reading validation node features...', end=' ', flush=True)
-        x_valid = dataset.paper_feat[valid_idx]
+        x_valid = x_fr[valid_idx]
+        # x_valid = dataset.paper_feat[valid_idx]
         x_valid = torch.from_numpy(x_valid).to(torch.float).to(device)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
-        idx = train_idx + valid_idx + test_idx
-        tr_num = len(train_idx)
-        val_num = len(valid_idx)
-        te_num = len(test_idx)
-
 
         y_train = torch.from_numpy(dataset.paper_label[train_idx])
         y_train = y_train.to(device, torch.long)
@@ -180,7 +180,7 @@ if __name__ == '__main__':
 
     out = []
     for i in range(0, dataset.num_papers, args.batch_size):
-        x = dataset.paper_feat[i:min(i + args.batch_size, dataset.num_papers)]
+        x = x_fr[i:min(i + args.batch_size, dataset.num_papers)]
         x = torch.from_numpy(x).to(torch.float).to(device)
         with torch.no_grad():
             out.append(model(x).softmax(dim=-1).cpu().numpy())
