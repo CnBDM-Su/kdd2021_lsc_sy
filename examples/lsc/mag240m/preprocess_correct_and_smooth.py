@@ -111,7 +111,7 @@ if __name__ == '__main__':
                       shape=(dataset.num_papers, 1536))
         ap_edge = dataset.edge_index('author', 'writes', 'paper')
         fea_ = []
-        for i in range(dataset.num_papers):
+        for i in tqdm(range(dataset.num_papers)):
             pool = np.arange(len(ap_edge[0])).tolist()
             pool = random.shuffle(pool)
             fea = []
