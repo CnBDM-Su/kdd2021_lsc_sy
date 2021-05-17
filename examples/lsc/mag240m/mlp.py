@@ -88,7 +88,7 @@ class MAG240MEvaluator:
         return {'acc': int((y_true == y_pred).sum()) / y_true.numel()}
 
     def save_test_submission(self, input_dict, dir_path):
-        assert 'y_pred' in input_dict
+        # assert 'y_pred' in input_dict
         y_pred = input_dict['y_pred']
         y_pred_valid = input_dict['y_pred_valid']
         # assert y_pred.shape == (146818, )
