@@ -27,7 +27,7 @@ if __name__ == '__main__':
     meaningful_idx = np.concatenate([train_idx, valid_idx, test_idx], 0)
     meaningful_idx = np.sort(meaningful_idx)
 
-    pp_edge = dataset.edge_index('paper', 'sites', 'paper')
+    pp_edge = dataset.edge_index('paper', 'cites', 'paper')
 
     path = f'{dataset.dir}/inverse_sorted_edge.npy'
     if not osp.exists(path):

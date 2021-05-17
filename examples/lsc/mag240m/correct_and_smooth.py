@@ -11,6 +11,7 @@ from torch_geometric.nn import CorrectAndSmooth
 from torch_geometric.nn.conv.gcn_conv import gcn_norm
 from ogb.lsc import MAG240MDataset
 from root import ROOT
+from ogb.utils.url import makedirs
 
 class MAG240MEvaluator:
     def eval(self, input_dict):
