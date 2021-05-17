@@ -261,7 +261,7 @@ if __name__ == '__main__':
         torch.cuda.empty_cache()
         print(sup.shape[0])
         if sup.shape[0]==0:
-            print('apply {} batchs for data augmentation'.format (rand+1))
+            print('apply {} batchs for data augmentation'.format(rand+1))
             print('finished class contains:',finish_record)
             break
     print('apply {} batchs for data augmentation'.format(rand + 1))
