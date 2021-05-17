@@ -58,7 +58,7 @@ if __name__ == '__main__':
             i = search_domain[i]
             for j in range(bias_1,pp_edge.shape[1]):
                 if i==pp_edge[0,j]:
-                    if i not in layer_info.keys():
+                    if pp_edge[1,j] not in layer_info.keys():
                         layer_info[pp_edge[1,j]] = layer + 1
                 if i<pp_edge[0,j]:
                     bias_1 = j
@@ -66,9 +66,9 @@ if __name__ == '__main__':
 
             for j in range(bias_2,ipp_edge.shape[1]):
                 if i==ipp_edge[1,j]:
-                    if i not in layer_info.keys():
+                    if ipp_edge[0,j] not in layer_info.keys():
                         layer_info[ipp_edge[0,j]] = layer + 1
-                if i<ipp_edge[0,j]:
+                if i<ipp_edge[1,j]:
                     bias_2 = j
                     break
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
