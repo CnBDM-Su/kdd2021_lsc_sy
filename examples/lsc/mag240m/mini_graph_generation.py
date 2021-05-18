@@ -103,12 +103,9 @@ if __name__ == '__main__':
         bias_1 = 0
         for i in tqdm(range(meaningful_idx.shape[0])):
             i = meaningful_idx[i]
-            tmp = []
             for j in range(bias_1,ap_edge.shape[1]):
                 if i==ap_edge[1,j]:
-                    if ap_edge[0,j] not in tmp:
-                        tmp.append(ap_edge[0, j])
-                        meaningful_a.append(ap_edge[0,j])
+                    meaningful_a.append(ap_edge[0,j])
                 if i<ap_edge[1,j]:
                     bias_1 = j
                     break
@@ -128,9 +125,7 @@ if __name__ == '__main__':
             tmp = []
             for j in range(bias_1,ai_edge.shape[1]):
                 if i==ai_edge[0,j]:
-                    if ai_edge[1,j] not in tmp:
-                        tmp.append(ai_edge[1,j])
-                        meaningful_i.append(ai_edge[1,j])
+                    meaningful_i.append(ai_edge[1,j])
                 if i<ai_edge[0,j]:
                     bias_1 = j
                     break
