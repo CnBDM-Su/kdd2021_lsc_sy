@@ -54,24 +54,43 @@ if __name__ == '__main__':
     parser.add_argument('--correction_alpha', type=float, default=1.0)
     parser.add_argument('--num_smoothing_layers', type=int, default=2)
     parser.add_argument('--smoothing_alpha', type=float, default=0.8)
+    parser.add_argument('--mini_graph', type=bool, default=False)
     args = parser.parse_args()
     print(args)
 
     dataset = MAG240MDataset(ROOT)
     evaluator = MAG240MEvaluator()
 
+    if args.mini_graph:
+        save_path = 'results/mini_cs'
+        load_path = '/mini_graph/'
+
+        train_idx = torch.from_numpy(np.load(f'{dataset.dir}/mini_graph/train_idx.npy'))
+        valid_idx = torch.from_numpy(np.load(f'{dataset.dir}/mini_graph/valid_idx.npy'))
+        test_idx = torch.from_numpy(np.load(f'{dataset.dir}/mini_graph/test_idx.npy'))
+        paper_label = np.load(f'{dataset.dir}/mini_graph/paper_label.npy')
+
+    else:
+        save_path = 'results/cs'
+        load_path = '/'
+
+        train_idx = torch.from_numpy(dataset.get_idx_split('train'))
+        valid_idx = torch.from_numpy(dataset.get_idx_split('valid'))
+        test_idx = torch.from_numpy(dataset.get_idx_split('test'))
+        paper_label = dataset.paper_label
+
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
-    y_pred = torch.from_numpy(np.load('results/cs/pred.npy'))
+    y_pred = torch.from_numpy(np.load(save_path+'/pred.npy'))
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     t = time.perf_counter()
     print('Reading adjacency matrix...', end=' ', flush=True)
-    path = f'{dataset.dir}/paper_to_paper_symmetric_gcn.pt'
+    path = f'{dataset.dir}'+load_path+'paper_to_paper_symmetric_gcn.pt'
     if osp.exists(path):
         adj_t = torch.load(path)
     else:
-        path_sym = f'{dataset.dir}/paper_to_paper_symmetric.pt'
+        path_sym = f'{dataset.dir}'+load_path+'paper_to_paper_symmetric.pt'
         if osp.exists(path_sym):
             adj_t = torch.load(path_sym)
         else:
@@ -87,12 +106,8 @@ if __name__ == '__main__':
         torch.save(adj_t, path)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-    train_idx = torch.from_numpy(dataset.get_idx_split('train'))
-    valid_idx = torch.from_numpy(dataset.get_idx_split('valid'))
-    test_idx = torch.from_numpy(dataset.get_idx_split('test'))
-
-    y_train = torch.from_numpy(dataset.paper_label[train_idx]).to(torch.long)
-    y_valid = torch.from_numpy(dataset.paper_label[valid_idx]).to(torch.long)
+    y_train = torch.from_numpy(paper_label[train_idx]).to(torch.long)
+    y_valid = torch.from_numpy(paper_label[valid_idx]).to(torch.long)
 
     model = CorrectAndSmooth(args.num_correction_layers, args.correction_alpha,
                              args.num_smoothing_layers, args.smoothing_alpha,
@@ -124,4 +139,4 @@ if __name__ == '__main__':
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
 
     res = {'y_pred': y_pred[test_idx].argmax(dim=-1), 'y_pred_valid' : y_pred[valid_idx].argmax(dim=-1)}
-    evaluator.save_test_submission(res, 'results/cs')
+    evaluator.save_test_submission(res, save_path)
