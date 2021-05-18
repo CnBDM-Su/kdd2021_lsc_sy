@@ -103,11 +103,13 @@ if __name__ == '__main__':
         valid_idx = np.load(f'{dataset.dir}/mini_graph/valid_idx.npy')
         test_idx = np.load(f'{dataset.dir}/mini_graph/test_idx.npy')
 
+        paper_label = np.load(f'{dataset.dir}/mini_graph/paper_label.npy')
+
         path = f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy'
         if not osp.exists(path):
             print('Generating sorted mini author paper edges...')
             t = time.perf_counter()
-            ap_edge = np.load(f'{dataset.dir}/author_paper_edge.npy')
+            ap_edge = np.load(f'{dataset.dir}/mini_graph/author_paper_edge.npy')
             ap_edge = ap_edge[:, ap_edge[1, :].argsort()]
             np.save(path, ap_edge)
             print(f'Done! [{time.perf_counter() - t:.2f}s]')
@@ -120,7 +122,7 @@ if __name__ == '__main__':
         if not osp.exists(path):
             print('Generating mini paper relation features...')
             t = time.perf_counter()
-            x = np.load(f'{dataset.dir}/mini_graph/full_feat.npy', dtype=np.float16)
+            x = np.load(f'{dataset.dir}/mini_graph/full_feat.npy')
             y = np.memmap(path, dtype=np.float16, mode='w+',
                           shape=(num_papers, 1536))
             ap_edge = np.load(f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy')
@@ -154,6 +156,8 @@ if __name__ == '__main__':
         train_idx = dataset.get_idx_split('train')
         valid_idx = dataset.get_idx_split('valid')
         test_idx = dataset.get_idx_split('test')
+
+        paper_label = dataset.paper_label
 
         path = f'{dataset.dir}/sorted_author_paper_edge.npy'
         if not osp.exists(path):
@@ -214,9 +218,9 @@ if __name__ == '__main__':
         x_valid = torch.from_numpy(x_valid).to(torch.float).to(device)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-        y_train = torch.from_numpy(dataset.paper_label[train_idx])
+        y_train = torch.from_numpy(paper_label[train_idx])
         y_train = y_train.to(device, torch.long)
-        y_valid = torch.from_numpy(dataset.paper_label[valid_idx])
+        y_valid = torch.from_numpy(paper_label[valid_idx])
         y_valid = y_valid.to(device, torch.long)
 
         if args.mini_graph:
@@ -224,7 +228,7 @@ if __name__ == '__main__':
         else:
             save_path = 'results/cs'
         makedirs(save_path)
-        model = MLP(dataset.num_paper_features, args.hidden_channels,
+        model = MLP(dataset.num_paper_features*2, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
@@ -244,7 +248,7 @@ if __name__ == '__main__':
                       f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
                       f'Best: {best_valid_acc:.4f}')
     else:
-        model = MLP(dataset.num_paper_features, args.hidden_channels,
+        model = MLP(dataset.num_paper_features*2, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
     model.load_state_dict(torch.load(save_path+'/model.pt'))

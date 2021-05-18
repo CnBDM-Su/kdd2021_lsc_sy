@@ -6,6 +6,7 @@ import numpy as np
 import os.path as osp
 from ogb.lsc import MAG240MDataset
 from root import ROOT
+from torch_sparse import SparseTensor
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -161,6 +162,15 @@ if __name__ == '__main__':
         np.save(path,y)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
+    path = f'{dataset.dir}/mini_graph/paper_label.npy'
+    if not osp.exists(path):
+        print('generating mini paper label...')
+        t = time.perf_counter()
+        label = dataset.paper_label[meaningful_idx]
+
+        np.save(path, label)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
+
     p_ind_dict = {}
     for i in range(meaningful_idx.shape[0]):
         p_ind_dict[meaningful_idx[i]] = i
@@ -236,6 +246,68 @@ if __name__ == '__main__':
         np.save(path,ai_edge)
     else:
         ai_edge = np.load(path)
+
+    path = f'{dataset.dir}/mini_graph/paper_to_paper_symmetric.pt'
+    if not osp.exists(path):  # Will take approximately 5 minutes...
+        t = time.perf_counter()
+        print('Converting adjacency matrix...', end=' ', flush=True)
+        edge_index = pp_edge
+        edge_index = torch.from_numpy(edge_index)
+        adj_t = SparseTensor(
+            row=edge_index[0], col=edge_index[1],
+            sparse_sizes=(num_dict['paper'], num_dict['paper']),
+            is_sorted=True)
+        torch.save(adj_t.to_symmetric(), path)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
+
+    path = f'{dataset.dir}/mini_graph/full_adj_t.pt'
+    if not osp.exists(path):  # Will take approximately 16 minutes...
+        t = time.perf_counter()
+        print('Merging adjacency matrices...', end=' ', flush=True)
+
+        row, col, _ = torch.load(
+            f'{dataset.dir}/mini_graph/paper_to_paper_symmetric.pt').coo()
+        rows, cols = [row], [col]
+
+        edge_index = ap_edge
+        row, col = torch.from_numpy(edge_index)
+        row += num_dict['paper']
+        rows += [row, col]
+        cols += [col, row]
+
+        edge_index = ai_edge
+        row, col = torch.from_numpy(edge_index)
+        row += num_dict['paper']
+        col += num_dict['paper'] + num_dict['author']
+        rows += [row, col]
+        cols += [col, row]
+
+        edge_types = [
+            torch.full(x.size(), i, dtype=torch.int8)
+            for i, x in enumerate(rows)
+        ]
+
+        row = torch.cat(rows, dim=0)
+        del rows
+        col = torch.cat(cols, dim=0)
+        del cols
+
+        N = (num_dict['paper'] + num_dict['author'] +
+             num_dict['institution'])
+
+        perm = (N * row).add_(col).numpy().argsort()
+        perm = torch.from_numpy(perm)
+        row = row[perm]
+        col = col[perm]
+
+        edge_type = torch.cat(edge_types, dim=0)[perm]
+        del edge_types
+
+        full_adj_t = SparseTensor(row=row, col=col, value=edge_type,
+                                  sparse_sizes=(N, N), is_sorted=True)
+
+        torch.save(full_adj_t, path)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
 
 
