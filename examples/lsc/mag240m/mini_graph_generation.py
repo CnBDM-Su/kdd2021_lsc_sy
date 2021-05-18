@@ -207,7 +207,7 @@ if __name__ == '__main__':
         pp_edge_new = []
         for i in tqdm(range(pp_edge.shape[1])):
             if (pp_edge[0,i] in p_ind_dict.keys()) and (pp_edge[1,i] in p_ind_dict.keys()):
-                pp_edge_new.append(p_ind_dict[pp_edge[0,i]],[p_ind_dict[pp_edge[1,i]]])
+                pp_edge_new.append([p_ind_dict[pp_edge[0,i]],p_ind_dict[pp_edge[1,i]]])
         pp_edge = np.array(pp_edge_new).T
         np.save(path,pp_edge)
     else:
@@ -219,7 +219,7 @@ if __name__ == '__main__':
         ap_edge_new = []
         for i in tqdm(range(ap_edge.shape[1])):
             if ap_edge[1,i] in p_ind_dict.keys():
-                ap_edge.append(a_ind_dict[ap_edge[0,i]],[p_ind_dict[ap_edge[1,i]]])
+                ap_edge.append([a_ind_dict[ap_edge[0,i]],p_ind_dict[ap_edge[1,i]]])
         ap_edge = np.array(ap_edge_new).T
         np.save(path,ap_edge)
     else:
@@ -231,7 +231,7 @@ if __name__ == '__main__':
         ai_edge_new = []
         for i in tqdm(range(ai_edge.shape[1])):
             if ai_edge[0,i] in a_ind_dict.keys():
-                ai_edge.append(a_ind_dict[ai_edge[0,i]],[i_ind_dict[ai_edge[1,i]]])
+                ai_edge.append([a_ind_dict[ai_edge[0,i]],i_ind_dict[ai_edge[1,i]]])
         ai_edge = np.array(ai_edge_new).T
         np.save(path,ai_edge)
     else:
