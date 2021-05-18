@@ -132,6 +132,7 @@ if __name__ == '__main__':
                     fea_.append(0)
                 else:
                     fea = []
+                    degree = []
                     for j in range(bias, len(ap_edge[0])):
                         if ap_edge[1, j] == i:
                             fea.append(ap_edge[0, j])
