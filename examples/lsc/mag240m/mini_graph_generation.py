@@ -100,6 +100,7 @@ if __name__ == '__main__':
     if not osp.exists(path):
         print('generating author meaningful index...')
         meaningful_a = []
+        bias_1 = 0
         for i in tqdm(range(meaningful_idx.shape[0])):
             i = meaningful_idx[i]
             for j in range(bias_1,ap_edge.shape[1]):
@@ -111,6 +112,7 @@ if __name__ == '__main__':
                     break
         meaningful_a = np.sort(meaningful_a)
         np.save(path,meaningful_a)
+        print('meaningful author num:',meaningful_a.shape[0])
     else:
         meaningful_a = np.load(path)
 
@@ -118,6 +120,7 @@ if __name__ == '__main__':
     if not osp.exists(path):
         print('generating institution meaningful index...')
         meaningful_i = []
+        bias_1 = 0
         for i in tqdm(range(meaningful_a.shape[0])):
             i = meaningful_a[i]
             for j in range(bias_1,ai_edge.shape[1]):
@@ -129,6 +132,7 @@ if __name__ == '__main__':
                     break
         meaningful_i = np.sort(meaningful_i)
         np.save(path, meaningful_i)
+        print('meaningful institution num:', meaningful_i.shape[0])
     else:
         meaningful_i = np.load(path)
 
