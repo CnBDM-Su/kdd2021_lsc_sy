@@ -103,14 +103,16 @@ if __name__ == '__main__':
         bias_1 = 0
         for i in tqdm(range(meaningful_idx.shape[0])):
             i = meaningful_idx[i]
+            tmp = []
             for j in range(bias_1,ap_edge.shape[1]):
                 if i==ap_edge[1,j]:
-                    if ap_edge[0,j] not in meaningful_a:
+                    if ap_edge[0,j] not in tmp:
+                        tmp.append(ap_edge[0, j])
                         meaningful_a.append(ap_edge[0,j])
                 if i<ap_edge[1,j]:
                     bias_1 = j
                     break
-        meaningful_a = np.sort(meaningful_a)
+        meaningful_a = np.unique(meaningful_a)
         np.save(path,meaningful_a)
         print('meaningful author num:',meaningful_a.shape[0])
     else:
@@ -123,14 +125,17 @@ if __name__ == '__main__':
         bias_1 = 0
         for i in tqdm(range(meaningful_a.shape[0])):
             i = meaningful_a[i]
+            tmp = []
             for j in range(bias_1,ai_edge.shape[1]):
                 if i==ai_edge[0,j]:
-                    if ai_edge[1,j] not in meaningful_i:
+                    if ai_edge[1,j] not in tmp:
+                        tmp.append(ai_edge[1,j])
                         meaningful_i.append(ai_edge[1,j])
                 if i<ai_edge[0,j]:
                     bias_1 = j
                     break
-        meaningful_i = np.sort(meaningful_i)
+
+        meaningful_i = np.unique(meaningful_i)
         np.save(path, meaningful_i)
         print('meaningful institution num:', meaningful_i.shape[0])
     else:
@@ -153,8 +158,8 @@ if __name__ == '__main__':
         x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
                            mode='r', shape=(N, 768))
         y = x[meaningful_idx]
-        y1 = x[meaningful_a+num_dict['paper']]
-        y2 = x[meaningful_a + num_dict['paper']+num_dict['author']]
+        y1 = x[meaningful_a + num_dict['paper']]
+        y2 = x[meaningful_i + num_dict['paper'] + num_dict['author']]
 
         y = np.concatenate([y,y1,y2],0)
 
