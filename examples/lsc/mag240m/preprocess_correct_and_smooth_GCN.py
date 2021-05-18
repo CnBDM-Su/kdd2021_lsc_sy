@@ -110,6 +110,8 @@ if __name__ == '__main__':
         np.save(path, ap_edge)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
+    meaningful_idx = np.load(f'{dataset.dir}/meaningful_idx.npy')
+
     path = f'{dataset.dir}/paper_relation_feat.npy'
     if not osp.exists(path):
         print('Generating paper relation features...')
@@ -126,16 +128,18 @@ if __name__ == '__main__':
             fea_ = []
             end = min((p_batch + 1) * p_batch_size, dataset.num_papers)
             for i in range(p_batch * p_batch_size, end):
-                sign = 0
-                fea = []
-                for j in range(bias, len(ap_edge[0])):
-                    if ap_edge[1, j] == i:
-                        fea.append(ap_edge[0, j])
-                    else:
-                        break
-                bias = j
-                fea = x[fea]
-                fea_.append(np.mean(fea, 0))
+                if i not in meaningful_idx:
+                    fea_.append(0)
+                else:
+                    fea = []
+                    for j in range(bias, len(ap_edge[0])):
+                        if ap_edge[1, j] == i:
+                            fea.append(ap_edge[0, j])
+                        else:
+                            break
+                    bias = j
+                    fea = x[fea]
+                    fea_.append(np.mean(fea, 0))
             fea_ = np.array(fea_)
             y[p_batch * p_batch_size:end] = np.concatenate([x[p_batch * p_batch_size:end], fea_], 1)
         x_fr = np.memmap(path, dtype=np.float16, mode='r',
