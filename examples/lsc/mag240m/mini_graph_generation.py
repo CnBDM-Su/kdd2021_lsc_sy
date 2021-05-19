@@ -137,15 +137,16 @@ if __name__ == '__main__':
     else:
         meaningful_i = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph/num_dict.npy'
+    path = f'{dataset.dir}/mini_graph/meta.pt'
     if not osp.exists(path):
         num_dict = {}
         num_dict['paper'] = meaningful_idx.shape[0]
         num_dict['author'] = meaningful_a.shape[0]
         num_dict['institution'] = meaningful_i.shape[0]
-        np.save(path,num_dict)
+        num_dict['num_classes'] = 153
+        torch.save(num_dict,path)
     else:
-        num_dict = np.load(path,allow_pickle=True).item()
+        num_dict = torch.load(path)
 
     path = f'{dataset.dir}/mini_graph/full_feat.npy'
     if not osp.exists(path):
@@ -193,35 +194,27 @@ if __name__ == '__main__':
     for i in range(meaningful_i.shape[0]):
         i_ind_dict[meaningful_i[i]] = i
 
-    path = f'{dataset.dir}/mini_graph/train_idx.npy'
+    path = f'{dataset.dir}/mini_graph/split_dict.pt'
     if not osp.exists(path):
+        split_dict = {}
         train_idx_new = []
         for i in train_idx:
             train_idx_new.append(p_ind_dict[i])
-        train_idx = np.sort(train_idx_new)
-        np.save(path, train_idx)
+        split_dict['train'] = np.sort(train_idx_new)
+
+        valid_idx_new = []
+        for i in valid_idx:
+            valid_idx_new.append(p_ind_dict[i])
+        split_dict['valid'] = np.sort(valid_idx_new)
+
+        test_idx_new = []
+        for i in test_idx:
+            test_idx_new.append(p_ind_dict[i])
+        split_dict['test'] = np.sort(test_idx_new)
+
+        torch.save(split_dict,path)
     else:
-        train_idx = np.load(path)
-
-        path = f'{dataset.dir}/mini_graph/valid_idx.npy'
-        if not osp.exists(path):
-            valid_idx_new = []
-            for i in valid_idx:
-                valid_idx_new.append(p_ind_dict[i])
-            valid_idx = np.sort(valid_idx_new)
-            np.save(path, valid_idx)
-        else:
-            valid_idx = np.load(path)
-
-        path = f'{dataset.dir}/mini_graph/test_idx.npy'
-        if not osp.exists(path):
-            test_idx_new = []
-            for i in test_idx:
-                test_idx_new.append(p_ind_dict[i])
-            test_idx = np.sort(test_idx_new)
-            np.save(path, test_idx)
-        else:
-            test_idx = np.load(path)
+        split_dict = torch.load(path)
 
     path = f'{dataset.dir}/mini_graph/paper_paper_edge.npy'
     if not osp.exists(path):
