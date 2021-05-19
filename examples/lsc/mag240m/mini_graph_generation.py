@@ -143,6 +143,7 @@ if __name__ == '__main__':
         num_dict['paper'] = meaningful_idx.shape[0]
         num_dict['author'] = meaningful_a.shape[0]
         num_dict['institution'] = meaningful_i.shape[0]
+        np.save(path,num_dict)
     else:
         num_dict = np.load(path,allow_pickle=True).item()
 
