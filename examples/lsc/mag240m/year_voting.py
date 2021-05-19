@@ -67,7 +67,7 @@ if __name__ == '__main__':
         i = author_list[i]
         for j in tqdm(range(bias, ap_edge.shape[1])):
             if i == ap_edge[0, j]:
-                author_paper_list.append([i,ap_edge[j, 1]])
+                author_paper_list.append([i,ap_edge[1, j]])
                 paper_list.append(ap_edge[1, j])
             if i < ap_edge[0, j]:
                 bias = j

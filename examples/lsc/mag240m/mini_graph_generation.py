@@ -161,6 +161,8 @@ if __name__ == '__main__':
         y = np.concatenate([y,y1,y2],0)
 
         np.save(path,y)
+        with open(f'{dataset.dir}/full_feat_done.txt', 'w') as f:
+            f.write('done')
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     path = f'{dataset.dir}/mini_graph/paper_label.npy'
