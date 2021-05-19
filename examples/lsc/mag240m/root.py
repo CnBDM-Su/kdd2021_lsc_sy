@@ -1,1 +1,1 @@
-ROOT = '/app/kdd/data/'
+ROOT = '/var/kdd-data/'
