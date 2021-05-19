@@ -45,27 +45,29 @@ if __name__ == '__main__':
     paper_author_list = []
     author_list = []
     bias = 0
+    print('--reading paper author list--')
     for i in idx:
-        for j in range(bias, ap_edge.shape[1]):
-            if i == ap_edge[j,1]:
-                paper_author_list.append(i,ap_edge[j,0])
-                author_list.append(ap_edge[j,0])
-            if i < ap_edge[j,1]:
+        for j in tqdm(range(bias, ap_edge.shape[1])):
+            if i == ap_edge[1,j]:
+                paper_author_list.append([i,ap_edge[0,j]])
+                author_list.append(ap_edge[0,j])
+            if i < ap_edge[1,j]:
                 bias = j
                 break
     author_list = np.unique(author_list)
 
     ap_edge = dataset.edge_index('author', 'writes', 'paper')
 
+    print('--reading author paper list--')
     bias = 0
     author_paper_list = []
     paper_list = []
     for i in author_list:
-        for j in range(bias, ap_edge.shape[1]):
-            if i == ap_edge[j, 0]:
-                author_paper_list.append(i,ap_edge[j, 1])
-                paper_list.append(ap_edge[j, 1])
-            if i < ap_edge[j, 0]:
+        for j in tqdm(range(bias, ap_edge.shape[1])):
+            if i == ap_edge[0, j]:
+                author_paper_list.append([i,ap_edge[j, 1]])
+                paper_list.append(ap_edge[1, j])
+            if i < ap_edge[0, j]:
                 bias = j
                 break
     paper_list = np.unique(paper_list)
