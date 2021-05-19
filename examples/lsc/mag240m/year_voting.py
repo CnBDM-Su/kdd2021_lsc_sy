@@ -74,7 +74,6 @@ if __name__ == '__main__':
                 break
     paper_list = np.unique(paper_list)
 
-
     related_year = year[paper_list]
     related_label = label[paper_list]
 
@@ -86,23 +85,17 @@ if __name__ == '__main__':
 
     result = []
     print('resulting...')
-    ind = list(target.groupby('author').year.max().index)
-    val = target.groupby('author').year.max().values
-    r = np.concatenate([np.array(ind).reshape(-1, 1), val.reshape(-1, 1)], 1)
+    target = target.groupby('author').apply(lambda t: t[t.year == t.year.max()]).reset_index(drop=True)
+    target2 = target.groupby('author').label.agg(lambda x: x.value_counts().index[0]).reset_index()
 
-    a_ = []
-    for i in range(r.shape[0]):
-        tmp = target[(target.author == r[i, 0]) & (target.year == r[i, 1])]
-        try:
-            a_.append([tmp.author.values[0], tmp.label.mode().values[0]])
-        except:
-            a_.append([tmp.author.values[0], -1])
 
     target1 = pd.DataFrame(paper_author_list,columns=['ind','author'])
-    target2 = pd.DataFrame(a_,columns=['author','label'])
+    # target2 = pd.DataFrame(a_,columns=['author','label'])
 
     target = pd.merge(target1,target2)
     target = pd.DataFrame(target.groupby('ind').label.agg(lambda x: x.value_counts().index[0]))
+
+
     y_pred = target.loc[valid_idx].label.values
     y_true = label[valid_idx]
 
