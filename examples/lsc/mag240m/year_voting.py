@@ -32,15 +32,15 @@ if __name__ == '__main__':
     dataset = MAG240MDataset(ROOT)
     evaluator = MAG240MEvaluator()
 
-    train_idx = dataset.get_idx_split('train')
-    valid_idx = dataset.get_idx_split('valid')
-    test_idx = dataset.get_idx_split('test')
+    train_idx = np.load(f'{dataset.dir}/mini_graph/train_idx.npy')
+    valid_idx = np.load(f'{dataset.dir}/mini_graph/valid_idx.npy')
+    test_idx = np.load(f'{dataset.dir}/mini_graph/test_idx.npy')
 
-    ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
+    ap_edge = np.load(f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy')
     idx = np.concatenate([train_idx,valid_idx],0)
 
-    year = dataset.paper_year
-    label = dataset.paper_label
+    year = np.load(f'{dataset.dir}/mini_graph/paper_year.npy')
+    label = np.load(f'{dataset.dir}/mini_graph/paper_label.npy')
 
     paper_author_list = []
     author_list = []

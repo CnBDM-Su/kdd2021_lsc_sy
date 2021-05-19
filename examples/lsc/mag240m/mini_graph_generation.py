@@ -171,6 +171,15 @@ if __name__ == '__main__':
         np.save(path, label)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
+    path = f'{dataset.dir}/mini_graph/paper_year.npy'
+    if not osp.exists(path):
+        print('generating mini paper year...')
+        t = time.perf_counter()
+        year = dataset.paper_year[meaningful_idx]
+
+        np.save(path, year)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
+
     p_ind_dict = {}
     for i in range(meaningful_idx.shape[0]):
         p_ind_dict[meaningful_idx[i]] = i
