@@ -20,19 +20,22 @@ class MAG240MDataset(object):
         ('paper', 'paper'): 'cites',
     }
 
-    def __init__(self, root: str = 'dataset'):
+    def __init__(self, root: str = 'dataset', type=None):
         if isinstance(root, str):
             root = osp.expanduser(osp.normpath(root))
         self.root = root
-        self.dir = osp.join(root, '/app/kdd/data/mag240m_kddcup2021')
+        if type=='mini_graph':
+            self.dir = osp.join(root, 'mag240m_kddcup2021/mini_graph')
+        else:
+            self.dir = osp.join(root, 'mag240m_kddcup2021')
 
-        if osp.isdir(self.dir) and (not osp.exists(
-                osp.join(self.dir, f'RELEASE_v{self.version}.txt'))):
-            print('MAG240M dataset has been updated.')
-            if input('Will you update the dataset now? (y/N)\n') == 'y':
-                shutil.rmtree(osp.join(self.dir))
-
-        self.download()
+        # if osp.isdir(self.dir) and (not osp.exists(
+        #         osp.join(self.dir, f'RELEASE_v{self.version}.txt'))):
+        #     print('MAG240M dataset has been updated.')
+        #     if input('Will you update the dataset now? (y/N)\n') == 'y':
+        #         shutil.rmtree(osp.join(self.dir))
+        #
+        # self.download()
         self.__meta__ = torch.load(osp.join(self.dir, 'meta.pt'))
         self.__split__ = torch.load(osp.join(self.dir, 'split_dict.pt'))
 
