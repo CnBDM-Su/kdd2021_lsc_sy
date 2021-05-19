@@ -46,8 +46,9 @@ if __name__ == '__main__':
     author_list = []
     bias = 0
     print('--reading paper author list--')
-    for i in idx:
-        for j in tqdm(range(bias, ap_edge.shape[1])):
+    for i in tqdm(range(idx.shape[0])):
+        i = idx[i]
+        for j in range(bias, ap_edge.shape[1]):
             if i == ap_edge[1,j]:
                 paper_author_list.append([i,ap_edge[0,j]])
                 author_list.append(ap_edge[0,j])
@@ -62,7 +63,8 @@ if __name__ == '__main__':
     bias = 0
     author_paper_list = []
     paper_list = []
-    for i in author_list:
+    for i in tqdm(range(author_list.shape[0])):
+        i = author_list[i]
         for j in tqdm(range(bias, ap_edge.shape[1])):
             if i == ap_edge[0, j]:
                 author_paper_list.append([i,ap_edge[j, 1]])
@@ -77,7 +79,7 @@ if __name__ == '__main__':
     related_label = label[paper_list]
 
     target1 = pd.DataFrame(author_paper_list,columns=['author','ind'])
-    target2 = pd.DataFrame(np.concatenate([author_paper_list,related_year,related_label],1),columns=['ind','year','label'])
+    target2 = pd.DataFrame(np.concatenate([paper_list.reshape(-1,1),np.array(related_year).reshape(-1,1),np.array(related_label).reshape(-1,1)],1),columns=['ind','year','label'])
     target2 = target2[target2.year<2019]
 
     target = pd.merge(target1,target2)
@@ -91,7 +93,10 @@ if __name__ == '__main__':
     a_ = []
     for i in range(r.shape[0]):
         tmp = target[(target.author == r[i, 0]) & (target.year == r[i, 1])]
-        a_.append([tmp.author.values[0], tmp.label.mode().values[0]])
+        try:
+            a_.append([tmp.author.values[0], tmp.label.mode().values[0]])
+        except:
+            a_.append([tmp.author.values[0], -1])
 
     target1 = pd.DataFrame(paper_author_list,columns=['ind','author'])
     target2 = pd.DataFrame(a_,columns=['author','label'])
