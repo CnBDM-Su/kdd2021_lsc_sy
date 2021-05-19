@@ -154,8 +154,8 @@ if __name__ == '__main__':
         x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
                            mode='r', shape=(N, 768))
         y = x[meaningful_idx]
-        y1 = x[meaningful_a + num_dict['paper']]
-        y2 = x[meaningful_i + num_dict['paper'] + num_dict['author']]
+        y1 = x[meaningful_a + dataset.num_papers]
+        y2 = x[meaningful_i + dataset.num_papers + dataset.num_authors]
 
         y = np.concatenate([y,y1,y2],0)
 
