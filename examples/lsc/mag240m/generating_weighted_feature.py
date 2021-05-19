@@ -17,7 +17,7 @@ done_flag_path = f'{dataset.dir}/mini_graph/full_weighted_feat_done.txt'
 if not osp.exists(done_flag_path):  # Will take ~3 hours...
     t = time.perf_counter()
     print('Generating mini full weighted feature matrix...')
-    num_dict = np.load(f'{dataset.dir}/mini_graph/num_dict',allow_pickle=True).item()
+    num_dict = np.load(f'{dataset.dir}/mini_graph/num_dict.npy',allow_pickle=True).item()
 
     node_chunk_size = 100000
     dim_chunk_size = 64
@@ -34,7 +34,7 @@ if not osp.exists(done_flag_path):  # Will take ~3 hours...
         edge_index = np.load(f'{dataset.dir}/mini_graph/author_paper_edge.npy')
         year = np.load(f'{dataset.dir}/mini_graph/paper_year.npy')
         mm = MinMaxScaler((0.5,1))
-
+        bias = 0
         val = []
         for i in tqdm(range(num_dict['author'])):
             tmp = []
@@ -44,10 +44,11 @@ if not osp.exists(done_flag_path):  # Will take ~3 hours...
                 if i < edge_index[0,j]:
                     bias = j
                     break
-            tmp = mm.fit_transform(year[tmp].reshape(-1,1)).ravel()
-            for weight in tmp:
-                val.append(weight)
-        weighted_edge = np.concatenate([edge_index,np.array(val)],0)
+            if len(tmp)!=0:
+                tmp = mm.fit_transform(year[tmp].reshape(-1,1)).ravel()
+                for weight in tmp:
+                    val.append(weight)
+        weighted_edge = np.concatenate([edge_index,np.array(val).reshape(1,-1)],0)
         np.save(path,weighted_edge)
 
     row, col = torch.from_numpy(weighted_edge)

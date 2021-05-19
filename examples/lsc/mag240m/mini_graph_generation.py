@@ -238,6 +238,7 @@ if __name__ == '__main__':
     path = f'{dataset.dir}/mini_graph/author_paper_edge.npy'
     if not osp.exists(path):
         print('generating mini graph author_paper edge...')
+        ap_edge = dataset.edge_index('author', 'writes', 'paper')
         ap_edge_new = []
         for i in tqdm(range(ap_edge.shape[1])):
             if ap_edge[1,i] in p_ind_dict.keys():
