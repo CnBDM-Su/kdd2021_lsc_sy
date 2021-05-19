@@ -26,7 +26,6 @@ from torch_geometric.data import NeighborSampler
 from ogb.lsc import MAG240MDataset
 from root import ROOT
 from ogb.utils.url import makedirs
-import zarr
 
 class Batch(NamedTuple):
     x: Tensor
