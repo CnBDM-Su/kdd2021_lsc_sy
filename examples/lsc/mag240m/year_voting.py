@@ -57,61 +57,71 @@ if __name__ == '__main__':
                 break
     author_list = np.unique(author_list)
 
-    ap_edge = dataset.edge_index('author', 'writes', 'paper')
+    ap_edge = np.load(f'{dataset.dir}/mini_graph/author_paper_edge.npy')
 
     print('--reading author paper list--')
     bias = 0
     author_paper_list = []
     paper_list = []
+    num = 0
     for i in tqdm(range(author_list.shape[0])):
         i = author_list[i]
+        sig = 0
         for j in range(bias, ap_edge.shape[1]):
             if i == ap_edge[0, j]:
+                if ap_edge[1, j] in idx:
+                    sig = 1
                 author_paper_list.append([i,ap_edge[1, j]])
                 paper_list.append(ap_edge[1, j])
             if i < ap_edge[0, j]:
                 bias = j
                 break
-    paper_list = np.unique(paper_list)
-
-    related_year = year[paper_list]
-    related_label = label[paper_list]
-
-    target1 = pd.DataFrame(author_paper_list,columns=['author','ind'])
-    target2 = pd.DataFrame(np.concatenate([paper_list.reshape(-1,1),np.array(related_year).reshape(-1,1),np.array(related_label).reshape(-1,1)],1),columns=['ind','year','label'])
-    target2 = target2[target2.year<2019]
-
-    target = pd.merge(target1,target2)
-
-    result = []
-    print('resulting...')
-    target = target.groupby('author').apply(lambda t: t[t.year == t.year.max()]).reset_index(drop=True)
-    target2 = target.groupby('author').label.agg(lambda x: x.value_counts().index[0]).reset_index()
-
-
-    target1 = pd.DataFrame(paper_author_list,columns=['ind','author'])
-    # target2 = pd.DataFrame(a_,columns=['author','label'])
-
-    target = pd.merge(target1,target2)
-    target = pd.DataFrame(target.groupby('ind').label.agg(lambda x: x.value_counts().index[0]))
-
-
-    y_pred = target.loc[valid_idx].label.values
-    y_true = label[valid_idx]
-
-    if not isinstance(y_pred, torch.Tensor):
-        y_pred = torch.from_numpy(y_pred)
-    if not isinstance(y_true, torch.Tensor):
-        y_true = torch.from_numpy(y_true)
-
-    assert (y_true.numel() == y_pred.numel())
-    assert (y_true.dim() == y_pred.dim() == 1)
-
-    acc = int((y_true == y_pred).sum()) / y_true.numel()
-    print(acc)
-
-
-
-
+        if sig==1:
+            num += 1
+    print('known author num:',num)
+    # paper_list = np.unique(paper_list)
+    #
+    # related_year = year[paper_list]
+    # related_label = label[paper_list]
+    #
+    # target1 = pd.DataFrame(author_paper_list,columns=['author','ind'])
+    # target2 = pd.DataFrame(np.concatenate([paper_list.reshape(-1,1),np.array(related_year).reshape(-1,1),np.array(related_label).reshape(-1,1)],1),columns=['ind','year','label'])
+    # target2 = target2[target2.year<2019]
+    #
+    # target = pd.merge(target1,target2)
+    #
+    # result = []
+    # print('resulting...')
+    #
+    # target = target.groupby('author').apply(lambda t: t[t.year == t.year.max()]).reset_index(drop=True)
+    # target = target.fillna(-1)
+    # target2 = target.groupby('author').label.agg(lambda x: x.value_counts().index[0]).reset_index()
+    #
+    #
+    # target1 = pd.DataFrame(paper_author_list,columns=['ind','author'])
+    # # target2 = pd.DataFrame(a_,columns=['author','label'])
+    #
+    # target = pd.merge(target1,target2)
+    # target = pd.DataFrame(target.groupby('ind').label.agg(lambda x: x.value_counts().index[0]))
+    #
+    #
+    #
+    # y_pred = target.loc[valid_idx].label.values
+    # y_true = label[valid_idx]
+    #
+    # if not isinstance(y_pred, torch.Tensor):
+    #     y_pred = torch.from_numpy(y_pred)
+    # if not isinstance(y_true, torch.Tensor):
+    #     y_true = torch.from_numpy(y_true)
+    #
+    # assert (y_true.numel() == y_pred.numel())
+    # assert (y_true.dim() == y_pred.dim() == 1)
+    #
+    # acc = int((y_true == y_pred).sum()) / y_true.numel()
+    # print(acc)
+    #
+    #
+    #
+    #
 
 
