@@ -11,7 +11,11 @@ import random
 import os.path as osp
 
 from ogb.utils.url import makedirs
+
 from ogb.lsc import MAG240MDataset, MAG240MEvaluator
+import sys
+sys.path.append('/var/kdd-code/test/ogb/lsc')
+from mag240m_mini_graph import MAG240MMINIDataset
 from root import ROOT
 
 
@@ -95,113 +99,63 @@ if __name__ == '__main__':
     torch.manual_seed(12345)
     device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
 
-    dataset = MAG240MDataset(ROOT)
+
     evaluator = MAG240MEvaluator()
 
     if args.mini_graph:
-        train_idx = np.load(f'{dataset.dir}/mini_graph/train_idx.npy')
-        valid_idx = np.load(f'{dataset.dir}/mini_graph/valid_idx.npy')
-        test_idx = np.load(f'{dataset.dir}/mini_graph/test_idx.npy')
-
-        paper_label = np.load(f'{dataset.dir}/mini_graph/paper_label.npy')
-
-        path = f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy'
-        if not osp.exists(path):
-            print('Generating sorted mini author paper edges...')
-            t = time.perf_counter()
-            ap_edge = np.load(f'{dataset.dir}/mini_graph/author_paper_edge.npy')
-            ap_edge = ap_edge[:, ap_edge[1, :].argsort()]
-            np.save(path, ap_edge)
-            print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
-        meaningful_idx = np.load(f'{dataset.dir}/meaningful_idx.npy')
-        num_papers = meaningful_idx.shape[0]
-
-
-        path = f'{dataset.dir}/mini_graph/paper_relation_feat.npy'
-        if not osp.exists(path):
-            print('Generating mini paper relation features...')
-            t = time.perf_counter()
-            x = np.load(f'{dataset.dir}/mini_graph/full_feat.npy')
-            y = np.memmap(path, dtype=np.float16, mode='w+',
-                          shape=(num_papers, 1536))
-            ap_edge = np.load(f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy')
-            bias = 0
-            p_batch_size = args.p_batch_size
-            for p_batch in tqdm(range(num_papers // p_batch_size)):
-                fea_ = []
-                end = min((p_batch + 1) * p_batch_size, num_papers)
-                for i in range(p_batch * p_batch_size, end):
-                    sign = 0
-                    fea = []
-                    for j in range(bias, len(ap_edge[0])):
-                        if ap_edge[1, j] == i:
-                            fea.append(ap_edge[0, j])
-                        else:
-                            break
-                    bias = j
-                    fea = x[fea]
-                    fea_.append(np.mean(fea, 0))
-                fea_ = np.array(fea_)
-                y[p_batch * p_batch_size:end] = np.concatenate([x[p_batch * p_batch_size:end], fea_], 1)
-            x_fr = np.memmap(path, dtype=np.float16, mode='r',
-                             shape=(num_papers, 1536))
-            print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
-        else:
-            x_fr = np.memmap(path, dtype=np.float16, mode='r',
-                          shape=(num_papers, 1536))
-
+        dataset = MAG240MMINIDataset(ROOT)
     else:
-        train_idx = dataset.get_idx_split('train')
-        valid_idx = dataset.get_idx_split('valid')
-        test_idx = dataset.get_idx_split('test')
+        dataset = MAG240MDataset(ROOT)
 
-        paper_label = dataset.paper_label
+    train_idx = dataset.get_idx_split('train')
+    valid_idx = dataset.get_idx_split('valid')
+    test_idx = dataset.get_idx_split('test')
 
-        path = f'{dataset.dir}/sorted_author_paper_edge.npy'
-        if not osp.exists(path):
-            print('Generating sorted author paper edges...')
-            t = time.perf_counter()
-            ap_edge = dataset.edge_index('author', 'writes', 'paper')
-            ap_edge = ap_edge[:, ap_edge[1, :].argsort()]
-            np.save(path, ap_edge)
-            print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    paper_label = dataset.paper_label
 
-        path = f'{dataset.dir}/paper_relation_feat.npy'
-        if not osp.exists(path):
-            print('Generating paper relation features...')
-            t = time.perf_counter()
-            N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
-            x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
-                               mode='r', shape=(N, 768))
-            y = np.memmap(path, dtype=np.float16, mode='w+',
-                          shape=(dataset.num_papers, 1536))
-            ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
-            bias = 0
-            p_batch_size = args.p_batch_size
-            for p_batch in tqdm(range(dataset.num_papers // p_batch_size)):
-                fea_ = []
-                end = min((p_batch + 1) * p_batch_size, dataset.num_papers)
-                for i in range(p_batch * p_batch_size, end):
-                    sign = 0
-                    fea = []
-                    for j in range(bias, len(ap_edge[0])):
-                        if ap_edge[1, j] == i:
-                            fea.append(ap_edge[0, j])
-                        else:
-                            break
-                    bias = j
-                    fea = x[fea]
-                    fea_.append(np.mean(fea, 0))
-                fea_ = np.array(fea_)
-                y[p_batch * p_batch_size:end] = np.concatenate([x[p_batch * p_batch_size:end], fea_], 1)
-            x_fr = np.memmap(path, dtype=np.float16, mode='r',
-                             shape=(dataset.num_papers, 1536))
-            print(f'Done! [{time.perf_counter() - t:.2f}s]')
-        else:
-            x_fr = np.memmap(path, dtype=np.float16, mode='r',
-                          shape=(dataset.num_papers, 1536))
+    path = f'{dataset.dir}/sorted_author_paper_edge.npy'
+    if not osp.exists(path):
+        print('Generating sorted author paper edges...')
+        t = time.perf_counter()
+        ap_edge = dataset.edge_index('author', 'writes', 'paper')
+        ap_edge = ap_edge[:, ap_edge[1, :].argsort()]
+        np.save(path, ap_edge)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
+
+    path = f'{dataset.dir}/paper_relation_feat.npy'
+    if not osp.exists(path):
+        print('Generating paper relation features...')
+        t = time.perf_counter()
+        N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
+        x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
+                           mode='r', shape=(N, 768))
+        y = np.memmap(path, dtype=np.float16, mode='w+',
+                      shape=(dataset.num_papers, 1536))
+        ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
+        bias = 0
+        p_batch_size = args.p_batch_size
+        for p_batch in tqdm(range(dataset.num_papers // p_batch_size)):
+            fea_ = []
+            end = min((p_batch + 1) * p_batch_size, dataset.num_papers)
+            for i in range(p_batch * p_batch_size, end):
+                sign = 0
+                fea = []
+                for j in range(bias, len(ap_edge[0])):
+                    if ap_edge[1, j] == i:
+                        fea.append(ap_edge[0, j])
+                    else:
+                        break
+                bias = j
+                fea = x[fea]
+                fea_.append(np.mean(fea, 0))
+            fea_ = np.array(fea_)
+            y[p_batch * p_batch_size:end] = np.concatenate([x[p_batch * p_batch_size:end], fea_], 1)
+        x_fr = np.memmap(path, dtype=np.float16, mode='r',
+                         shape=(dataset.num_papers, 1536))
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    else:
+        x_fr = np.memmap(path, dtype=np.float16, mode='r',
+                      shape=(dataset.num_papers, 1536))
 
     if args.evaluate==False:
         t = time.perf_counter()
