@@ -77,7 +77,7 @@ if not osp.exists(done_flag_path):  # Will take ~3 hours...
     print('Generating institution features...')
     # Processing 64-dim subfeatures at a time for memory efficiency.
 
-    inputs = torch.from_numpy(paper_feat)
+    inputs = torch.from_numpy(paper_feat).float()
     outputs_2 = adj_t.matmul(inputs, reduce='mean').numpy()
 
     outputs = np.concatenate([paper_feat,outputs,outputs_2],0)
