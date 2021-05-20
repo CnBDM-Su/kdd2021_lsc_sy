@@ -10,7 +10,7 @@ import numpy as np
 from ogb.utils.url import decide_download, download_url, extract_zip, makedirs
 
 
-class MAG240MDataset_mini_graph(object):
+class MAG240MMINIDataset(object):
     version = 1
     url = 'http://ogb-data.stanford.edu/data/lsc/mag240m_kddcup2021.zip'
 
@@ -129,7 +129,7 @@ class MAG240MEvaluator:
 
 
 if __name__ == '__main__':
-    dataset = MAG240MDataset_mini_graph()
+    dataset = MAG240MMINIDataset()
     print(dataset)
     print(dataset.num_papers)
     print(dataset.num_authors)
