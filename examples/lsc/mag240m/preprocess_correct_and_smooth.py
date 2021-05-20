@@ -99,7 +99,6 @@ if __name__ == '__main__':
     torch.manual_seed(12345)
     device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
 
-
     evaluator = MAG240MEvaluator()
 
     if args.mini_graph:
