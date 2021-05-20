@@ -17,7 +17,7 @@ from root import ROOT
 dataset = MAG240MMINIDataset(ROOT)
 dataset2 = MAG240MDataset(ROOT)
 
-path = f'{dataset.dir}full_weighted_feat.npy'
+path = f'{dataset.dir}/full_weighted_feat.npy'
 done_flag_path = f'{dataset.dir}full_weighted_feat_done.txt'
 if not osp.exists(done_flag_path):  # Will take ~3 hours...
     t = time.perf_counter()
@@ -31,7 +31,7 @@ if not osp.exists(done_flag_path):  # Will take ~3 hours...
     paper_feat = dataset.all_paper_feat
     print(paper_feat.shape)
 
-    path = f'{dataset.dir}weighted_author_paper_edge.npy'
+    path = f'{dataset.dir}/weighted_author_paper_edge.npy'
     if not osp.exists(path):
         edge_index = dataset.edge_index('author', 'writes', 'paper')
         year = dataset.all_paper_year
