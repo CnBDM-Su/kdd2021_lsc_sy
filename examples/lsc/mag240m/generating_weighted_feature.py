@@ -8,9 +8,10 @@ import torch
 from torch_sparse import SparseTensor
 from sklearn.preprocessing import MinMaxScaler
 import sys
-sys.path.append('/var/kdd-code/test/ogb/lsc')
-from mag240m_mini_graph import MAG240MMINIDataset
 from mag240m import MAG240MDataset
+sys.path.append('/var/ogb/ogb/lsc')
+from mag240m_mini_graph import MAG240MMINIDataset
+
 from root import ROOT
 
 dataset = MAG240MMINIDataset(ROOT)
