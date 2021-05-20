@@ -15,7 +15,7 @@ from ogb.utils.url import makedirs
 from ogb.lsc import MAG240MDataset, MAG240MEvaluator
 import sys
 from torch_sparse import SparseTensor
-sys.path.append('/var/kdd-code/test/ogb/lsc')
+sys.path.append('/var/ogb/ogb/lsc')
 from mag240m_mini_graph import MAG240MMINIDataset
 from root import ROOT
 
