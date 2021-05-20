@@ -64,7 +64,7 @@ if not osp.exists(done_flag_path):  # Will take ~3 hours...
     # Processing 64-dim subfeatures at a time for memory efficiency.
     print('Generating author features...')
 
-    inputs = torch.from_numpy(paper_feat)
+    inputs = torch.from_numpy(paper_feat).half()
     outputs = adj_t.matmul(inputs, reduce='mean').numpy()
 
     edge_index = dataset.edge_index('author', 'affiliated_with', 'institution')
