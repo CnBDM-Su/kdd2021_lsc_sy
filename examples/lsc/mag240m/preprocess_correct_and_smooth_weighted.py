@@ -14,7 +14,7 @@ from ogb.utils.url import makedirs
 
 from ogb.lsc import MAG240MDataset, MAG240MEvaluator
 import sys
-
+from torch_sparse import SparseTensor
 sys.path.append('/var/kdd-code/test/ogb/lsc')
 from mag240m_mini_graph import MAG240MMINIDataset
 from root import ROOT
@@ -124,13 +124,13 @@ if __name__ == '__main__':
         #               shape=(dataset.num_papers, 1536))
         row, col, val = torch.from_numpy(weighted_edge)
         adj_t = SparseTensor(
-            row=row.long(), col=col.long(), value=val.float(),
+            row=col.long(), col=row.long(), value=val.float(),
             sparse_sizes=(dataset.num_papers, dataset.num_authors),
             is_sorted=True)
 
         # Processing 64-dim subfeatures at a time for memory efficiency.
-        print('Generating author features...')
-        inputs = torch.from_numpy(x[dataset.num_papers:dataset.num_authors]).float()
+
+        inputs = torch.from_numpy(x[dataset.num_papers:dataset.num_papers+dataset.num_authors]).float()
         outputs = adj_t.matmul(inputs, reduce='mean').numpy()
         x = np.concatenate([x,outputs],1)
         np.save(path, x)

@@ -12,7 +12,8 @@ from torch_geometric.nn.conv.gcn_conv import gcn_norm
 from ogb.lsc import MAG240MDataset
 from root import ROOT
 from ogb.utils.url import makedirs
-
+sys.path.append('/var/ogb/ogb/lsc')
+from mag240m_mini_graph import MAG240MMINIDataset
 class MAG240MEvaluator:
     def eval(self, input_dict):
         assert 'y_pred' in input_dict and 'y_true' in input_dict
@@ -55,29 +56,24 @@ if __name__ == '__main__':
     parser.add_argument('--num_smoothing_layers', type=int, default=2)
     parser.add_argument('--smoothing_alpha', type=float, default=0.8)
     parser.add_argument('--mini_graph', type=bool, default=False)
+    parser.add_argument('--save_path',type=str, default='results/cs')
     args = parser.parse_args()
     print(args)
 
-    dataset = MAG240MDataset(ROOT)
     evaluator = MAG240MEvaluator()
 
     if args.mini_graph:
-        save_path = 'results/mini_cs'
-        load_path = '/mini_graph/'
+        dataset = MAG240MMINIDataset(ROOT)
 
-        train_idx = torch.from_numpy(np.load(f'{dataset.dir}/mini_graph/train_idx.npy'))
-        valid_idx = torch.from_numpy(np.load(f'{dataset.dir}/mini_graph/valid_idx.npy'))
-        test_idx = torch.from_numpy(np.load(f'{dataset.dir}/mini_graph/test_idx.npy'))
-        paper_label = np.load(f'{dataset.dir}/mini_graph/paper_label.npy')
 
     else:
-        save_path = 'results/cs'
-        load_path = '/'
+        dataset = MAG240MDataset(ROOT)
 
-        train_idx = torch.from_numpy(dataset.get_idx_split('train'))
-        valid_idx = torch.from_numpy(dataset.get_idx_split('valid'))
-        test_idx = torch.from_numpy(dataset.get_idx_split('test'))
-        paper_label = dataset.paper_label
+    save_path = args.save_path
+    train_idx = torch.from_numpy(dataset.get_idx_split('train'))
+    valid_idx = torch.from_numpy(dataset.get_idx_split('valid'))
+    test_idx = torch.from_numpy(dataset.get_idx_split('test'))
+    paper_label = dataset.paper_label
 
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
@@ -86,11 +82,11 @@ if __name__ == '__main__':
 
     t = time.perf_counter()
     print('Reading adjacency matrix...', end=' ', flush=True)
-    path = f'{dataset.dir}'+load_path+'paper_to_paper_symmetric_gcn.pt'
+    path = f'{dataset.dir}/paper_to_paper_symmetric_gcn.pt'
     if osp.exists(path):
         adj_t = torch.load(path)
     else:
-        path_sym = f'{dataset.dir}'+load_path+'paper_to_paper_symmetric.pt'
+        path_sym = f'{dataset.dir}/paper_to_paper_symmetric.pt'
         if osp.exists(path_sym):
             adj_t = torch.load(path_sym)
         else:
