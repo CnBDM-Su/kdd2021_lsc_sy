@@ -228,7 +228,7 @@ if __name__ == '__main__':
     else:
         split_dict = torch.load(path)
 
-    path = f'{dataset.dir}/mini_graph/processed/paper__cites__paper/edge_index.npy'
+    path = f'{dataset.dir}/mini_graph/processed/paper___cites___paper/edge_index.npy'
     if not osp.exists(path):
         print('generating mini graph paper_paper edge...')
         pp_edge_new = []
@@ -240,7 +240,7 @@ if __name__ == '__main__':
     else:
         pp_edge = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph/processed/author__writes__paper/edge_index.npy'
+    path = f'{dataset.dir}/mini_graph/processed/author___writes___paper/edge_index.npy'
     if not osp.exists(path):
         print('generating mini graph author_paper edge...')
         ap_edge = dataset.edge_index('author', 'writes', 'paper')
@@ -253,7 +253,7 @@ if __name__ == '__main__':
     else:
         ap_edge = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph//processed/author__affiliated_with__institution/edge_index.npy'
+    path = f'{dataset.dir}/mini_graph//processed/author___affiliated_with___institution/edge_index.npy'
     if not osp.exists(path):
         print('generating mini graph author_institution edge...')
         ai_edge_new = []

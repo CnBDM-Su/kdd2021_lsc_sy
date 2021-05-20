@@ -24,7 +24,7 @@ class MAG240MMINIDataset(object):
         if isinstance(root, str):
             root = osp.expanduser(osp.normpath(root))
         self.root = root
-        self.dir = osp.join(root, '/mag240m_kddcup2021/mini_graph')
+        self.dir = osp.join(root, 'mag240m_kddcup2021/mini_graph')
 
         self.__meta__ = torch.load(osp.join(self.dir, 'meta.pt'))
         self.__split__ = torch.load(osp.join(self.dir, 'split_dict.pt'))
