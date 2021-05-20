@@ -113,55 +113,67 @@ if __name__ == '__main__':
 
     paper_label = dataset.paper_label
 
+    path = f'{dataset.dir}/sorted_weighted_author_paper_edge.npy'
+    if not osp.exists(path):
+        print('Generating sorted weighted author paper edges...')
+        t = time.perf_counter()
+        ap_edge = np.load(f'{dataset.dir}/weighted_author_paper_edge.npy')
+        ap_edge = ap_edge[:, ap_edge[1, :].argsort()]
+        np.save(path, ap_edge)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
+
     path = f'{dataset.dir}/paper_relation_weighted_feat.npy'
     if not osp.exists(path):
         print('Generating paper relation weighted features...')
         t = time.perf_counter()
         #N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
         x = np.load(f'{dataset.dir}/full_weighted_feat.npy')
-        weighted_edge = np.load(f'{dataset.dir}/weighted_author_paper_edge.npy')
+        weighted_edge = np.load(f'{dataset.dir}/sorted_weighted_author_paper_edge.npy')
+        y = np.zeros(shape=(dataset.num_papers, 1536))
         # y = np.memmap(path, dtype=np.float16, mode='w+',
         #               shape=(dataset.num_papers, 1536))
-        row, col, val = torch.from_numpy(weighted_edge)
-        adj_t = SparseTensor(
-            row=col.long(), col=row.long(), value=val.float(),
-            sparse_sizes=(dataset.num_papers, dataset.num_authors),
-            is_sorted=True)
+        # row, col, val = torch.from_numpy(weighted_edge)
+    #     adj_t = SparseTensor(
+    #         row=col.long(), col=row.long(), value=val.float(),
+    #         sparse_sizes=(dataset.num_papers, dataset.num_authors),
+    #         is_sorted=True)
+    #
+    #     # Processing 64-dim subfeatures at a time for memory efficiency.
+    #
+    #     inputs = torch.from_numpy(x[dataset.num_papers:dataset.num_papers+dataset.num_authors]).float()
+    #     outputs = adj_t.matmul(inputs, reduce='mean').numpy()
+    #     x = np.concatenate([x,outputs],1)
+    #     np.save(path, x)
+    #     print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    # else:
+    #     x = np.load(path)
 
-        # Processing 64-dim subfeatures at a time for memory efficiency.
-
-        inputs = torch.from_numpy(x[dataset.num_papers:dataset.num_papers+dataset.num_authors]).float()
-        outputs = adj_t.matmul(inputs, reduce='mean').numpy()
-        x = np.concatenate([x,outputs],1)
-        np.save(path, x)
+        bias = 0
+        p_batch_size = args.p_batch_size
+        for p_batch in tqdm(range(dataset.num_papers // p_batch_size)):
+            fea_ = []
+            end = min((p_batch + 1) * p_batch_size, dataset.num_papers)
+            for i in range(p_batch * p_batch_size, end):
+                sign = 0
+                fea = []
+                weight = []
+                for j in range(bias, len(weighted_edge[0])):
+                    if weighted_edge[1, j] == i:
+                        fea.append(weighted_edge[0, j])
+                        weight.append(weighted_edge[2, j])
+                    else:
+                        break
+                bias = j
+                fea = x[fea] * np.array(weight).reshape(-1,1)
+                fea_.append(np.mean(fea, 0))
+            fea_ = np.array(fea_)
+            y[p_batch * p_batch_size:end] = np.concatenate([x[p_batch * p_batch_size:end], fea_], 1)
+            np.save(path, y)
+        # x_fr = np.memmap(path, dtype=np.float16, mode='r',
+        #                  shape=(dataset.num_papers, 1536))
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
     else:
         x = np.load(path)
-
-        # bias = 0
-        # p_batch_size = args.p_batch_size
-        # for p_batch in tqdm(range(dataset.num_papers // p_batch_size)):
-        #     fea_ = []
-        #     end = min((p_batch + 1) * p_batch_size, dataset.num_papers)
-        #     for i in range(p_batch * p_batch_size, end):
-        #         sign = 0
-        #         fea = []
-        #         for j in range(bias, len(ap_edge[0])):
-        #             if ap_edge[1, j] == i:
-        #                 fea.append(ap_edge[0, j])
-        #             else:
-        #                 break
-        #         bias = j
-        #         fea = x[fea]
-        #         fea_.append(np.mean(fea, 0))
-        #     fea_ = np.array(fea_)
-        #     y[p_batch * p_batch_size:end] = np.concatenate([x[p_batch * p_batch_size:end], fea_], 1)
-        # x_fr = np.memmap(path, dtype=np.float16, mode='r',
-        #                  shape=(dataset.num_papers, 1536))
-        # print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    # else:
-    #     x_fr = np.memmap(path, dtype=np.float16, mode='r',
-    #                      shape=(dataset.num_papers, 1536))
 
     if args.evaluate == False:
         t = time.perf_counter()
