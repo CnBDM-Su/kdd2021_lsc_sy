@@ -57,14 +57,14 @@ if not osp.exists(done_flag_path):  # Will take ~3 hours...
 
     row, col, val = torch.from_numpy(weighted_edge)
     adj_t = SparseTensor(
-        row=row.long(), col=col.long(),value=val.half(),
+        row=row.long(), col=col.long(),value=val.float(),
         sparse_sizes=(dataset.num_authors, dataset.num_papers),
         is_sorted=True)
 
     # Processing 64-dim subfeatures at a time for memory efficiency.
     print('Generating author features...')
 
-    inputs = torch.from_numpy(paper_feat).half()
+    inputs = torch.from_numpy(paper_feat).float()
     outputs = adj_t.matmul(inputs, reduce='mean').numpy()
 
     edge_index = dataset.edge_index('author', 'affiliated_with', 'institution')
