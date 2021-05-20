@@ -132,48 +132,44 @@ if __name__ == '__main__':
         y = np.zeros(shape=(dataset.num_papers, 1536))
         # y = np.memmap(path, dtype=np.float16, mode='w+',
         #               shape=(dataset.num_papers, 1536))
-        # row, col, val = torch.from_numpy(weighted_edge)
-    #     adj_t = SparseTensor(
-    #         row=col.long(), col=row.long(), value=val.float(),
-    #         sparse_sizes=(dataset.num_papers, dataset.num_authors),
-    #         is_sorted=True)
-    #
-    #     # Processing 64-dim subfeatures at a time for memory efficiency.
-    #
-    #     inputs = torch.from_numpy(x[dataset.num_papers:dataset.num_papers+dataset.num_authors]).float()
-    #     outputs = adj_t.matmul(inputs, reduce='mean').numpy()
-    #     x = np.concatenate([x,outputs],1)
-    #     np.save(path, x)
-    #     print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    # else:
-    #     x = np.load(path)
+        row, col, val = torch.from_numpy(weighted_edge)
+        adj_t = SparseTensor(
+            row=col.long(), col=row.long(), value=val.float(),
+            sparse_sizes=(dataset.num_papers, dataset.num_authors),
+            is_sorted=True)
 
-        bias = 0
-        p_batch_size = args.p_batch_size
-        for p_batch in tqdm(range(dataset.num_papers // p_batch_size)):
-            fea_ = []
-            end = min((p_batch + 1) * p_batch_size, dataset.num_papers)
-            for i in range(p_batch * p_batch_size, end):
-                sign = 0
-                fea = []
-                weight = []
-                for j in range(bias, len(weighted_edge[0])):
-                    if weighted_edge[1, j] == i:
-                        fea.append(weighted_edge[0, j])
-                        weight.append(weighted_edge[2, j])
-                    else:
-                        break
-                bias = j
-                fea = x[fea] * np.array(weight).reshape(-1,1)
-                fea_.append(np.mean(fea, 0))
-            fea_ = np.array(fea_)
-            y[p_batch * p_batch_size:end] = np.concatenate([x[p_batch * p_batch_size:end], fea_], 1)
-            np.save(path, y)
-        # x_fr = np.memmap(path, dtype=np.float16, mode='r',
-        #                  shape=(dataset.num_papers, 1536))
+        inputs = torch.from_numpy(x[dataset.num_papers:dataset.num_papers+dataset.num_authors]).float()
+        outputs = adj_t.matmul(inputs, reduce='mean').numpy()
+        x = np.concatenate([x,outputs],1)
+        np.save(path, x)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
     else:
         x = np.load(path)
+
+        # bias = 0
+        # p_batch_size = args.p_batch_size
+        # for p_batch in tqdm(range(dataset.num_papers // p_batch_size)):
+        #     fea_ = []
+        #     end = min((p_batch + 1) * p_batch_size, dataset.num_papers)
+        #     for i in range(p_batch * p_batch_size, end):
+        #         sign = 0
+        #         fea = []
+        #         weight = []
+        #         for j in range(bias, len(weighted_edge[0])):
+        #             if weighted_edge[1, j] == i:
+        #                 fea.append(weighted_edge[0, j])
+        #                 weight.append(weighted_edge[2, j])
+        #             else:
+        #                 break
+        #         bias = j
+        #         fea = x[fea] * np.array(weight).reshape(-1,1)
+        #         fea_.append(np.mean(fea, 0))
+        #     fea_ = np.array(fea_)
+        #     y[p_batch * p_batch_size:end] = np.concatenate([x[p_batch * p_batch_size:end], fea_], 1)
+        #     np.save(path, y)
+        # print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    # else:
+    #     x = np.load(path)
 
     if args.evaluate == False:
         t = time.perf_counter()
