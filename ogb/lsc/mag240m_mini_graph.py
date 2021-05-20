@@ -10,7 +10,7 @@ import numpy as np
 from ogb.utils.url import decide_download, download_url, extract_zip, makedirs
 
 
-class MAG240MDataset(object):
+class MAG240MDataset_mini_graph(object):
     version = 1
     url = 'http://ogb-data.stanford.edu/data/lsc/mag240m_kddcup2021.zip'
 
@@ -24,27 +24,11 @@ class MAG240MDataset(object):
         if isinstance(root, str):
             root = osp.expanduser(osp.normpath(root))
         self.root = root
-        self.dir = osp.join(root, 'mag240m_kddcup2021')
+        self.dir = osp.join(root, '/mini_graph/mag240m_kddcup2021')
 
-        if osp.isdir(self.dir) and (not osp.exists(
-                osp.join(self.dir, f'RELEASE_v{self.version}.txt'))):
-            print('MAG240M dataset has been updated.')
-            if input('Will you update the dataset now? (y/N)\n') == 'y':
-                shutil.rmtree(osp.join(self.dir))
-
-        self.download()
         self.__meta__ = torch.load(osp.join(self.dir, 'meta.pt'))
         self.__split__ = torch.load(osp.join(self.dir, 'split_dict.pt'))
 
-    def download(self):
-        if not osp.exists(self.dir):
-            if decide_download(self.url):
-                path = download_url(self.url, self.root)
-                extract_zip(path, self.root)
-                os.unlink(path)
-            else:
-                print('Stop download.')
-                exit(-1)
 
     @property
     def num_papers(self) -> int:
@@ -145,7 +129,7 @@ class MAG240MEvaluator:
 
 
 if __name__ == '__main__':
-    dataset = MAG240MDataset()
+    dataset = MAG240MDataset_mini_graph()
     print(dataset)
     print(dataset.num_papers)
     print(dataset.num_authors)
