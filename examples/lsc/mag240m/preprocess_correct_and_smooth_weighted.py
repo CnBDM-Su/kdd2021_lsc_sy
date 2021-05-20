@@ -113,24 +113,30 @@ if __name__ == '__main__':
 
     paper_label = dataset.paper_label
 
-    path = f'{dataset.dir}/sorted_author_paper_edge.npy'
-    if not osp.exists(path):
-        print('Generating sorted author paper edges...')
-        t = time.perf_counter()
-        ap_edge = dataset.edge_index('author', 'writes', 'paper')
-        ap_edge = ap_edge[:, ap_edge[1, :].argsort()]
-        np.save(path, ap_edge)
-        print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
     path = f'{dataset.dir}/paper_relation_weighted_feat.npy'
     if not osp.exists(path):
         print('Generating paper relation weighted features...')
         t = time.perf_counter()
-        N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
-        x = np.load(f'{dataset.dir}/full_feat.npy')
-        y = np.memmap(path, dtype=np.float16, mode='w+',
-                      shape=(dataset.num_papers, 1536))
-        ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
+        #N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
+        x = np.load(f'{dataset.dir}/full_weighted_feat.npy')
+        weighted_edge = np.load(f'{dataset.dir}/weighted_author_paper_edge.npy')
+        # y = np.memmap(path, dtype=np.float16, mode='w+',
+        #               shape=(dataset.num_papers, 1536))
+        row, col, val = torch.from_numpy(weighted_edge)
+        adj_t = SparseTensor(
+            row=row.long(), col=col.long(), value=val.float(),
+            sparse_sizes=(dataset.num_papers, dataset.num_authors),
+            is_sorted=True)
+
+        # Processing 64-dim subfeatures at a time for memory efficiency.
+        print('Generating author features...')
+        inputs = torch.from_numpy(x[dataset.num_papers:dataset.num_authors]).float()
+        outputs = adj_t.matmul(inputs, reduce='mean').numpy()
+        x = np.concatenate([x,outputs],1)
+        np.save(path, x)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    else:
+        x = np.load(path)
 
         # bias = 0
         # p_batch_size = args.p_batch_size
@@ -152,22 +158,22 @@ if __name__ == '__main__':
         #     y[p_batch * p_batch_size:end] = np.concatenate([x[p_batch * p_batch_size:end], fea_], 1)
         # x_fr = np.memmap(path, dtype=np.float16, mode='r',
         #                  shape=(dataset.num_papers, 1536))
-        print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    else:
-        x_fr = np.memmap(path, dtype=np.float16, mode='r',
-                         shape=(dataset.num_papers, 1536))
+        # print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    # else:
+    #     x_fr = np.memmap(path, dtype=np.float16, mode='r',
+    #                      shape=(dataset.num_papers, 1536))
 
     if args.evaluate == False:
         t = time.perf_counter()
 
         print('Reading training node features...', end=' ', flush=True)
         # x_train = dataset.paper_feat[train_idx]
-        x_train = x_fr[train_idx]
+        x_train = x[train_idx]
         x_train = torch.from_numpy(x_train).to(torch.float).to(device)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
         t = time.perf_counter()
         print('Reading validation node features...', end=' ', flush=True)
-        x_valid = x_fr[valid_idx]
+        x_valid = x[valid_idx]
         # x_valid = dataset.paper_feat[valid_idx]
         x_valid = torch.from_numpy(x_valid).to(torch.float).to(device)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
@@ -178,7 +184,7 @@ if __name__ == '__main__':
         y_valid = y_valid.to(device, torch.long)
 
         if args.mini_graph:
-            save_path = 'results/mini_cs'
+            save_path = 'results/mini_cs_weighted'
         else:
             save_path = 'results/cs'
         makedirs(save_path)
@@ -213,7 +219,7 @@ if __name__ == '__main__':
 
     out = []
     for i in range(0, dataset.num_papers, args.batch_size):
-        x = x_fr[i:min(i + args.batch_size, dataset.num_papers)]
+        x = x[i:min(i + args.batch_size, dataset.num_papers)]
         x = torch.from_numpy(x).to(torch.float).to(device)
         with torch.no_grad():
             out.append(model(x).softmax(dim=-1).cpu().numpy())
