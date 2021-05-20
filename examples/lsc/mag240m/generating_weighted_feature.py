@@ -52,10 +52,12 @@ if not osp.exists(done_flag_path):  # Will take ~3 hours...
                     val.append(weight)
         weighted_edge = np.concatenate([edge_index,np.array(val).reshape(1,-1)],0)
         np.save(path,weighted_edge)
+    else:
+        weighted_edge = np.load(path)
 
-    row, col = torch.from_numpy(weighted_edge)
+    row, col, val = torch.from_numpy(weighted_edge)
     adj_t = SparseTensor(
-        row=row, col=col,val=val,
+        row=row.long(), col=col.long(),value=val.half(),
         sparse_sizes=(dataset.num_authors, dataset.num_papers),
         is_sorted=True)
 

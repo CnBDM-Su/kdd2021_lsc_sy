@@ -122,13 +122,12 @@ if __name__ == '__main__':
         np.save(path, ap_edge)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-    path = f'{dataset.dir}/paper_relation_feat.npy'
+    path = f'{dataset.dir}/paper_relation_weighted_feat.npy'
     if not osp.exists(path):
-        print('Generating paper relation features...')
+        print('Generating paper relation weighted features...')
         t = time.perf_counter()
         N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
-        x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
-                      mode='r', shape=(N, 768))
+        x = np.load(f'{dataset.dir}/full_feat.npy')
         y = np.memmap(path, dtype=np.float16, mode='w+',
                       shape=(dataset.num_papers, 1536))
         ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
