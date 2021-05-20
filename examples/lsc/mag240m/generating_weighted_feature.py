@@ -8,7 +8,7 @@ import torch
 from torch_sparse import SparseTensor
 from sklearn.preprocessing import MinMaxScaler
 import sys
-from ogb.mag240m import MAG240MDataset
+ffrom ogb.lsc import MAG240MDataset, MAG240MEvaluator
 sys.path.append('/var/ogb/ogb/lsc')
 from mag240m_mini_graph import MAG240MMINIDataset
 
