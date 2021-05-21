@@ -82,15 +82,18 @@ if __name__ == '__main__':
 
     t = time.perf_counter()
     print('Reading adjacency matrix...', end=' ', flush=True)
-    path = f'{dataset.dir}/paper_to_paper_symmetric_gcn.pt'
+    # path = f'{dataset.dir}/paper_to_paper_symmetric__gcn.pt'
+    path = f'{dataset.dir}/paper_to_paper_weighted_symmetric__gcn.pt'
     if osp.exists(path):
         adj_t = torch.load(path)
     else:
-        path_sym = f'{dataset.dir}/paper_to_paper_symmetric.pt'
+        # path_sym = f'{dataset.dir}/paper_to_paper_symmetric.pt'
+        path_sym = f'{dataset.dir}/paper_to_paper_weighted_symmetric.pt'
         if osp.exists(path_sym):
             adj_t = torch.load(path_sym)
         else:
-            edge_index = dataset.edge_index('paper', 'cites', 'paper')
+            # edge_index = dataset.edge_index('paper', 'cites', 'paper')
+            edge_index = np.load(f'{dataset.dir}/weighted_paper_paper_edge.npy')
             edge_index = torch.from_numpy(edge_index)
             adj_t = SparseTensor(
                 row=edge_index[0], col=edge_index[1],
@@ -116,12 +119,12 @@ if __name__ == '__main__':
     numel = int(train_idx.sum()) if train_idx.dtype == torch.bool else train_idx.size(0)
     assert y_train.size(0) == numel
 
-    y_pred = model.correct(y_pred, y_train, train_idx, adj_t)
+    y_pred = model.correct(y_pred, y_train, train_idx, adj_t, edge_index[2])
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     t = time.perf_counter()
     print('Smoothing predictions...', end=' ', flush=True)
-    y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
+    y_pred = model.smooth(y_pred, y_train, train_idx, adj_t, edge_index[2])
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     train_acc = evaluator.eval({
