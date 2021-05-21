@@ -190,7 +190,7 @@ if __name__ == '__main__':
         else:
             save_path = 'results/cs'
         makedirs(save_path)
-        model = MLP(dataset.num_paper_features * 2, args.hidden_channels,
+        model = MLP(dataset.num_paper_features * 3, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
         if args.parallel == True:
@@ -212,7 +212,7 @@ if __name__ == '__main__':
                       f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
                       f'Best: {best_valid_acc:.4f}')
     else:
-        model = MLP(dataset.num_paper_features * 2, args.hidden_channels,
+        model = MLP(dataset.num_paper_features * 3, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
     model.load_state_dict(torch.load(save_path + '/model.pt'))
