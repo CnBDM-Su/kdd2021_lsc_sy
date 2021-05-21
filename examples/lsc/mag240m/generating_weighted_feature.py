@@ -13,6 +13,7 @@ sys.path.append('/var/ogb/ogb/lsc')
 from mag240m_mini_graph import MAG240MMINIDataset
 from sklearn.metrics.pairwise import rbf_kernel
 from root import ROOT
+from joblib import Parallel, delayed
 
 dataset = MAG240MMINIDataset(ROOT)
 dataset2 = MAG240MDataset(ROOT)
@@ -43,7 +44,7 @@ dataset2 = MAG240MDataset(ROOT)
 #     weighted_edge = np.load(path)
 
 path = f'{dataset.dir}/full_weighted_feat.npy'
-done_flag_path = f'{dataset.dir}full_weighted_feat_done.txt'
+done_flag_path = f'{dataset.dir}/full_weighted_feat_done.txt'
 if not osp.exists(done_flag_path):  # Will take ~3 hours...
     t = time.perf_counter()
     print('Generating mini full weighted feature matrix...')
@@ -122,8 +123,9 @@ if not osp.exists(path):
     year = dataset.all_paper_year
 
     val = []
-    for i in tqdm(range(edge_index.shape[1])):
-        val.append(rbf_kernel(feat[edge_index[0,i]],feat[edge_index[1,i]],0.1))
+    def rbf(i, edge_index=edge_index, feat=feat):
+        return rbf_kernel(feat[edge_index[0, i]].reshape(1, -1), feat[edge_index[1, i]].reshape(1, -1), 0.1)
+    val = Parallel(n_jobs=28)(delayed(rbf)(i) for i in range(edge_index.shape[1]))
 
     weighted_edge = np.concatenate([edge_index, np.array(val).reshape(1, -1)], 0)
     np.save(path, weighted_edge)
