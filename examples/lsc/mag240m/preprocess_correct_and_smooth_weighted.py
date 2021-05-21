@@ -124,9 +124,9 @@ if __name__ == '__main__':
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
 
-    path = f'{dataset.dir}/paper_relation_weighted_feat.npy'
+    path = f'{dataset.dir}/paper_relation_weighted_i_feat.npy'
     if not osp.exists(path):
-        print('Generating paper relation weighted features...')
+        print('Generating paper relation weighted institurion features...')
         path_ = f'{dataset.dir}/author_relation_feat.npy'
         if not osp.exists(path_):
             print('Generating author relation features...')
