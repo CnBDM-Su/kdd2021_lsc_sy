@@ -35,7 +35,7 @@ class MAG240MEvaluator:
         # assert 'y_pred' in input_dict
         y_pred = input_dict['y_pred']
         y_pred_valid = input_dict['y_pred_valid']
-        # assert y_pred.shape == (146818, )
+        assert y_pred.shape == (146818, )
 
         if isinstance(y_pred, torch.Tensor):
             y_pred = y_pred.cpu().numpy()
@@ -57,7 +57,6 @@ if __name__ == '__main__':
     parser.add_argument('--num_smoothing_layers', type=int, default=2)
     parser.add_argument('--smoothing_alpha', type=float, default=0.8)
     parser.add_argument('--mini_graph', type=bool, default=False)
-    parser.add_argument('--save_path',type=str, default='results/cs')
     args = parser.parse_args()
     print(args)
 
@@ -65,11 +64,12 @@ if __name__ == '__main__':
 
     if args.mini_graph:
         dataset = MAG240MMINIDataset(ROOT)
+        save_path = 'results/mini_cs_weighted'
 
     else:
         dataset = MAG240MDataset(ROOT)
+        save_path = 'results/cs'
 
-    save_path = args.save_path
     train_idx = torch.from_numpy(dataset.get_idx_split('train'))
     valid_idx = torch.from_numpy(dataset.get_idx_split('valid'))
     test_idx = torch.from_numpy(dataset.get_idx_split('test'))

@@ -202,11 +202,11 @@ if __name__ == '__main__':
 
     out = []
     for i in range(0, dataset.num_papers, args.batch_size):
-        x = x[i:min(i + args.batch_size, dataset.num_papers)]
-        x = torch.from_numpy(x).to(torch.float).to(device)
+        x_ = x[i:min(i + args.batch_size, dataset.num_papers)]
+        x_ = torch.from_numpy(x_).to(torch.float).to(device)
         with torch.no_grad():
-            out.append(model(x).softmax(dim=-1).cpu().numpy())
-        pbar.update(x.size(0))
+            out.append(model(x_).softmax(dim=-1).cpu().numpy())
+        pbar.update(x_.size(0))
     pbar.close()
     np.save(save_path + '/pred.npy', np.concatenate(out, axis=0))
     # np.savez('results/cs/pred.npz', *out)
