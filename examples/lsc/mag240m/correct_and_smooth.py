@@ -82,18 +82,15 @@ if __name__ == '__main__':
 
     t = time.perf_counter()
     print('Reading adjacency matrix...', end=' ', flush=True)
-    # path = f'{dataset.dir}/paper_to_paper_symmetric__gcn.pt'
-    path = f'{dataset.dir}/paper_to_paper_weighted_symmetric__gcn.pt'
+    path = f'{dataset.dir}/paper_to_paper_symmetric_gcn.pt'
     if osp.exists(path):
         adj_t = torch.load(path)
     else:
-        # path_sym = f'{dataset.dir}/paper_to_paper_symmetric.pt'
-        path_sym = f'{dataset.dir}/paper_to_paper_weighted_symmetric.pt'
+        path_sym = f'{dataset.dir}/paper_to_paper_symmetric.pt'
         if osp.exists(path_sym):
             adj_t = torch.load(path_sym)
         else:
-            # edge_index = dataset.edge_index('paper', 'cites', 'paper')
-            edge_index = np.load(f'{dataset.dir}/weighted_paper_paper_edge.npy')
+            edge_index = dataset.edge_index('paper', 'cites', 'paper')
             edge_index = torch.from_numpy(edge_index)
             adj_t = SparseTensor(
                 row=edge_index[0], col=edge_index[1],
@@ -107,6 +104,8 @@ if __name__ == '__main__':
 
     y_train = torch.from_numpy(paper_label[train_idx]).to(torch.long)
     y_valid = torch.from_numpy(paper_label[valid_idx]).to(torch.long)
+    edge_index = np.load(f'{dataset.dir}/weighted_paper_paper_edge.npy')
+    edge_index = torch.from_numpy(edge_index)
 
     model = CorrectAndSmooth(args.num_correction_layers, args.correction_alpha,
                              args.num_smoothing_layers, args.smoothing_alpha,
