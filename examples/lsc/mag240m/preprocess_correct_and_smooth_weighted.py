@@ -142,7 +142,7 @@ if __name__ == '__main__':
 
             inputs = torch.from_numpy(x[dataset.num_papers + dataset.num_authors:]).float()
             outputs = adj_t.matmul(inputs, reduce='mean').numpy()
-            ar_f = np.concatenate([x[:dataset.num_papers], outputs], 1)
+            ar_f = np.concatenate([x[dataset.num_papers:dataset.num_papers + dataset.num_authors], outputs], 1)
             np.save(path_, ar_f)
             print(f'Done! [{time.perf_counter() - t:.2f}s]')
         else:
