@@ -164,6 +164,7 @@ if __name__ == '__main__':
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
     else:
         x = np.load(path)
+        print(x.shape)
 
     if args.evaluate == False:
         t = time.perf_counter()
