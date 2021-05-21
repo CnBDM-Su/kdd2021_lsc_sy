@@ -137,7 +137,7 @@ if __name__ == '__main__':
             row, col = torch.from_numpy(weighted_edge)
             adj_t = SparseTensor(
                 row=row.long(), col=col.long(),
-                sparse_sizes=(dataset.num_papers, dataset.num_authors),
+                sparse_sizes=(dataset.num_authors, dataset.num_institutions),
                 is_sorted=True)
 
             inputs = torch.from_numpy(x[dataset.num_papers + dataset.num_authors:]).float()
