@@ -265,6 +265,17 @@ if __name__ == '__main__':
     else:
         ai_edge = np.load(path)
 
+    path = f'{dataset.dir}/mini_graph//processed/paper_degree.npy'
+    if not osp.exists(path):
+        print('generating mini graph paper degree...')
+        degree = np.zeros(num_dict['paper'])
+        for i in tqdm(range(pp_edge.shape[1])):
+            degree[pp_edge[0, i]] += 1
+            degree[pp_edge[1, i]] += 1
+        np.save(path, degree)
+    else:
+        degree = np.load(path)
+
     path = f'{dataset.dir}/mini_graph/paper_to_paper_symmetric.pt'
     if not osp.exists(path):  # Will take approximately 5 minutes...
         t = time.perf_counter()
