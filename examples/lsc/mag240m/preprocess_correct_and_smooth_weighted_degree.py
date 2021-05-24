@@ -134,11 +134,12 @@ if __name__ == '__main__':
         weighted_edge = np.load(f'{dataset.dir}/sorted_weighted_author_paper_edge.npy')
         row, col, val = torch.from_numpy(weighted_edge)
         degree = np.load(f'{dataset.dir}/author_degree.npy')
-        degree = torch.from_numpy(np.diag(degree.astype(float)**(-1)))
-        # degree = SparseTensor(
-        #     row=torch.from_numpy(np.arange(dataset.num_authors)).long(), col=torch.from_numpy(np.arange(dataset.num_authors)).long(), value=degree.float(),
-        #     sparse_sizes=(dataset.num_authors, dataset.num_authors),
-        #     is_sorted=True)
+        degree = degree.astype(float)**(-1)
+        # degree = torch.from_numpy(np.diag(degree.astype(float)**(-1)))
+        degree = SparseTensor(
+            row=torch.from_numpy(np.arange(dataset.num_authors)).long(), col=torch.from_numpy(np.arange(dataset.num_authors)).long(), value=degree.float(),
+            sparse_sizes=(dataset.num_authors, dataset.num_authors),
+            is_sorted=True)
         adj_t = SparseTensor(
             row=col.long(), col=row.long(), value=val.float(),
             sparse_sizes=(dataset.num_papers, dataset.num_authors),
