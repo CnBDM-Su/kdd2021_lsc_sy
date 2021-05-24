@@ -156,7 +156,7 @@ if __name__ == '__main__':
         print('Reading training node features...', end=' ', flush=True)
         # x_train = dataset.paper_feat[train_idx]
         x_train = x[train_idx]
-        x_train = torch.from_numpy(x_train).to(torch.float)
+        x_train = torch.from_numpy(x_train).to(device, torch.float)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
         t = time.perf_counter()
         print('Reading validation node features...', end=' ', flush=True)
@@ -179,7 +179,7 @@ if __name__ == '__main__':
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
         if args.parallel == True:
-            model = torch.nn.DataParallel(model, device_ids=[0,2,3,4,5,6,7])
+            model = torch.nn.DataParallel(model, device_ids=[2,3,4,5,6,7])
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
         num_params = sum([p.numel() for p in model.parameters()])
         print(f'#Params: {num_params}')
