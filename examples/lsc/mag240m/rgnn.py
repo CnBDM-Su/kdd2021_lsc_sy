@@ -517,7 +517,7 @@ if __name__ == '__main__':
             trainer = Trainer(gpus=args.device, resume_from_checkpoint=ckpt)
 
         model = RGNN.load_from_checkpoint(
-            checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml')
+            checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml').to(int(args.device))
 
         datamodule.batch_size = 16
         datamodule.sizes = [160] * len(args.sizes)  # (Almost) no sampling...
