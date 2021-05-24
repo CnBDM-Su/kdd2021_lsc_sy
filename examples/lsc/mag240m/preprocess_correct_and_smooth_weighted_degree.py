@@ -141,10 +141,7 @@ if __name__ == '__main__':
             is_sorted=True)
 
         # adj_t = adj_t.matmul(degree)
-        print(x[dataset.num_papers:dataset.num_authors])
-        inputs = torch.from_numpy(x[dataset.num_papers:dataset.num_authors]).float()
-        print(adj_t)
-        print(inputs)
+        inputs = torch.from_numpy(x[dataset.num_papers:dataset.num_papers+dataset.num_authors]).float()
         outputs = adj_t.matmul(inputs, reduce='mean').numpy()
         x = np.concatenate([x[:dataset.num_papers],outputs],1)
         np.save(path, x)
