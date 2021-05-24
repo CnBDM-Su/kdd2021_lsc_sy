@@ -251,8 +251,9 @@ class MAG240M(LightningDataModule):
         #                       mode='r', shape=(N-1000*(N//1000), self.num_features))
         # self.x = zarr.open(f'{dataset.dir}/full_feat.zarr', mode='r',shape=(N, self.num_features) ,
         #                    chunks=(200000, self.num_features), dtype=np.float16)
-        self.x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
-                           mode='r', shape=(N, self.num_features))
+        # self.x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
+        #                    mode='r', shape=(N, self.num_features))
+        self.x = np.load(f'{dataset.dir}/full_feat.npy')
         self.y = torch.from_numpy(dataset.all_paper_label)
         self.file_batch_size = N//1000
 
@@ -552,9 +553,10 @@ if __name__ == '__main__':
                 model.eval()
                 y_preds = []
                 for batch in tqdm(loader):
-                    batch = batch.to(int(args.device))
+                    batch = batch.to('cpu')
+                    # batch = batch.to(int(args.device))
                     with torch.no_grad():
-                        out = model(batch.x, batch.adjs_t).softmax(dim=-1).to(int(args.device))
+                        out = model(batch.x, batch.adjs_t).softmax(dim=-1).cpu()
                         y_preds.append(out)
                 res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
                 evaluator.save_test_submission(res, f'results/rgat_cs')
