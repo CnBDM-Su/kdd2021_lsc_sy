@@ -296,7 +296,7 @@ class MAG240M(LightningDataModule):
                                batch_size=self.batch_size, num_workers=4)
 
     def convert_batch(self, batch_size, n_id, adjs):
-        t = time.perf_counter()
+        # t = time.perf_counter()
         # x = []
         #
         # for i in n_id.numpy():
@@ -308,7 +308,7 @@ class MAG240M(LightningDataModule):
         x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
         # print(sys.getsizeof(x.storage()))
         y = self.y[n_id[:batch_size]].to(torch.long)
-        print(f'Done sampling! [{time.perf_counter() - t:.2f}s]')
+        # print(f'Done sampling! [{time.perf_counter() - t:.2f}s]')
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
 
