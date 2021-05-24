@@ -485,7 +485,7 @@ if __name__ == '__main__':
         print(f'#Params {sum([p.numel() for p in model.parameters()])}')
         checkpoint_callback = ModelCheckpoint(monitor='val_acc', save_top_k=1)
         if args.parallel==True:
-            gpus = [2,3,4,5,6,7]
+            gpus = [4,5,6,7]
             trainer = Trainer(gpus=gpus, max_epochs=args.epochs,
                               callbacks=[checkpoint_callback],
                               default_root_dir=f'logs/{args.model}')
@@ -511,7 +511,7 @@ if __name__ == '__main__':
         print(f'Evaluating saved model in {logdir}...')
         ckpt = glob.glob(f'{logdir}/checkpoints/*')[0]
         if args.parallel==True:
-            gpus = [2,3,4,5,6,7]
+            gpus = [4,5,6,7]
             trainer = Trainer(gpus=gpus, resume_from_checkpoint=ckpt)
         else:
             trainer = Trainer(gpus=args.device, resume_from_checkpoint=ckpt)
