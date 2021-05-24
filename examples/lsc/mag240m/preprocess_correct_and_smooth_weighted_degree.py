@@ -137,7 +137,7 @@ if __name__ == '__main__':
         degree = degree.astype(float)**(-1)
         # degree = torch.from_numpy(np.diag(degree.astype(float)**(-1)))
         degree = SparseTensor(
-            row=torch.from_numpy(np.arange(dataset.num_authors)).long(), col=torch.from_numpy(np.arange(dataset.num_authors)).long(), value=degree.float(),
+            row=torch.from_numpy(np.arange(dataset.num_authors)).long(), col=torch.from_numpy(np.arange(dataset.num_authors)).long(), value=torch.from_numpy(degree).float(),
             sparse_sizes=(dataset.num_authors, dataset.num_authors),
             is_sorted=True)
         adj_t = SparseTensor(
