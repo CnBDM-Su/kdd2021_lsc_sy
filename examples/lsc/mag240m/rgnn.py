@@ -519,7 +519,7 @@ if __name__ == '__main__':
         model = RGNN.load_from_checkpoint(
             checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml').to(int(args.device))
 
-        datamodule.batch_size = 16
+        datamodule.batch_size = 16000
         datamodule.sizes = [160] * len(args.sizes)  # (Almost) no sampling...
 
         # trainer.test(model=model, datamodule=datamodule)
@@ -555,7 +555,7 @@ if __name__ == '__main__':
                 for batch in tqdm(loader):
                     batch = batch.to(int(args.device))
                     with torch.no_grad():
-                        out = model(batch.x.to(int(args.device)), batch.adjs_t).softmax(dim=-1).to(int(args.device))
+                        out = model(batch.x, batch.adjs_t).softmax(dim=-1).to(int(args.device))
                         y_preds.append(out)
                 res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
                 evaluator.save_test_submission(res, f'results/rgat_cs')
