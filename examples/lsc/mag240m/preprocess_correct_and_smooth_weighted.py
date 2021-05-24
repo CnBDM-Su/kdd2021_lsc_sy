@@ -64,7 +64,7 @@ def train(model, x_train, y_train, batch_size, optimizer):
     total_loss = 0
     for idx in DataLoader(range(y_train.size(0)), batch_size, shuffle=True):
         optimizer.zero_grad()
-        loss = F.cross_entropy(model(x_train[idx]), y_train[idx])
+        loss = F.cross_entropy(model(x_train[idx].to(device)), y_train[idx])
         loss.backward()
         optimizer.step()
 
