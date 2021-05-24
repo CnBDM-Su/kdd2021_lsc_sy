@@ -268,13 +268,23 @@ if __name__ == '__main__':
     path = f'{dataset.dir}/mini_graph/paper_degree.npy'
     if not osp.exists(path):
         print('generating mini graph paper degree...')
-        degree = np.zeros(num_dict['paper'])
+        p_degree = np.zeros(num_dict['paper'])
         for i in tqdm(range(pp_edge.shape[1])):
-            degree[pp_edge[0, i]] += 1
-            degree[pp_edge[1, i]] += 1
-        np.save(path, degree)
+            p_degree[pp_edge[0, i]] += 1
+            p_degree[pp_edge[1, i]] += 1
+        np.save(path, p_degree)
     else:
-        degree = np.load(path)
+        p_degree = np.load(path)
+
+    path = f'{dataset.dir}/mini_graph/author_degree.npy'
+    if not osp.exists(path):
+        print('generating mini graph paper degree...')
+        a_degree = np.zeros(num_dict['author'])
+        for i in tqdm(range(ap_edge.shape[1])):
+            a_degree[ap_edge[0, i]] += 1
+        np.save(path, a_degree)
+    else:
+        a_degree = np.load(path)
 
     path = f'{dataset.dir}/mini_graph/paper_to_paper_symmetric.pt'
     if not osp.exists(path):  # Will take approximately 5 minutes...

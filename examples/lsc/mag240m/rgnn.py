@@ -26,6 +26,9 @@ from torch_geometric.data import NeighborSampler
 from ogb.lsc import MAG240MDataset
 from root import ROOT
 from ogb.utils.url import makedirs
+import sys
+sys.path.append('/var/ogb/ogb/lsc')
+from mag240m_mini_graph import MAG240MMINIDataset
 
 class Batch(NamedTuple):
     x: Tensor
@@ -60,11 +63,12 @@ def save_col_slice(x_src, x_dst, start_row_idx, end_row_idx, start_col_idx,
 
 
 class MAG240M(LightningDataModule):
-    def __init__(self, data_dir: str, batch_size: int, sizes: List[int]):
+    def __init__(self, data_dir: str, batch_size: int, sizes: List[int], mini: bool):
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size
         self.sizes = sizes
+        self.mini = mini
 
     @property
     def num_features(self) -> int:
@@ -79,7 +83,10 @@ class MAG240M(LightningDataModule):
         return 5
 
     def prepare_data(self):
-        dataset = MAG240MDataset(self.data_dir)
+        if self.mini:
+            dataset = MAG240MMINIDataset(self.data_dir)
+        else:
+            dataset = MAG240MDataset(self.data_dir)
 
         path = f'{dataset.dir}/paper_to_paper_symmetric.pt'
         if not osp.exists(path):  # Will take approximately 5 minutes...
@@ -220,7 +227,10 @@ class MAG240M(LightningDataModule):
     def setup(self, stage: Optional[str] = None):
         t = time.perf_counter()
         print('Reading dataset...', end=' ', flush=True)
-        dataset = MAG240MDataset(self.data_dir)
+        if self.mini:
+            dataset = MAG240MMINIDataset(self.data_dir)
+        else:
+            dataset = MAG240MDataset(self.data_dir)
 
         self.train_idx = torch.from_numpy(dataset.get_idx_split('train'))
         self.train_idx = self.train_idx
@@ -256,6 +266,16 @@ class MAG240M(LightningDataModule):
                                batch_size=self.batch_size, shuffle=True,
                                num_workers=16)
         return ns
+
+    def all_dataloader(self):
+        if self.mini:
+            dataset = MAG240MMINIDataset(self.data_dir)
+        else:
+            dataset = MAG240MDataset(self.data_dir)
+        return NeighborSampler(self.adj_t, node_idx=np.arange(self.dataset.num_papers),
+                               sizes=self.sizes, return_e_id=False,
+                               transform=self.convert_batch,
+                               batch_size=self.batch_size, num_workers=4)
 
     def val_dataloader(self):
         return NeighborSampler(self.adj_t, node_idx=self.val_idx,
@@ -446,6 +466,8 @@ if __name__ == '__main__':
     parser.add_argument('--evaluate', action='store_true')
     parser.add_argument('--resume', type=int, default=None)
     parser.add_argument('--valid_result', type=bool, default=False)
+    parser.add_argument('--mini_graph', type=bool, default=False)
+    parser.add_argument('--cs', type=bool, default=False)
     args = parser.parse_args()
     args.sizes = [int(i) for i in args.sizes.split('-')]
     print(args)
@@ -461,7 +483,7 @@ if __name__ == '__main__':
         print(f'#Params {sum([p.numel() for p in model.parameters()])}')
         checkpoint_callback = ModelCheckpoint(monitor='val_acc', save_top_k=1)
         if args.parallel==True:
-            gpus = [0,1,2,3,4,5,6,7]
+            gpus = [2,3,4,5,6,7]
             trainer = Trainer(gpus=gpus, max_epochs=args.epochs,
                               callbacks=[checkpoint_callback],
                               default_root_dir=f'logs/{args.model}')
@@ -487,7 +509,7 @@ if __name__ == '__main__':
         print(f'Evaluating saved model in {logdir}...')
         ckpt = glob.glob(f'{logdir}/checkpoints/*')[0]
         if args.parallel==True:
-            gpus = [0,1,2,3,4,5,6,7]
+            gpus = [2,3,4,5,6,7]
             trainer = Trainer(gpus=gpus, resume_from_checkpoint=ckpt)
         else:
             trainer = Trainer(gpus=args.device, resume_from_checkpoint=ckpt)
@@ -523,14 +545,28 @@ if __name__ == '__main__':
             evaluator.save_test_submission(res, f'results/{args.model}')
 
         else:
-            loader = datamodule.hidden_test_dataloader()
+            if args.cs:
+                loader = datamodule.all_dataloader()
 
-            model.eval()
-            y_preds = []
-            for batch in tqdm(loader):
-                batch = batch.to(int(args.device))
-                with torch.no_grad():
-                    out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
-                    y_preds.append(out)
-            res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
-            evaluator.save_test_submission(res, f'results/{args.model}')
+                model.eval()
+                y_preds = []
+                for batch in tqdm(loader):
+                    batch = batch.to(int(args.device))
+                    with torch.no_grad():
+                        out = model(batch.x, batch.adjs_t).softmax(dim=-1).cpu()
+                        y_preds.append(out)
+                res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
+                evaluator.save_test_submission(res, f'results/rgat_cs')
+
+            else:
+                loader = datamodule.hidden_test_dataloader()
+
+                model.eval()
+                y_preds = []
+                for batch in tqdm(loader):
+                    batch = batch.to(int(args.device))
+                    with torch.no_grad():
+                        out = model(batch.x, batch.adjs_t).argmax(dim=-1).cpu()
+                        y_preds.append(out)
+                res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
+                evaluator.save_test_submission(res, f'results/{args.model}')

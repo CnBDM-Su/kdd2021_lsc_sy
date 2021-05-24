@@ -5,7 +5,6 @@ from torch.utils.data import DataLoader, Dataset, TensorDataset
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 import sys
-from ogb.lsc import MAG240MDataset, MAG240MEvaluator
 sys.path.append('/var/ogb/ogb/lsc')
 from mag240m_mini_graph import MAG240MMINIDataset
 from root import ROOT
@@ -21,7 +20,7 @@ x = MMScaler.fit_transform(x)
 
 ###### 输入数据转换成神经网络接受的dataset类型，batch设定为10
 tensor_x = torch.from_numpy(x.astype(np.float32))
-tensor_y = torch.from_numpy([])
+tensor_y = torch.from_numpy(np.zeros(x.shape[0]))
 my_dataset = TensorDataset(tensor_x, tensor_y)
 my_dataset_loader = DataLoader(my_dataset, batch_size=10000, shuffle=False)
 
