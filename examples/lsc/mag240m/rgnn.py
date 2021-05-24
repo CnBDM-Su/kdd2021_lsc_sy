@@ -518,7 +518,7 @@ if __name__ == '__main__':
         model = RGNN.load_from_checkpoint(
             checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml')
 
-        datamodule.batch_size = 16
+        datamodule.batch_size = 16000
         datamodule.sizes = [160] * len(args.sizes)  # (Almost) no sampling...
 
         # trainer.test(model=model, datamodule=datamodule)
