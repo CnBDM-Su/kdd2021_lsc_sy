@@ -69,6 +69,7 @@ class MAG240M(LightningDataModule):
         self.batch_size = batch_size
         self.sizes = sizes
         self.mini = mini
+        self.setup()
 
     @property
     def num_features(self) -> int:
