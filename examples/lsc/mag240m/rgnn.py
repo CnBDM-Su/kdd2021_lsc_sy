@@ -552,7 +552,8 @@ if __name__ == '__main__':
                 model.eval()
                 y_preds = []
                 for batch in tqdm(loader):
-                    batch = batch.to(int(args.device))
+                    batch = batch.cpu()
+                    # batch = batch.to(int(args.device))
                     with torch.no_grad():
                         out = model(batch.x, batch.adjs_t).softmax(dim=-1).cpu()
                         y_preds.append(out)
