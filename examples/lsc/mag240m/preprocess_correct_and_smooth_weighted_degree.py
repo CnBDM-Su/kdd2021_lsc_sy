@@ -127,12 +127,15 @@ if __name__ == '__main__':
     path = f'{dataset.dir}/paper_relation_weighted_degree_feat.npy'
     if not osp.exists(path):
         print('Generating paper relation weighted degree features...')
-        path_ = f'{dataset.dir}/author_relation_feat.npy'
+        # path_ = f'{dataset.dir}/author_relation_feat.npy'
         t = time.perf_counter()
         #N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
         x = np.load(f'{dataset.dir}/full_weighted_feat.npy')
         weighted_edge = np.load(f'{dataset.dir}/sorted_weighted_author_paper_edge.npy')
         row, col, val = torch.from_numpy(weighted_edge)
+        print(row)
+        print(col)
+        print(x)
         # degree = np.load(f'{dataset.dir}/paper_degree.npy')
         # degree = torch.from_numpy(np.diag(degree.astype(float)**(-1)))
         adj_t = SparseTensor(
@@ -175,7 +178,7 @@ if __name__ == '__main__':
         else:
             save_path = 'results/cs'
         makedirs(save_path)
-        model = MLP(dataset.num_paper_features * 3, args.hidden_channels,
+        model = MLP(dataset.num_paper_features * 2, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
         if args.parallel == True:
@@ -197,7 +200,7 @@ if __name__ == '__main__':
                       f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
                       f'Best: {best_valid_acc:.4f}')
     else:
-        model = MLP(dataset.num_paper_features * 3, args.hidden_channels,
+        model = MLP(dataset.num_paper_features * 2, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
     model.load_state_dict(torch.load(save_path + '/model.pt'))
