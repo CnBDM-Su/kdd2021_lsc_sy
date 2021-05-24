@@ -273,7 +273,7 @@ class MAG240M(LightningDataModule):
             dataset = MAG240MMINIDataset(self.data_dir)
         else:
             dataset = MAG240MDataset(self.data_dir)
-        return NeighborSampler(self.adj_t, node_idx=np.arange(dataset.num_papers),
+        return NeighborSampler(self.adj_t, node_idx=torch.from_numpy(np.arange(dataset.num_papers)),
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
                                batch_size=self.batch_size, num_workers=4)
