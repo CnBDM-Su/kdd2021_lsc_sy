@@ -253,7 +253,7 @@ if __name__ == '__main__':
     else:
         ap_edge = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph//processed/author___affiliated_with___institution/edge_index.npy'
+    path = f'{dataset.dir}/mini_graph/processed/author___affiliated_with___institution/edge_index.npy'
     if not osp.exists(path):
         print('generating mini graph author_institution edge...')
         ai_edge_new = []
@@ -265,7 +265,7 @@ if __name__ == '__main__':
     else:
         ai_edge = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph//processed/paper_degree.npy'
+    path = f'{dataset.dir}/mini_graph/paper_degree.npy'
     if not osp.exists(path):
         print('generating mini graph paper degree...')
         degree = np.zeros(num_dict['paper'])
