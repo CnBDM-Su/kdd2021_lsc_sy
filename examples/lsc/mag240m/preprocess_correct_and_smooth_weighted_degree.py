@@ -141,6 +141,7 @@ if __name__ == '__main__':
             is_sorted=True)
 
         # adj_t = adj_t.matmul(degree)
+        print(x.shape)
         inputs = torch.from_numpy(x[dataset.num_papers:dataset.num_authors]).float()
         print(adj_t)
         print(inputs)
