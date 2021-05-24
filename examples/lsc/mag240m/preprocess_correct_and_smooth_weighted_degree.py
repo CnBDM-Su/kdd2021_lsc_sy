@@ -133,9 +133,6 @@ if __name__ == '__main__':
         x = np.load(f'{dataset.dir}/full_weighted_feat.npy')
         weighted_edge = np.load(f'{dataset.dir}/sorted_weighted_author_paper_edge.npy')
         row, col, val = torch.from_numpy(weighted_edge)
-        print(row)
-        print(col)
-        print(x)
         # degree = np.load(f'{dataset.dir}/paper_degree.npy')
         # degree = torch.from_numpy(np.diag(degree.astype(float)**(-1)))
         adj_t = SparseTensor(
@@ -145,6 +142,8 @@ if __name__ == '__main__':
 
         # adj_t = adj_t.matmul(degree)
         inputs = torch.from_numpy(x[dataset.num_papers:dataset.num_authors]).float()
+        print(adj_t)
+        print(inputs)
         outputs = adj_t.matmul(inputs, reduce='mean').numpy()
         x = np.concatenate([x[:dataset.num_papers],outputs],1)
         np.save(path, x)
