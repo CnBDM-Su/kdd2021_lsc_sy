@@ -278,7 +278,7 @@ if __name__ == '__main__':
 
     path = f'{dataset.dir}/mini_graph/author_degree.npy'
     if not osp.exists(path):
-        print('generating mini graph paper degree...')
+        print('generating mini graph author degree...')
         a_degree = np.zeros(num_dict['author'])
         for i in tqdm(range(ap_edge.shape[1])):
             a_degree[ap_edge[0, i]] += 1
