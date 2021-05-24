@@ -473,7 +473,7 @@ if __name__ == '__main__':
     print(args)
 
     seed_everything(42)
-    datamodule = MAG240M(ROOT, args.batch_size, args.sizes)
+    datamodule = MAG240M(ROOT, args.batch_size, args.sizes, args.mini_graph)
 
     if not args.evaluate:
         model = RGNN(args.model, datamodule.num_features,
