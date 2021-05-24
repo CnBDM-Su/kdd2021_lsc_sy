@@ -106,6 +106,7 @@ if __name__ == '__main__':
     y_valid = torch.from_numpy(paper_label[valid_idx]).to(torch.long)
     edge_index = np.load(f'{dataset.dir}/weighted_paper_paper_edge.npy')
     edge_index = torch.from_numpy(edge_index)
+    adj_t = adj_t.set_value(edge_index[2], layout='coo')
 
     model = CorrectAndSmooth(args.num_correction_layers, args.correction_alpha,
                              args.num_smoothing_layers, args.smoothing_alpha,

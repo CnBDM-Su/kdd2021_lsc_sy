@@ -124,29 +124,29 @@ if __name__ == '__main__':
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
 
-    path = f'{dataset.dir}/paper_relation_weighted_i_feat.npy'
+    path = f'{dataset.dir}/paper_relation_weighted_feat.npy'
     if not osp.exists(path):
-        print('Generating paper relation weighted institurion features...')
-        path_ = f'{dataset.dir}/author_relation_feat.npy'
-        if not osp.exists(path_):
-            print('Generating author relation features...')
-            t = time.perf_counter()
-            # N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
-            x = np.load(f'{dataset.dir}/full_weighted_feat.npy')
-            weighted_edge = dataset.edge_index('author', 'affiliated_with', 'institution')
-            row, col = torch.from_numpy(weighted_edge)
-            adj_t = SparseTensor(
-                row=row.long(), col=col.long(),
-                sparse_sizes=(dataset.num_authors, dataset.num_institutions),
-                is_sorted=True)
-
-            inputs = torch.from_numpy(x[dataset.num_papers + dataset.num_authors:]).float()
-            outputs = adj_t.matmul(inputs, reduce='mean').numpy()
-            ar_f = np.concatenate([x[dataset.num_papers:dataset.num_papers + dataset.num_authors], outputs], 1)
-            np.save(path_, ar_f)
-            print(f'Done! [{time.perf_counter() - t:.2f}s]')
-        else:
-            ar_f = np.load(path_)
+        print('Generating paper relation weighted features...')
+        # path_ = f'{dataset.dir}/author_relation_feat.npy'
+        # if not osp.exists(path_):
+        #     print('Generating author relation features...')
+        #     t = time.perf_counter()
+        #     # N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
+        #     x = np.load(f'{dataset.dir}/full_weighted_feat.npy')
+        #     weighted_edge = dataset.edge_index('author', 'affiliated_with', 'institution')
+        #     row, col = torch.from_numpy(weighted_edge)
+        #     adj_t = SparseTensor(
+        #         row=row.long(), col=col.long(),
+        #         sparse_sizes=(dataset.num_authors, dataset.num_institutions),
+        #         is_sorted=True)
+        #
+        #     inputs = torch.from_numpy(x[dataset.num_papers + dataset.num_authors:]).float()
+        #     outputs = adj_t.matmul(inputs, reduce='mean').numpy()
+        #     ar_f = np.concatenate([x[dataset.num_papers:dataset.num_papers + dataset.num_authors], outputs], 1)
+        #     np.save(path_, ar_f)
+        #     print(f'Done! [{time.perf_counter() - t:.2f}s]')
+        # else:
+        #     ar_f = np.load(path_)
         t = time.perf_counter()
         #N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
         x = np.load(f'{dataset.dir}/full_weighted_feat.npy')
@@ -157,7 +157,7 @@ if __name__ == '__main__':
             sparse_sizes=(dataset.num_papers, dataset.num_authors),
             is_sorted=True)
 
-        inputs = torch.from_numpy(ar_f).float()
+        inputs = torch.from_numpy(x[dataset.num_papers:dataset.num_papers+dataset.num_authors]).float()
         outputs = adj_t.matmul(inputs, reduce='mean').numpy()
         x = np.concatenate([x[:dataset.num_papers],outputs],1)
         np.save(path, x)

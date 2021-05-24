@@ -136,11 +136,11 @@ if __name__ == '__main__':
         degree = np.load(f'{dataset.dir}/paper_degree.npy')
         degree = torch.from_numpy(np.diag(degree.astype(float)**(-1)))
         adj_t = SparseTensor(
-            row=col.long(), col=row.long(), value=val.float(),
+            row=col.long(), col=row.long(),
             sparse_sizes=(dataset.num_papers, dataset.num_authors),
             is_sorted=True)
 
-        adj_t = adj_t.matmul(degree)
+        # adj_t = adj_t.matmul(degree)
         inputs = torch.from_numpy(x[dataset.num_papers:dataset.num_authors]).float()
         outputs = adj_t.matmul(inputs, reduce='mean').numpy()
         x = np.concatenate([x[:dataset.num_papers],outputs],1)
