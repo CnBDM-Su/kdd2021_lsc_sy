@@ -520,7 +520,7 @@ if __name__ == '__main__':
         datamodule.batch_size = 16
         datamodule.sizes = [160] * len(args.sizes)  # (Almost) no sampling...
 
-        trainer.test(model=model, datamodule=datamodule)
+        # trainer.test(model=model, datamodule=datamodule)
 
         evaluator = MAG240MEvaluator()
 
