@@ -156,13 +156,13 @@ if __name__ == '__main__':
         print('Reading training node features...', end=' ', flush=True)
         # x_train = dataset.paper_feat[train_idx]
         x_train = x[train_idx]
-        x_train = torch.from_numpy(x_train).to(device, torch.float)
+        x_train = torch.from_numpy(x_train).to(torch.float)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
         t = time.perf_counter()
         print('Reading validation node features...', end=' ', flush=True)
         x_valid = x[valid_idx]
         # x_valid = dataset.paper_feat[valid_idx]
-        x_valid = torch.from_numpy(x_valid).to(device, torch.float)
+        x_valid = torch.from_numpy(x_valid).to(torch.float)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
         y_train = torch.from_numpy(paper_label[train_idx])
