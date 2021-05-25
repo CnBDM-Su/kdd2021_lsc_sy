@@ -519,10 +519,6 @@ if __name__ == '__main__':
         model = RGNN.load_from_checkpoint(
             checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml').to(int(args.device))
 
-        if args.parallel==True:
-            gpus = [4,5,6,7]
-            model = torch.nn.DataParallel(model, device_ids=gpus)
-
         datamodule.batch_size = 16
         datamodule.sizes = [160] * len(args.sizes)  # (Almost) no sampling...
 
