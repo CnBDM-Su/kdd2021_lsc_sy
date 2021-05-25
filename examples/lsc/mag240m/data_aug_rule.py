@@ -13,8 +13,8 @@ dataset = MAG240MMINIDataset(ROOT)
 
 train_idx = dataset.get_idx_split('train')
 te_id = np.random.choice(train_idx.shape[0], size=(int(np.round(train_idx.shape[0]*0.2)),), replace=False)
-te_idx = train_idx[te_id]
-train_idx = np.array(list(set(train_idx) - set(te_idx)))
+te_idx = np.sort(train_idx[te_id])
+train_idx = np.sort(np.array(list(set(train_idx) - set(te_idx))))
 valid_idx = dataset.get_idx_split('valid')
 test_idx = dataset.get_idx_split('test')
 idx = np.concatenate([train_idx,valid_idx,test_idx],0)
