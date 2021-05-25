@@ -165,6 +165,8 @@ if __name__ == '__main__':
     else:
         x = np.load(path)
         print(x.shape)
+    y = dataset.all_paper_year
+    x = np.concatenate([x,y],1)
 
     if args.evaluate == False:
         t = time.perf_counter()
@@ -191,11 +193,11 @@ if __name__ == '__main__':
         else:
             save_path = 'results/cs'
         makedirs(save_path)
-        model = MLP(dataset.num_paper_features * 3, args.hidden_channels,
+        model = MLP(dataset.num_paper_features * 2+1, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
         if args.parallel == True:
-            model = torch.nn.DataParallel(model, device_ids=[2,3,4,5,6,7])
+            model = torch.nn.DataParallel(model, device_ids=[5,6,7])
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
         num_params = sum([p.numel() for p in model.parameters()])
         print(f'#Params: {num_params}')
@@ -213,7 +215,7 @@ if __name__ == '__main__':
                       f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
                       f'Best: {best_valid_acc:.4f}')
     else:
-        model = MLP(dataset.num_paper_features * 3, args.hidden_channels,
+        model = MLP(dataset.num_paper_features * 2+1, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
     model.load_state_dict(torch.load(save_path + '/model.pt'))
