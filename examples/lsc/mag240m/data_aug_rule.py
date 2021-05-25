@@ -36,7 +36,7 @@ for i in tqdm(range(train_idx.shape[0])):
         else:
             bias = j
             break
-
+print(len(a_l.keys()))
 for i in a_l.keys():
     if len(a_l[i]) > 1:
         print(a_l[i])
