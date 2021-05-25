@@ -70,7 +70,7 @@ new_label = deepcopy(paper_label)
 new_tr = []
 bias = 0
 for i in tqdm(range(len(reliable_author.keys()))):
-    i = reliable_author.keys()[i]
+    i = list(reliable_author.keys())[i]
     l = reliable_author[i]
     for j in range(bias,ap_edge.shape[1]):
         if i==ap_edge[0,j]:
