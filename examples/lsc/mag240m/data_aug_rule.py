@@ -26,7 +26,7 @@ ap_edge = dataset.edge_index('author', 'writes', 'paper')
 a_l = {}
 bias = 0
 for i in tqdm(range(train_idx.shape[0])):
-    print(train_idx[i])
+    print(train_idx[i].numpy())
     i = train_idx[i].numpy()[0]
     for j in range(bias,ap_edge.shape[1]):
         print(i,ap_edge[0,i])
