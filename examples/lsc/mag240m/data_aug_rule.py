@@ -32,7 +32,7 @@ for i in tqdm(range(ap_edge.shape[1])):
             a_l[ap_edge[0,i]] = [paper_label[ap_edge[1,i]]]
         else:
             print(a_l[ap_edge[0, i]])
-            a_l[ap_edge[0, i]] = a_l[ap_edge[0, i]].append(paper_label[ap_edge[1,i]])
+            a_l[ap_edge[0, i]].append(paper_label[ap_edge[1,i]])
 
 for i in a_l.keys():
     if len(a_l[i]) > 3:
