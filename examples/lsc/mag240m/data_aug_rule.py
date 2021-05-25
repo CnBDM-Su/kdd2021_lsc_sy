@@ -52,12 +52,12 @@ for i in tqdm(range(len(reliable_author.keys()))):
     l = reliable_author[i]
     for j in range(bias,ap_edge.shape[1]):
         if i==ap_edge[0,j]:
-                new_label[ap_edge[1,j]] = l
+            new_label[ap_edge[1,j]] = l
         elif i<ap_edge[0,j]:
             bias = j
             break
 pred = new_label[te_idx]
-print(precision_score(true,pred))
+print(accuracy_score(true,pred))
 
 #______________predict________________
 # new_label = deepcopy(paper_label)
