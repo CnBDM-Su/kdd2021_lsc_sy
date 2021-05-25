@@ -47,7 +47,7 @@ ap_edge = dataset.edge_index('author', 'writes', 'paper')
 new_label = deepcopy(paper_label)
 true = new_label[te_idx]
 bias = 0
-for i in tqdm(len(reliable_author.keys())):
+for i in tqdm(range(len(reliable_author.keys()))):
     i = reliable_author.keys()[i]
     l = reliable_author[i]
     for j in range(bias,ap_edge.shape[1]):
@@ -62,7 +62,7 @@ print(precision_score(true,pred))
 #______________predict________________
 # new_label = deepcopy(paper_label)
 # bias = 0
-# for i in tqdm(len(reliable_author.keys())):
+# for i in tqdm(range(len(reliable_author.keys()))):
 #     i = reliable_author.keys()[i]
 #     l = reliable_author[i]
 #     for j in range(bias,ap_edge.shape[1]):
