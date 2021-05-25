@@ -69,8 +69,9 @@ ap_edge = dataset.edge_index('author', 'writes', 'paper')
 new_label = deepcopy(paper_label)
 new_tr = []
 bias = 0
+keys = np.sort(list(reliable_author.keys()))
 for i in tqdm(range(len(reliable_author.keys()))):
-    i = list(reliable_author.keys())[i]
+    i = keys[i]
     l = reliable_author[i]
     for j in range(bias,ap_edge.shape[1]):
         if i==ap_edge[0,j]:

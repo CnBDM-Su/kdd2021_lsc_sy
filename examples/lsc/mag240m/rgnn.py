@@ -555,7 +555,7 @@ if __name__ == '__main__':
                 for batch in tqdm(loader):
                     batch = batch.to(int(args.device))
                     with torch.no_grad():
-                        out = model(batch.x, batch.adjs_t).softmax(dim=-1).to(int(args.device))
+                        out = model(batch.x, batch.adjs_t).softmax(dim=-1).cpu()
                         # print(out)
                         y_preds.append(out)
                 res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
