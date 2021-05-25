@@ -22,13 +22,12 @@ valid_idx = torch.from_numpy(dataset.get_idx_split('valid'))
 test_idx = torch.from_numpy(dataset.get_idx_split('test'))
 paper_label = dataset.paper_label
 
-ap_edge = dataset.edge_index('author', 'writes', 'paper')
+ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
 a_l = {}
 bias = 0
 for i in tqdm(range(train_idx.shape[0])):
     i = train_idx[i].numpy()
     for j in range(bias,ap_edge.shape[1]):
-        print(i,ap_edge[0,j])
         if i==ap_edge[0,j]:
             if ap_edge[0,j] not in a_l.keys():
                 a_l[ap_edge[0,j]] = [paper_label[ap_edge[1,j]]]
