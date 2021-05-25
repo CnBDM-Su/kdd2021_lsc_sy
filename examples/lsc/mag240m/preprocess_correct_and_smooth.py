@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from torch.nn import ModuleList, Linear, BatchNorm1d, Identity
 import random
 import os.path as osp
-
+from torch_sparse import SparseTensor
 from ogb.utils.url import makedirs
 
 from ogb.lsc import MAG240MDataset, MAG240MEvaluator
@@ -126,35 +126,28 @@ if __name__ == '__main__':
         print('Generating paper relation features...')
         t = time.perf_counter()
         N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
-        x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
-                           mode='r', shape=(N, 768))
-        y = np.memmap(path, dtype=np.float16, mode='w+',
-                      shape=(dataset.num_papers, 1536))
+        x = np.load(f'{dataset.dir}/full_feat.npy')
+
         ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
-        bias = 0
-        p_batch_size = args.p_batch_size
-        for p_batch in tqdm(range(dataset.num_papers // p_batch_size)):
-            fea_ = []
-            end = min((p_batch + 1) * p_batch_size, dataset.num_papers)
-            for i in range(p_batch * p_batch_size, end):
-                sign = 0
-                fea = []
-                for j in range(bias, len(ap_edge[0])):
-                    if ap_edge[1, j] == i:
-                        fea.append(ap_edge[0, j])
-                    else:
-                        break
-                bias = j
-                fea = x[fea]
-                fea_.append(np.mean(fea, 0))
-            fea_ = np.array(fea_)
-            y[p_batch * p_batch_size:end] = np.concatenate([x[p_batch * p_batch_size:end], fea_], 1)
-        x_fr = np.memmap(path, dtype=np.float16, mode='r',
-                         shape=(dataset.num_papers, 1536))
+
+        row, col = torch.from_numpy(ap_edge)
+        adj_t = SparseTensor(
+            row=col.long(), col=row.long(),
+            sparse_sizes=(dataset.num_papers, dataset.num_authors),
+            is_sorted=True)
+
+        inputs = torch.from_numpy(x[dataset.num_papers:dataset.num_papers + dataset.num_authors]).float()
+        outputs = adj_t.matmul(inputs, reduce='mean').numpy()
+        x = np.concatenate([x[:dataset.num_papers], outputs], 1)
+        np.save(path, x)
+        x_fr = np.load(path)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
     else:
-        x_fr = np.memmap(path, dtype=np.float16, mode='r',
-                      shape=(dataset.num_papers, 1536))
+        x_fr = np.load(path)
+
+    y = dataset.all_paper_year
+
+    x_fr = np.concatenate([x_fr,y],1)
 
     if args.evaluate==False:
         t = time.perf_counter()
