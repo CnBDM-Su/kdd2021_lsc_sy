@@ -26,12 +26,9 @@ ap_edge = dataset.edge_index('author', 'writes', 'paper')
 a_l = {}
 for i in tqdm(range(ap_edge.shape[1])):
     if ap_edge[1,i] in train_idx:
-        print(ap_edge[0,i],ap_edge[1,i])
         if ap_edge[0,i] not in a_l.keys():
-            print(paper_label[ap_edge[1, i]])
             a_l[ap_edge[0,i]] = [paper_label[ap_edge[1,i]]]
         else:
-            print(a_l[ap_edge[0, i]])
             a_l[ap_edge[0, i]].append(paper_label[ap_edge[1,i]])
 
 for i in a_l.keys():
