@@ -6,9 +6,12 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torch.nn import ModuleList, Linear, BatchNorm1d, Identity
 import os.path as osp
-from ogb.lsc import MAG240MDataset
+# from ogb.lsc import MAG240MDataset
 from root import ROOT
 import numpy as np
+import sys
+sys.path.append('/var/ogb/ogb/lsc')
+from mag240m_mini_graph import MAG240MMINIDataset
 from ogb.utils.url import makedirs
 
 class MLP(torch.nn.Module):
@@ -122,7 +125,7 @@ if __name__ == '__main__':
     print(args)
 
     torch.manual_seed(12345)
-    gpus = [0,1,2,3,4,5,6,7]
+    gpus = [5,6,7]
     if torch.cuda.is_available():
         device = f'cuda:{args.device}'
     else:
@@ -130,10 +133,13 @@ if __name__ == '__main__':
         print('cpu')
 
 
-    dataset = MAG240MDataset(ROOT)
+    # dataset = MAG240MDataset(ROOT)
+    dataset = MAG240MMINIDataset(ROOT)
     evaluator = MAG240MEvaluator()
 
-    train_idx = dataset.get_idx_split('train')
+
+    # train_idx = dataset.get_idx_split('train')
+    train_idx = np.load(f'{dataset.dir}/new_train_idx.npy')
     valid_idx = dataset.get_idx_split('valid')
     test_idx = dataset.get_idx_split('test')
 
@@ -153,9 +159,12 @@ if __name__ == '__main__':
     x_test = torch.from_numpy(x_test).to(torch.float).to(device)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-    y_train = torch.from_numpy(dataset.paper_label[train_idx])
+    label = np.load(f'{dataset.dir}/new_paper_label.npy')
+    # y_train = torch.from_numpy(dataset.paper_label[train_idx])
+    y_train = torch.from_numpy(label[train_idx])
     y_train = y_train.to(device, torch.long)
-    y_valid = torch.from_numpy(dataset.paper_label[valid_idx])
+    # y_valid = torch.from_numpy(dataset.paper_label[valid_idx])
+    y_valid = torch.from_numpy(label[valid_idx])
     y_valid = y_valid.to(device, torch.long)
 
     model = MLP(dataset.num_paper_features, args.hidden_channels,
