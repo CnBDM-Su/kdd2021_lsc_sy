@@ -80,6 +80,7 @@ for i in tqdm(range(len(reliable_author.keys()))):
         elif i<ap_edge[0,j]:
             bias = j
             break
+print('new label num:',len(new_tr))
 new_tr = np.sort(train_idx.tolist() + new_tr)
 np.save(f'{dataset.dir}/new_train_idx.npy',new_tr)
 np.save(f'{dataset.dir}/new_paper_label.npy',new_label)
