@@ -61,7 +61,7 @@ for epoch in range(300):
         optimizer.step()
         total_loss += loss
     if epoch % 100 == 0:
-        print(total_loss.data.numpy())
+        print(total_loss.data.cpu().numpy())
 
 ###### 基于训练好的model做降维并可视化
 
