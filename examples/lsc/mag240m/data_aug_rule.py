@@ -12,7 +12,7 @@ from mag240m_mini_graph import MAG240MMINIDataset
 dataset = MAG240MMINIDataset(ROOT)
 
 train_idx = dataset.get_idx_split('train')
-te_id = np.random.choice(range(train_idx.shape[0]), size=(np.round(train_idx.shape[0]*0.2),), replace=False)
+te_id = np.random.choice(train_idx.shape[0], size=(np.round(train_idx.shape[0]*0.2),), replace=False)
 te_idx = train_idx[te_id]
 train_idx = np.array(list(set(train_idx) - set(te_idx)))
 valid_idx = dataset.get_idx_split('valid')
