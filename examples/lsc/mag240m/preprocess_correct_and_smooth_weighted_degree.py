@@ -11,7 +11,7 @@ import random
 import os.path as osp
 
 from ogb.utils.url import makedirs
-
+from sklearn.preprocessing import MinMaxScaler
 from ogb.lsc import MAG240MDataset, MAG240MEvaluator
 import sys
 from torch_sparse import SparseTensor
@@ -154,6 +154,9 @@ if __name__ == '__main__':
     else:
         x = np.load(path)
         print(x.shape)
+
+    mm = MinMaxScaler((0,1))
+    x = mm.fit_transform(x)
 
     if args.evaluate == False:
         t = time.perf_counter()

@@ -18,30 +18,30 @@ from joblib import Parallel, delayed
 dataset = MAG240MMINIDataset(ROOT)
 dataset2 = MAG240MDataset(ROOT)
 
-# path = f'{dataset.dir}/weighted_paper_paper_edge.npy'
-# if not osp.exists(path):
-#     print('Generating mini weighted paper paper edge...')
-#     edge_index = dataset.edge_index('paper', 'cites', 'paper')
-#     year = dataset.all_paper_year
-#     mm = MinMaxScaler((0.5, 1))
-#     bias = 0
-#     val = []
-#     for i in tqdm(range(dataset.num_papers)):
-#         tmp = []
-#         for j in range(bias, edge_index.shape[1]):
-#             if i == edge_index[0, j]:
-#                 tmp.append(edge_index[1, j])
-#             if i < edge_index[0, j]:
-#                 bias = j
-#                 break
-#         if len(tmp) != 0:
-#             tmp = mm.fit_transform(year[tmp].reshape(-1, 1)).ravel()
-#             for weight in tmp:
-#                 val.append(weight)
-#     weighted_edge = np.concatenate([edge_index, np.array(val).reshape(1, -1)], 0)
-#     np.save(path, weighted_edge)
-# else:
-#     weighted_edge = np.load(path)
+path = f'{dataset.dir}/weighted_paper_paper_edge.npy'
+if not osp.exists(path):
+    print('Generating mini weighted paper paper edge...')
+    edge_index = dataset.edge_index('paper', 'cites', 'paper')
+    year = dataset.all_paper_year
+    mm = MinMaxScaler((0.5, 1))
+    bias = 0
+    val = []
+    for i in tqdm(range(dataset.num_papers)):
+        tmp = []
+        for j in range(bias, edge_index.shape[1]):
+            if i == edge_index[0, j]:
+                tmp.append(edge_index[1, j])
+            if i < edge_index[0, j]:
+                bias = j
+                break
+        if len(tmp) != 0:
+            tmp = mm.fit_transform(year[tmp].reshape(-1, 1)).ravel()
+            for weight in tmp:
+                val.append(weight)
+    weighted_edge = np.concatenate([edge_index, np.array(val).reshape(1, -1)], 0)
+    np.save(path, weighted_edge)
+else:
+    weighted_edge = np.load(path)
 
 path = f'{dataset.dir}/full_weighted_feat.npy'
 done_flag_path = f'{dataset.dir}/full_weighted_feat_done.txt'
