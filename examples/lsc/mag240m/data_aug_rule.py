@@ -27,6 +27,7 @@ a_l = {}
 for i in tqdm(range(ap_edge.shape[1])):
     if ap_edge[1,i] in train_idx:
         if ap_edge[0,i] not in a_l.keys():
+            print(paper_label[ap_edge[1, i]])
             a_l[ap_edge[0,i]] = [paper_label[ap_edge[1,i]]]
         else:
             a_l[ap_edge[0, i]] = a_l[ap_edge[0, i]].append(paper_label[ap_edge[1,i]])
