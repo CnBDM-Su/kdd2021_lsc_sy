@@ -10,9 +10,9 @@ from mag240m_mini_graph import MAG240MMINIDataset
 from root import ROOT
 
 dataset = MAG240MMINIDataset(ROOT)
-
+device = 'cuda:5'
 ###### 读入数据
-x = np.load(f'{dataset.dir}/full_weighted_feat.npy')[dataset.num_papers:]
+x = np.load(f'{dataset.dir}/full_weighted_feat.npy')[:dataset.num_papers]
 
 ###### 对输入进行归一化，因为autoencoder只用到了input
 MMScaler = MinMaxScaler()
@@ -47,19 +47,14 @@ class autoencoder(nn.Module):
         return encoder, decoder
 
 
-model = autoencoder()
-
-####### 定义损失函数
+model = autoencoder().to(device)
 criterion = nn.MSELoss()
-
-####### 定义优化函数
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)  # 如果采用SGD的话，收敛不下降
 
-####### epoch 设定为300
 for epoch in range(300):
     total_loss = 0
     for i, (x, y) in enumerate(my_dataset_loader):
-        _, pred = model(V(x))
+        _, pred = model(V(x).to(device))
         loss = criterion(pred, x)
         optimizer.zero_grad()
         loss.backward()
