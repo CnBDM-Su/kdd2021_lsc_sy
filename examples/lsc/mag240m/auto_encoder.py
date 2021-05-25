@@ -55,7 +55,7 @@ for epoch in range(300):
     total_loss = 0
     for i, (x, y) in enumerate(my_dataset_loader):
         _, pred = model(V(x).to(device))
-        loss = criterion(pred, x)
+        loss = criterion(pred.to(device), x.to(device))
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -68,7 +68,7 @@ for epoch in range(300):
 x_ = []
 y_ = []
 for i, (x, y) in enumerate(my_dataset):
-    _, pred = model(V(x))
+    _, pred = model(V(x).to(device))
     # loss = criterion(pred, x)
     dimension = _.data.numpy()
 np.save(f'{dataset.dir}/paper_autoencoder_feat.npy', dimension)
