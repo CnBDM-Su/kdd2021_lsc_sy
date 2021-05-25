@@ -25,7 +25,7 @@ paper_label = dataset.paper_label
 ap_edge = dataset.edge_index('author', 'writes', 'paper')
 a_l = {}
 bias = 0
-for i in tqdm(range(train_idx)):
+for i in tqdm(range(train_idx.shape[0])):
     i = train_idx[i]
     for j in range(bias,ap_edge.shape[1]):
         if i==j:
