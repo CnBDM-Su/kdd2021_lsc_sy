@@ -115,6 +115,8 @@ if __name__ == '__main__':
                              autoscale=True)
 
     t = time.perf_counter()
+    print(y_pred.shape)
+    print(y_pred)
     print('Correcting predictions...', end=' ', flush=True)
     assert abs((float(y_pred.sum()) / y_pred.size(0)) - 1.0) < 1e-2
 
