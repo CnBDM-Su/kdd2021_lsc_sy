@@ -78,7 +78,7 @@ if __name__ == '__main__':
 
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
-    y_pred = torch.from_numpy(np.load(save_path+'rgat_pred.npz'))['y_pred']
+    y_pred = torch.from_numpy(np.load(save_path+'/rgat_pred.npz'))['y_pred']
     # y_pred = torch.from_numpy(np.load(save_path+'/pred.npy'))
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
