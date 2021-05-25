@@ -28,7 +28,7 @@ bias = 0
 for i in tqdm(range(train_idx.shape[0])):
     i = train_idx[i]
     for j in range(bias,ap_edge.shape[1]):
-        if i==j:
+        if i==ap_edge[0,i]:
             if ap_edge[0,i] not in a_l.keys():
                 a_l[ap_edge[0,i]] = [paper_label[ap_edge[1,i]]]
             else:
