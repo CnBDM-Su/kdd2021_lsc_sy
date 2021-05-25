@@ -38,5 +38,5 @@ for i in tqdm(range(train_idx.shape[0])):
             break
 
 for i in a_l.keys():
-    if len(a_l[i]) > 3:
+    if len(a_l[i]) > 1:
         print(a_l[i])
