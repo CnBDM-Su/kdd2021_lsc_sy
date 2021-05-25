@@ -24,12 +24,18 @@ paper_label = dataset.paper_label
 
 ap_edge = dataset.edge_index('author', 'writes', 'paper')
 a_l = {}
-for i in tqdm(range(ap_edge.shape[1])):
-    if ap_edge[1,i] in train_idx:
-        if ap_edge[0,i] not in a_l.keys():
-            a_l[ap_edge[0,i]] = [paper_label[ap_edge[1,i]]]
+bias = 0
+for i in tqdm(range(train_idx)):
+    i = train_idx[i]
+    for j in range(bias,ap_edge.shape[1]):
+        if i==j:
+            if ap_edge[0,i] not in a_l.keys():
+                a_l[ap_edge[0,i]] = [paper_label[ap_edge[1,i]]]
+            else:
+                a_l[ap_edge[0, i]].append(paper_label[ap_edge[1,i]])
         else:
-            a_l[ap_edge[0, i]].append(paper_label[ap_edge[1,i]])
+            bias = j
+            break
 
 for i in a_l.keys():
     if len(a_l[i]) > 3:
