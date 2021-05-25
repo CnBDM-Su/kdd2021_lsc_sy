@@ -555,7 +555,10 @@ if __name__ == '__main__':
                 for batch in tqdm(loader):
                     batch = batch.to(int(args.device))
                     with torch.no_grad():
+                        print(batch.x)
+                        print(batch.adjs_t)
                         out = model(batch.x, batch.adjs_t).softmax(dim=-1).to(int(args.device))
+                        print(out)
                         y_preds.append(out)
                 res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
                 evaluator.save_test_submission(res, f'results/rgat_cs')
