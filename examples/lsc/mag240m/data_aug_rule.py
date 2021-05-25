@@ -28,13 +28,13 @@ bias = 0
 for i in tqdm(range(train_idx.shape[0])):
     i = train_idx[i].numpy()
     for j in range(bias,ap_edge.shape[1]):
-        print(i,ap_edge[0,j])
-        if i==ap_edge[0,j]:
+        print(i,ap_edge[1,j])
+        if i==ap_edge[1,j]:
             if ap_edge[0,j] not in a_l.keys():
                 a_l[ap_edge[0,j]] = [paper_label[ap_edge[1,j]]]
             else:
                 a_l[ap_edge[0, j]].append(paper_label[ap_edge[1,j]])
-        elif i<ap_edge[0,j]:
+        elif i<ap_edge[1,j]:
             bias = j
             break
 print(len(a_l.keys()))
