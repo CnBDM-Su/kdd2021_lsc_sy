@@ -64,7 +64,8 @@ if __name__ == '__main__':
 
     if args.mini_graph:
         dataset = MAG240MMINIDataset(ROOT)
-        save_path = 'results/mini_cs_weighted'
+        # save_path = 'results/mini_cs_weighted'
+        save_path = 'results/rgat_cs'
 
     else:
         dataset = MAG240MDataset(ROOT)
@@ -77,7 +78,8 @@ if __name__ == '__main__':
 
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
-    y_pred = torch.from_numpy(np.load(save_path+'/pred.npy'))
+    y_pred = torch.from_numpy(np.load('rgat_pred.npz'))['y_pred']
+    # y_pred = torch.from_numpy(np.load(save_path+'/pred.npy'))
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     t = time.perf_counter()
