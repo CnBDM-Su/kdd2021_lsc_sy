@@ -165,8 +165,8 @@ if __name__ == '__main__':
     else:
         x = np.load(path)
         print(x.shape)
-    y = dataset.all_paper_year.reshape(-1,1)
-    x = np.concatenate([x,y],1)
+    # y = dataset.all_paper_year.reshape(-1,1)
+    # x = np.concatenate([x,y],1)
 
     if args.evaluate == False:
         t = time.perf_counter()
