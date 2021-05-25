@@ -443,11 +443,11 @@ class MAG240MEvaluator:
 
         if isinstance(y_pred, torch.Tensor):
             y_pred = y_pred.cpu().numpy()
-        y_pred = y_pred.astype(np.short)
+        # y_pred = y_pred.astype(np.short)
 
         if isinstance(y_pred_valid, torch.Tensor):
             y_pred_valid = y_pred_valid.cpu().numpy()
-        y_pred_valid = y_pred_valid.astype(np.short)
+        # y_pred_valid = y_pred_valid.astype(np.short)
 
         makedirs(dir_path)
         filename = osp.join(dir_path, 'y_pred_mag240m')
@@ -556,7 +556,7 @@ if __name__ == '__main__':
                     batch = batch.to(int(args.device))
                     with torch.no_grad():
                         out = model(batch.x, batch.adjs_t).softmax(dim=-1).to(int(args.device))
-                        print(out)
+                        # print(out)
                         y_preds.append(out)
                 res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
                 evaluator.save_test_submission(res, f'results/rgat_cs')
