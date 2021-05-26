@@ -146,5 +146,25 @@ if __name__ == '__main__':
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
 
-    res = {'y_pred': y_pred_[test_idx], 'y_pred_valid' : y_pred_[valid_idx]}
-    evaluator.save_test_submission(res, save_path)
+    initial_pred = y_pred.argmax(dim=-1)[valid_idx]
+    final_pred = y_pred_[valid_idx]
+    TT = 0
+    TF = 0
+    FT = 0
+    FF = 0
+    for i in range(y_valid.shape[1]):
+        if (y_valid[i] == initial_pred[i]) and (y_valid[i] == final_pred[i]):
+            TT += 1
+        elif (y_valid[i] == initial_pred[i]) and (y_valid[i] != final_pred[i]):
+            TF += 1
+        elif (y_valid[i] != initial_pred[i]) and (y_valid[i] == final_pred[i]):
+            FT += 1
+        elif (y_valid[i] != initial_pred[i]) and (y_valid[i] != final_pred[i]):
+            FF += 1
+    print('TT:',TT)
+    print('TF:', TF)
+    print('FT:', FT)
+    print('FF:', FF)
+
+    # res = {'y_pred': y_pred_[test_idx], 'y_pred_valid' : y_pred_[valid_idx]}
+    # evaluator.save_test_submission(res, save_path)
