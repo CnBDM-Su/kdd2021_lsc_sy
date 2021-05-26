@@ -147,20 +147,21 @@ if __name__ == '__main__':
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
 
     print('correct num:',correct_index.shape[0])
-    initial_pred = y_pred.argmax(dim=-1)[valid_idx]
-    final_pred = y_pred_[valid_idx]
+    initial_pred = y_pred.argmax(dim=-1)
+    final_pred = y_pred_
+    y_true = torch.from_numpy(paper_label).to(torch.long)
     TT = 0
     TF = 0
     FT = 0
     FF = 0
-    for i in range(y_valid.shape[0]):
-        if (y_valid[i] == initial_pred[i]) and (y_valid[i] == final_pred[i]):
+    for i in correct_index:
+        if (y_true[i] == initial_pred[i]) and (y_true[i] == final_pred[i]):
             TT += 1
-        elif (y_valid[i] == initial_pred[i]) and (y_valid[i] != final_pred[i]):
+        elif (y_true[i] == initial_pred[i]) and (y_true[i] != final_pred[i]):
             TF += 1
-        elif (y_valid[i] != initial_pred[i]) and (y_valid[i] == final_pred[i]):
+        elif (y_true[i] != initial_pred[i]) and (y_true[i] == final_pred[i]):
             FT += 1
-        elif (y_valid[i] != initial_pred[i]) and (y_valid[i] != final_pred[i]):
+        elif (y_true[i] != initial_pred[i]) and (y_true[i] != final_pred[i]):
             FF += 1
     print('TT:',TT)
     print('TF:', TF)
