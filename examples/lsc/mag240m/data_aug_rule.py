@@ -58,7 +58,6 @@ for i in a_l.keys():
 #             break
 # print('related paper num:',len(related_paper))
 print('reliable author num:',len(reliable_author.keys()))
-print(reliable_author.keys())
 print('___________sub_test___________')
 a_l_2 = {}
 bias = 0
@@ -82,7 +81,6 @@ for i in a_l_2.keys():
             reliable_author_2[i] = a_l_2[i][0]
 
 print(len(reliable_author_2.keys()))
-print(a_l_2.keys())
 print('___________valid___________')
 a_l_3 = {}
 bias = 0
@@ -150,12 +148,12 @@ print('__________coverage__________')
 # print('related paper sub_train & sub test coverage ratio:',cover_3_1)
 # print('related paper sub_train & valid coverage ratio:',cover_3_2)
 # print('related paper sub_train & test coverage ratio:',cover_3_3)
-cover_4_1 = len(list(set(reliable_author.keys()) & set(a_l_2.keys())))//len(a_l_2.keys())
-cover_4_2 = len(list(set(reliable_author.keys()) & set(a_l_3.keys())))//len(a_l_3.keys())
-cover_4_3 = len(list(set(reliable_author.keys()) & set(a_l_4.keys())))//len(a_l_4.keys())
-print('related paper sub_train & sub test coverage ratio:',cover_4_1)
-print('related paper sub_train & valid coverage ratio:',cover_4_2)
-print('related paper sub_train & test coverage ratio:',cover_4_3)
+cover_4_1 = len(list(set(reliable_author.keys()) & set(a_l_2.keys())))/len(a_l_2.keys())
+cover_4_2 = len(list(set(reliable_author.keys()) & set(a_l_3.keys())))/len(a_l_3.keys())
+cover_4_3 = len(list(set(reliable_author.keys()) & set(a_l_4.keys())))/len(a_l_4.keys())
+print('reliable author sub_train & sub test coverage ratio:',cover_4_1)
+print('reliable author sub_train & valid coverage ratio:',cover_4_2)
+print('reliable author sub_train & test coverage ratio:',cover_4_3)
 # ap_edge = dataset.edge_index('author', 'writes', 'paper')
 #______________sub test___________________
 # new_label = deepcopy(paper_label)
