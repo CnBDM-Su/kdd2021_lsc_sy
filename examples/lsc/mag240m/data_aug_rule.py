@@ -251,7 +251,7 @@ ap_edge = dataset.edge_index('author', 'writes', 'paper')
 # np.save(f'{dataset.dir}/new_train_idx.npy',new_tr)
 # np.save(f'{dataset.dir}/new_paper_label.npy',new_label)
 
-______________predict_valid____________
+# ______________predict_valid____________
 valid = deepcopy(paper_label)
 valid_related = []
 bias = 0
