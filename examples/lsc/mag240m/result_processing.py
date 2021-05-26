@@ -131,9 +131,10 @@ if __name__ == '__main__':
     t = time.perf_counter()
     print('result processing...', end=' ', flush=True)
     y_pred_ = y_pred.argmax(dim=-1)
-    y_correct = np.load(f'{dataset.dir}/new_paper_label.npy')
-    for i in idx:
-        y_pred_[i] = y_correct[i]
+    y_correct = np.load(f'{dataset.dir}/new_valid_label.npy')
+    for i in range(valid_idx.shape[0]):
+        ind = valid_idx[i]
+        y_pred_[ind] = y_correct[i]
 
 
     train_acc = evaluator.eval({
