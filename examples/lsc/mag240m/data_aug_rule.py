@@ -156,40 +156,36 @@ print('reliable author num:',len(reliable_author.keys()))
 # print('reliable author sub_train & test coverage ratio:',cover_4_3)
 ap_edge = dataset.edge_index('author', 'writes', 'paper')
 #______________sub test___________________
-new_label = deepcopy(paper_label)
-relate = []
-pred = []
-c = 0
-# true = new_label[te_idx]
-coverage = {}
-bias = 0
-keys = np.sort(list(reliable_author.keys()))
-for i in tqdm(range(len(reliable_author.keys()))):
-    i = keys[i]
-    l = reliable_author[i]
-    for j in range(bias,ap_edge.shape[1]):
-        if i==ap_edge[0,j]:
-            c+=1
-            if ap_edge[1, j] in te_idx:
-                if ap_edge[1, j] not in relate:
-                if ap_edge[1, j] not in coverage.keys():
-                    coverage[ap_edge[1, j]] = [l]
-                else:
-                    coverage[ap_edge[1, j]].append(l)
-        elif i<ap_edge[0,j]:
-            bias = j
-            break
-relate = []
-pred = []
-for i in coverage.keys():
-    relate.append(i)
-    counts = np.bincount(coverage[i])
-    pred.append(np.argmax(counts))
-
-true = new_label[relate]
-print('total:',c)
-print(len(relate))
-print('sub_test precision:',accuracy_score(true,pred))
+# new_label = deepcopy(paper_label)
+# c = 0
+# coverage = {}
+# bias = 0
+# keys = np.sort(list(reliable_author.keys()))
+# for i in tqdm(range(len(reliable_author.keys()))):
+#     i = keys[i]
+#     l = reliable_author[i]
+#     for j in range(bias,ap_edge.shape[1]):
+#         if i==ap_edge[0,j]:
+#             c+=1
+#             if ap_edge[1, j] in te_idx:
+#                 if ap_edge[1, j] not in coverage.keys():
+#                     coverage[ap_edge[1, j]] = [l]
+#                 else:
+#                     coverage[ap_edge[1, j]].append(l)
+#         elif i<ap_edge[0,j]:
+#             bias = j
+#             break
+# relate = []
+# pred = []
+# for i in coverage.keys():
+#     relate.append(i)
+#     counts = np.bincount(coverage[i])
+#     pred.append(np.argmax(counts))
+#
+# true = new_label[relate]
+# print('total:',c)
+# print(len(relate))
+# print('sub_test precision:',accuracy_score(true,pred))
 
 # #______________valid___________________
 new_label = deepcopy(paper_label)
