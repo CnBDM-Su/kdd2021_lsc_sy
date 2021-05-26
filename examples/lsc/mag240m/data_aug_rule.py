@@ -196,6 +196,7 @@ print('sub_test coverage paper num:', c)
 new_label = deepcopy(paper_label)
 relate = []
 c = 0
+pred = []
 # true = new_label[te_idx]
 coverage = {}
 bias = 0
@@ -249,21 +250,24 @@ print('valid coverage paper num:', c)
 # np.save(f'{dataset.dir}/new_paper_label.npy',new_label)
 
 #______________predict_valid____________
-# valid = deepcopy(paper_label)
-# bias = 0
-# keys = np.sort(list(reliable_author.keys()))
-# for i in tqdm(range(len(reliable_author.keys()))):
-#     i = keys[i]
-#     l = reliable_author[i]
-#     for j in range(bias,ap_edge.shape[1]):
-#         if i==ap_edge[0,j]:
-#             if ap_edge[1,j] in valid_idx:
-#                 valid[ap_edge[1,j]] = l
-#         elif i<ap_edge[0,j]:
-#             bias = j
-#             break
-# # print('new label num:',len(new_tr))
-# valid = valid[valid_idx]
-# # np.save(f'{dataset.dir}/new_train_idx.npy',new_tr)
-# np.save(f'{dataset.dir}/new_valid_label.npy',valid)
+valid = deepcopy(paper_label)
+valid_related = []
+bias = 0
+keys = np.sort(list(reliable_author.keys()))
+for i in tqdm(range(len(reliable_author.keys()))):
+    i = keys[i]
+    l = reliable_author[i]
+    for j in range(bias,ap_edge.shape[1]):
+        if i==ap_edge[0,j]:
+            if ap_edge[1,j] in valid_idx:
+                valid_related.append(ap_edge[1,j])
+                valid[ap_edge[1,j]] = l
+        elif i<ap_edge[0,j]:
+            bias = j
+            break
+# print('new label num:',len(new_tr))
+valid_related = np.array(valid_related)
+valid = valid[valid_idx]
+np.save(f'{dataset.dir}/changed_valid_idx.npy',valid_related)
+np.save(f'{dataset.dir}/new_valid_label.npy',valid)
 
