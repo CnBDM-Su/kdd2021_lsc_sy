@@ -93,8 +93,8 @@ print(len(reliable_author_3.keys()))
 print('___________test___________')
 a_l_4 = {}
 bias = 0
-for i in tqdm(range(train_idx.shape[0])):
-    i = train_idx[i]
+for i in tqdm(range(test_idx.shape[0])):
+    i = test_idx[i]
     for j in range(bias,ap_edge.shape[1]):
         if i==ap_edge[1,j]:
             if ap_edge[0,j] not in a_l_4.keys():
