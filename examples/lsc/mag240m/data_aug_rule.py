@@ -71,8 +71,28 @@ ap_edge = dataset.edge_index('author', 'writes', 'paper')
 # print(accuracy_score(true,pred))
 
 #______________predict________________
-new_label = deepcopy(paper_label)
-new_tr = []
+# new_label = deepcopy(paper_label)
+# new_tr = []
+# bias = 0
+# keys = np.sort(list(reliable_author.keys()))
+# for i in tqdm(range(len(reliable_author.keys()))):
+#     i = keys[i]
+#     l = reliable_author[i]
+#     for j in range(bias,ap_edge.shape[1]):
+#         if i==ap_edge[0,j]:
+#             if ap_edge[1,j] not in idx:
+#                 new_tr.append(ap_edge[1,j])
+#                 new_label[ap_edge[1,j]] = l
+#         elif i<ap_edge[0,j]:
+#             bias = j
+#             break
+# print('new label num:',len(new_tr))
+# new_tr = np.sort(train_idx.tolist() + new_tr)
+# np.save(f'{dataset.dir}/new_train_idx.npy',new_tr)
+# np.save(f'{dataset.dir}/new_paper_label.npy',new_label)
+
+#______________predict_valid____________
+valid = deepcopy(paper_label)
 bias = 0
 keys = np.sort(list(reliable_author.keys()))
 for i in tqdm(range(len(reliable_author.keys()))):
@@ -80,14 +100,13 @@ for i in tqdm(range(len(reliable_author.keys()))):
     l = reliable_author[i]
     for j in range(bias,ap_edge.shape[1]):
         if i==ap_edge[0,j]:
-            if ap_edge[1,j] not in idx:
-                new_tr.append(ap_edge[1,j])
-                new_label[ap_edge[1,j]] = l
+            if ap_edge[1,j] in valid_idx:
+                valid[ap_edge[1,j]] = l
         elif i<ap_edge[0,j]:
             bias = j
             break
-print('new label num:',len(new_tr))
-new_tr = np.sort(train_idx.tolist() + new_tr)
-np.save(f'{dataset.dir}/new_train_idx.npy',new_tr)
-np.save(f'{dataset.dir}/new_paper_label.npy',new_label)
+# print('new label num:',len(new_tr))
+valid = valid[valid_idx]
+# np.save(f'{dataset.dir}/new_train_idx.npy',new_tr)
+np.save(f'{dataset.dir}/new_valid_label.npy',valid)
 
