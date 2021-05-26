@@ -171,10 +171,10 @@ for i in tqdm(range(len(reliable_author.keys()))):
         if i==ap_edge[0,j]:
             c+=1
             if ap_edge[1, j] in te_idx:
-                if ap_edge[1, j] not in coverage.keys():
-                    coverage[ap_edge[1, j]] = [l]
-                else:
-                    coverage[ap_edge[1, j]].append(l)
+                # if ap_edge[1, j] not in coverage.keys():
+                #     coverage[ap_edge[1, j]] = [l]
+                # else:
+                #     coverage[ap_edge[1, j]].append(l)
                 pred.append(l)
                 relate.append(ap_edge[1, j])
         elif i<ap_edge[0,j]:
@@ -184,13 +184,13 @@ true = new_label[relate]
 print('total:',c)
 print(len(relate))
 print('sub_test precision:',accuracy_score(true,pred))
-c = 0
-for i in coverage.keys():
-    if len(coverage[i]) >1:
-        arr = np.array(coverage[i])
-        if arr[arr==coverage[i][0]].shape[0]!=arr.shape[0]:
-            c+=1
-print('sub_test coverage paper num:', c)
+# c = 0
+# for i in coverage.keys():
+#     if len(coverage[i]) >1:
+#         arr = np.array(coverage[i])
+#         if arr[arr==coverage[i][0]].shape[0]!=arr.shape[0]:
+#             c+=1
+# print('sub_test coverage paper num:', c)
 
 #______________valid___________________
 new_label = deepcopy(paper_label)
@@ -208,10 +208,10 @@ for i in tqdm(range(len(reliable_author.keys()))):
         if i==ap_edge[0,j]:
             c+=1
             if ap_edge[1, j] in valid_idx:
-                if ap_edge[1, j] not in coverage.keys():
-                    coverage[ap_edge[1, j]] = [l]
-                else:
-                    coverage[ap_edge[1, j]].append(l)
+                # if ap_edge[1, j] not in coverage.keys():
+                #     coverage[ap_edge[1, j]] = [l]
+                # else:
+                #     coverage[ap_edge[1, j]].append(l)
                 relate.append(ap_edge[1, j])
                 pred.append(l)
         elif i<ap_edge[0,j]:
@@ -221,13 +221,13 @@ true = new_label[relate]
 print('total:',c)
 print(len(relate))
 print('valid precision:',accuracy_score(true,pred))
-c = 0
-for i in coverage.keys():
-    if len(coverage[i]) >1:
-        arr = np.array(coverage[i])
-        if arr[arr == coverage[i][0]].shape[0] != arr.shape[0]:
-            c += 1
-print('valid coverage paper num:', c)
+# c = 0
+# for i in coverage.keys():
+#     if len(coverage[i]) >1:
+#         arr = np.array(coverage[i])
+#         if arr[arr == coverage[i][0]].shape[0] != arr.shape[0]:
+#             c += 1
+# print('valid coverage paper num:', c)
 #______________predict________________
 # new_label = deepcopy(paper_label)
 # new_tr = []
