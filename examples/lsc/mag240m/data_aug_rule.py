@@ -158,7 +158,6 @@ ap_edge = dataset.edge_index('author', 'writes', 'paper')
 #______________sub test___________________
 new_label = deepcopy(paper_label)
 relate = []
-true = []
 pred = []
 c = 0
 # true = new_label[te_idx]
@@ -176,13 +175,12 @@ for i in tqdm(range(len(reliable_author.keys()))):
                     coverage[ap_edge[1, j]] = [l]
                 else:
                     coverage[ap_edge[1, j]].append(l)
-                true.append(new_label[ap_edge[1,j]])
                 pred.append(l)
                 relate.append(ap_edge[1, j])
         elif i<ap_edge[0,j]:
             bias = j
             break
-
+true = new_label[relate]
 print('total:',c)
 print(len(relate))
 print('sub_test precision:',accuracy_score(true,pred))
@@ -197,7 +195,6 @@ print('sub_test coverage paper num:', c)
 #______________valid___________________
 new_label = deepcopy(paper_label)
 relate = []
-true = []
 c = 0
 # true = new_label[te_idx]
 coverage = {}
@@ -214,13 +211,12 @@ for i in tqdm(range(len(reliable_author.keys()))):
                     coverage[ap_edge[1, j]] = [l]
                 else:
                     coverage[ap_edge[1, j]].append(l)
-                true.append(new_label[ap_edge[1,j]])
                 relate.append(ap_edge[1, j])
                 pred.append(l)
         elif i<ap_edge[0,j]:
             bias = j
             break
-
+true = new_label[relate]
 print('total:',c)
 print(len(relate))
 print('valid precision:',accuracy_score(true,pred))
