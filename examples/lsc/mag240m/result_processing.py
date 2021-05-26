@@ -133,7 +133,7 @@ if __name__ == '__main__':
     y_pred_ = y_pred.argmax(dim=-1)
     y_correct = np.load(f'{dataset.dir}/new_valid_label.npy')
     correct_index = np.load(f'{dataset.dir}/changed_valid_idx.npy')
-    for i in correct_index[i]:
+    for i in correct_index:
         y_pred_[i] = y_correct[i]
 
     train_acc = evaluator.eval({
