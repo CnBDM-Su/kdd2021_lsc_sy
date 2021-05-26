@@ -58,7 +58,7 @@ def train(model, x_train, y_train, batch_size, optimizer):
     total_loss = 0
     for idx in DataLoader(range(y_train.size(0)), batch_size, shuffle=True):
         optimizer.zero_grad()
-        loss = F.cross_entropy(model(x_train[idx]), y_train[idx])
+        loss = F.cross_entropy(model(x_train[idx].to(device)), y_train[idx])
         loss.backward()
         optimizer.step()
 
@@ -146,7 +146,7 @@ if __name__ == '__main__':
     t = time.perf_counter()
     print('Reading training node features...', end=' ', flush=True)
     x_train = dataset.paper_feat[train_idx]
-    x_train = torch.from_numpy(x_train).to(torch.float).to(device)
+    x_train = torch.from_numpy(x_train).to(torch.float).to('cpu')
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
     t = time.perf_counter()
     print('Reading validation node features...', end=' ', flush=True)
