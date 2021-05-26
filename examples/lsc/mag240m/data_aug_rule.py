@@ -188,38 +188,38 @@ ap_edge = dataset.edge_index('author', 'writes', 'paper')
 # print('sub_test precision:',accuracy_score(true,pred))
 
 # #______________valid___________________
-new_label = deepcopy(paper_label)
-c = 0
-# true = new_label[te_idx]
-coverage = {}
-bias = 0
-keys = np.sort(list(reliable_author.keys()))
-for i in tqdm(range(len(reliable_author.keys()))):
-    i = keys[i]
-    l = reliable_author[i]
-    for j in range(bias,ap_edge.shape[1]):
-        if i==ap_edge[0,j]:
-            c+=1
-            if ap_edge[1, j] in valid_idx:
-                if ap_edge[1, j] not in coverage.keys():
-                    coverage[ap_edge[1, j]] = [l]
-                else:
-                    coverage[ap_edge[1, j]].append(l)
-        elif i<ap_edge[0,j]:
-            bias = j
-            break
-
-relate = []
-pred = []
-for i in coverage.keys():
-    relate.append(i)
-    counts = np.bincount(coverage[i])
-    pred.append(np.argmax(counts))
-
-true = new_label[relate]
-print('total:',c)
-print(len(relate))
-print('valid precision:',accuracy_score(true,pred))
+# new_label = deepcopy(paper_label)
+# c = 0
+# # true = new_label[te_idx]
+# coverage = {}
+# bias = 0
+# keys = np.sort(list(reliable_author.keys()))
+# for i in tqdm(range(len(reliable_author.keys()))):
+#     i = keys[i]
+#     l = reliable_author[i]
+#     for j in range(bias,ap_edge.shape[1]):
+#         if i==ap_edge[0,j]:
+#             c+=1
+#             if ap_edge[1, j] in valid_idx:
+#                 if ap_edge[1, j] not in coverage.keys():
+#                     coverage[ap_edge[1, j]] = [l]
+#                 else:
+#                     coverage[ap_edge[1, j]].append(l)
+#         elif i<ap_edge[0,j]:
+#             bias = j
+#             break
+#
+# relate = []
+# pred = []
+# for i in coverage.keys():
+#     relate.append(i)
+#     counts = np.bincount(coverage[i])
+#     pred.append(np.argmax(counts))
+#
+# true = new_label[relate]
+# print('total:',c)
+# print(len(relate))
+# print('valid precision:',accuracy_score(true,pred))
 
 #______________predict________________
 # new_label = deepcopy(paper_label)
@@ -246,6 +246,7 @@ print('valid precision:',accuracy_score(true,pred))
 valid = deepcopy(paper_label)
 valid_related = []
 bias = 0
+coverage = {}
 keys = np.sort(list(reliable_author.keys()))
 for i in tqdm(range(len(reliable_author.keys()))):
     i = keys[i]
@@ -261,13 +262,14 @@ for i in tqdm(range(len(reliable_author.keys()))):
             bias = j
             break
 # print('new label num:',len(new_tr))
-relate = []
+valid_related = []
 for i in coverage.keys():
-    relate.append(i)
+    valid_related.append(i)
     counts = np.bincount(coverage[i])
     valid[i] = np.argmax(counts)
 
 valid_related = np.array(valid_related)
+print(valid_related.shape)
 np.save(f'{dataset.dir}/changed_valid_idx.npy',valid_related)
 np.save(f'{dataset.dir}/new_valid_label.npy',valid)
 
