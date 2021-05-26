@@ -23,7 +23,6 @@ paper_label = dataset.paper_label
 ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
 print('___________sub_train___________')
 a_l = {}
-a_p = {}
 bias = 0
 for i in tqdm(range(train_idx.shape[0])):
     i = train_idx[i]
@@ -33,13 +32,10 @@ for i in tqdm(range(train_idx.shape[0])):
                 a_l[ap_edge[0,j]] = [paper_label[ap_edge[1,j]]]
             else:
                 a_l[ap_edge[0, j]].append(paper_label[ap_edge[1,j]])
-            if ap_edge[0,j] not in a_p.keys():
-                a_p[ap_edge[0,j]] = [ap_edge[1,j]]
-            else:
-                a_p[ap_edge[0, j]].append(ap_edge[1,j])
         elif i<ap_edge[1,j]:
             bias = j
             break
+
 print(len(a_l.keys()))
 reliable_author = {}
 for i in a_l.keys():
@@ -47,9 +43,19 @@ for i in a_l.keys():
         arr = np.array(a_l[i])
         if arr[arr == a_l[i][0]].shape[0] == arr.shape[0]:
             reliable_author[i] = a_l[i][0]
+
+ap_edge = dataset.edge_index('author', 'writes', 'paper')
 related_paper = []
-for i in reliable_author.keys():
-    related_paper+= a_p[i]
+bias = 0
+keys = np.sort(list(reliable_author.keys()))
+for i in tqdm(range(len(reliable_author.keys()))):
+    i = keys[i]
+    for j in range(bias,ap_edge.shape[1]):
+        if i==ap_edge[0,j]:
+            related_paper.append(ap_edge[1, j])
+        elif i<ap_edge[0,j]:
+            bias = j
+            break
 print('related paper num:',len(related_paper))
 print('reliable author num:',len(reliable_author.keys()))
 # print('___________sub_test___________')
