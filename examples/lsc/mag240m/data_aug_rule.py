@@ -183,7 +183,9 @@ print('sub_test precision:',accuracy_score(true,pred))
 c = 0
 for i in coverage.keys():
     if len(coverage[i]) >1:
-        c+=1
+        arr = np.array(coverage[i])
+        if arr[arr==coverage[i][0]].shape[0]!=arr.shape[0]:
+            c+=1
 print('sub_test coverage paper num:', c)
 
 #______________valid___________________
@@ -216,12 +218,14 @@ for i in tqdm(range(len(reliable_author.keys()))):
 pred = new_label[relate]
 print('total:',c)
 print(len(relate))
-print('sub_test precision:',accuracy_score(true,pred))
+print('valid precision:',accuracy_score(true,pred))
 c = 0
 for i in coverage.keys():
     if len(coverage[i]) >1:
-        c+=1
-print('sub_test coverage paper num:', c)
+        arr = np.array(coverage[i])
+        if arr[arr == coverage[i][0]].shape[0] != arr.shape[0]:
+            c += 1
+print('valid coverage paper num:', c)
 #______________predict________________
 # new_label = deepcopy(paper_label)
 # new_tr = []
