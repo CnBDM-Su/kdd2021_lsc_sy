@@ -58,6 +58,7 @@ for i in a_l.keys():
 #             break
 # print('related paper num:',len(related_paper))
 print('reliable author num:',len(reliable_author.keys()))
+print(reliable_author.keys())
 print('___________sub_test___________')
 a_l_2 = {}
 bias = 0
@@ -81,6 +82,7 @@ for i in a_l_2.keys():
             reliable_author_2[i] = a_l_2[i][0]
 
 print(len(reliable_author_2.keys()))
+print(a_l_2.keys())
 print('___________valid___________')
 a_l_3 = {}
 bias = 0
