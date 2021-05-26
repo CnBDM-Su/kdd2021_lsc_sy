@@ -163,7 +163,7 @@ if __name__ == '__main__':
             FT += 1
         elif (y_true[i] != initial_pred[i]) and (y_true[i] != final_pred[i]):
             FF += 1
-    print('TT:',TT)
+    print('TT:', TT)
     print('TF:', TF)
     print('FT:', FT)
     print('FF:', FF)
