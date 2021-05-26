@@ -146,6 +146,7 @@ if __name__ == '__main__':
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
 
+    print('correct num:',correct_index.shape[0])
     initial_pred = y_pred.argmax(dim=-1)[valid_idx]
     final_pred = y_pred_[valid_idx]
     TT = 0
