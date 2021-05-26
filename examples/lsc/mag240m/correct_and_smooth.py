@@ -115,20 +115,18 @@ if __name__ == '__main__':
                              autoscale=True)
 
     t = time.perf_counter()
-    print(y_pred.shape)
-    print(y_pred)
     print('Correcting predictions...', end=' ', flush=True)
     assert abs((float(y_pred.sum()) / y_pred.size(0)) - 1.0) < 1e-2
 
     numel = int(train_idx.sum()) if train_idx.dtype == torch.bool else train_idx.size(0)
     assert y_train.size(0) == numel
 
-    y_pred = model.correct(y_pred, y_train, train_idx, adj_t, edge_index[2])
+    y_pred = model.correct(y_pred, y_train, train_idx, adj_t)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     t = time.perf_counter()
     print('Smoothing predictions...', end=' ', flush=True)
-    y_pred = model.smooth(y_pred, y_train, train_idx, adj_t, edge_index[2])
+    y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     train_acc = evaluator.eval({
