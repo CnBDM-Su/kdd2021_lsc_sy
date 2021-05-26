@@ -58,77 +58,77 @@ for i in a_l.keys():
 #             break
 # print('related paper num:',len(related_paper))
 print('reliable author num:',len(reliable_author.keys()))
-print('___________sub_test___________')
-a_l_2 = {}
-bias = 0
-for i in tqdm(range(te_idx.shape[0])):
-    i = te_idx[i]
-    for j in range(bias,ap_edge.shape[1]):
-        if i==ap_edge[1,j]:
-            if ap_edge[0,j] not in a_l_2.keys():
-                a_l_2[ap_edge[0,j]] = [paper_label[ap_edge[1,j]]]
-            else:
-                a_l_2[ap_edge[0, j]].append(paper_label[ap_edge[1,j]])
-        elif i<ap_edge[1,j]:
-            bias = j
-            break
-print(len(a_l_2.keys()))
-reliable_author_2 = {}
-for i in a_l_2.keys():
-    if len(a_l_2[i]) > 1:
-        arr = np.array(a_l_2[i])
-        if arr[arr == a_l_2[i][0]].shape[0] == arr.shape[0]:
-            reliable_author_2[i] = a_l_2[i][0]
-
-print(len(reliable_author_2.keys()))
-print('___________valid___________')
-a_l_3 = {}
-bias = 0
-for i in tqdm(range(valid_idx.shape[0])):
-    i = valid_idx[i]
-    for j in range(bias,ap_edge.shape[1]):
-        if i==ap_edge[1,j]:
-            if ap_edge[0,j] not in a_l_3.keys():
-                a_l_3[ap_edge[0,j]] = [paper_label[ap_edge[1,j]]]
-            else:
-                a_l_3[ap_edge[0, j]].append(paper_label[ap_edge[1,j]])
-        elif i<ap_edge[1,j]:
-            bias = j
-            break
-print(len(a_l_3.keys()))
-reliable_author_3 = {}
-for i in a_l_3.keys():
-    if len(a_l_3[i]) > 1:
-        arr = np.array(a_l_3[i])
-        if arr[arr == a_l_3[i][0]].shape[0] == arr.shape[0]:
-            reliable_author_3[i] = a_l_3[i][0]
-
-print(len(reliable_author_3.keys()))
-print('___________test___________')
-a_l_4 = {}
-bias = 0
-for i in tqdm(range(test_idx.shape[0])):
-    i = test_idx[i]
-    for j in range(bias,ap_edge.shape[1]):
-        if i==ap_edge[1,j]:
-            if ap_edge[0,j] not in a_l_4.keys():
-                a_l_4[ap_edge[0,j]] = [paper_label[ap_edge[1,j]]]
-            else:
-                a_l_4[ap_edge[0, j]].append(paper_label[ap_edge[1,j]])
-        elif i<ap_edge[1,j]:
-            bias = j
-            break
-print(len(a_l_4.keys()))
-reliable_author_4 = {}
-for i in a_l_4.keys():
-    if len(a_l_4[i]) > 1:
-        arr = np.array(a_l_4[i])
-        if arr[arr==a_l_4[i][0]].shape[0]==arr.shape[0]:
-            reliable_author_4[i] = a_l_4[i][0]
-
-print(len(reliable_author_4.keys()))
-
-print('__________coverage__________')
+# print('___________sub_test___________')
+# a_l_2 = {}
+# bias = 0
+# for i in tqdm(range(te_idx.shape[0])):
+#     i = te_idx[i]
+#     for j in range(bias,ap_edge.shape[1]):
+#         if i==ap_edge[1,j]:
+#             if ap_edge[0,j] not in a_l_2.keys():
+#                 a_l_2[ap_edge[0,j]] = [paper_label[ap_edge[1,j]]]
+#             else:
+#                 a_l_2[ap_edge[0, j]].append(paper_label[ap_edge[1,j]])
+#         elif i<ap_edge[1,j]:
+#             bias = j
+#             break
+# print(len(a_l_2.keys()))
+# reliable_author_2 = {}
+# for i in a_l_2.keys():
+#     if len(a_l_2[i]) > 1:
+#         arr = np.array(a_l_2[i])
+#         if arr[arr == a_l_2[i][0]].shape[0] == arr.shape[0]:
+#             reliable_author_2[i] = a_l_2[i][0]
+#
+# print(len(reliable_author_2.keys()))
+# print('___________valid___________')
+# a_l_3 = {}
+# bias = 0
+# for i in tqdm(range(valid_idx.shape[0])):
+#     i = valid_idx[i]
+#     for j in range(bias,ap_edge.shape[1]):
+#         if i==ap_edge[1,j]:
+#             if ap_edge[0,j] not in a_l_3.keys():
+#                 a_l_3[ap_edge[0,j]] = [paper_label[ap_edge[1,j]]]
+#             else:
+#                 a_l_3[ap_edge[0, j]].append(paper_label[ap_edge[1,j]])
+#         elif i<ap_edge[1,j]:
+#             bias = j
+#             break
+# print(len(a_l_3.keys()))
+# reliable_author_3 = {}
+# for i in a_l_3.keys():
+#     if len(a_l_3[i]) > 1:
+#         arr = np.array(a_l_3[i])
+#         if arr[arr == a_l_3[i][0]].shape[0] == arr.shape[0]:
+#             reliable_author_3[i] = a_l_3[i][0]
+#
+# print(len(reliable_author_3.keys()))
+# print('___________test___________')
+# a_l_4 = {}
+# bias = 0
+# for i in tqdm(range(test_idx.shape[0])):
+#     i = test_idx[i]
+#     for j in range(bias,ap_edge.shape[1]):
+#         if i==ap_edge[1,j]:
+#             if ap_edge[0,j] not in a_l_4.keys():
+#                 a_l_4[ap_edge[0,j]] = [paper_label[ap_edge[1,j]]]
+#             else:
+#                 a_l_4[ap_edge[0, j]].append(paper_label[ap_edge[1,j]])
+#         elif i<ap_edge[1,j]:
+#             bias = j
+#             break
+# print(len(a_l_4.keys()))
+# reliable_author_4 = {}
+# for i in a_l_4.keys():
+#     if len(a_l_4[i]) > 1:
+#         arr = np.array(a_l_4[i])
+#         if arr[arr==a_l_4[i][0]].shape[0]==arr.shape[0]:
+#             reliable_author_4[i] = a_l_4[i][0]
+#
+# print(len(reliable_author_4.keys()))
+#
+# print('__________coverage__________')
 
 # cover_1_1 = len(list(set(a_l.keys()) & set(a_l_2.keys())))/len(a_l_2.keys())
 # cover_1_2 = len(list(set(a_l.keys()) & set(a_l_3.keys())))/len(a_l_3.keys())
@@ -148,90 +148,89 @@ print('__________coverage__________')
 # print('related paper sub_train & sub test coverage ratio:',cover_3_1)
 # print('related paper sub_train & valid coverage ratio:',cover_3_2)
 # print('related paper sub_train & test coverage ratio:',cover_3_3)
-cover_4_1 = len(list(set(reliable_author.keys()) & set(a_l_2.keys())))/len(a_l_2.keys())
-cover_4_2 = len(list(set(reliable_author.keys()) & set(a_l_3.keys())))/len(a_l_3.keys())
-cover_4_3 = len(list(set(reliable_author.keys()) & set(a_l_4.keys())))/len(a_l_4.keys())
-print('reliable author sub_train & sub test coverage ratio:',cover_4_1)
-print('reliable author sub_train & valid coverage ratio:',cover_4_2)
-print('reliable author sub_train & test coverage ratio:',cover_4_3)
-# ap_edge = dataset.edge_index('author', 'writes', 'paper')
+# cover_4_1 = len(list(set(reliable_author.keys()) & set(a_l_2.keys())))/len(a_l_2.keys())
+# cover_4_2 = len(list(set(reliable_author.keys()) & set(a_l_3.keys())))/len(a_l_3.keys())
+# cover_4_3 = len(list(set(reliable_author.keys()) & set(a_l_4.keys())))/len(a_l_4.keys())
+# print('reliable author sub_train & sub test coverage ratio:',cover_4_1)
+# print('reliable author sub_train & valid coverage ratio:',cover_4_2)
+# print('reliable author sub_train & test coverage ratio:',cover_4_3)
+ap_edge = dataset.edge_index('author', 'writes', 'paper')
 #______________sub test___________________
-# new_label = deepcopy(paper_label)
-# relate = []
-# true = []
-# c = 0
-# # true = new_label[te_idx]
-# coverage = {}
-# bias = 0
-# keys = np.sort(list(reliable_author.keys()))
-# for i in tqdm(range(len(reliable_author.keys()))):
-#     i = keys[i]
-#     l = reliable_author[i]
-#     for j in range(bias,ap_edge.shape[1]):
-#         if i==ap_edge[0,j]:
-#             c+=1
-#             if ap_edge[1, j] in te_idx:
-#                 if ap_edge[1, j] not in coverage.keys():
-#                     coverage[ap_edge[1, j]] = [l]
-#                 else:
-#                     coverage[ap_edge[1, j]].append(l)
-#                 true.append(new_label[ap_edge[1,j]])
-#                 relate.append(ap_edge[1, j])
-#                 new_label[ap_edge[1,j]] = l
-#         elif i<ap_edge[0,j]:
-#             bias = j
-#             break
-#
-# pred = new_label[relate]
-# print('total:',c)
-# print(len(relate))
-# print('sub_test precision:',accuracy_score(true,pred))
-# c = 0
-# for i in coverage.keys():
-#     if len(coverage[i]) >1:
-#         arr = np.array(coverage[i])
-#         if arr[arr==coverage[i][0]].shape[0]!=arr.shape[0]:
-#             c+=1
-# print('sub_test coverage paper num:', c)
-#
-# #______________valid___________________
-# new_label = deepcopy(paper_label)
-# relate = []
-# true = []
-# c = 0
-# # true = new_label[te_idx]
-# coverage = {}
-# bias = 0
-# keys = np.sort(list(reliable_author.keys()))
-# for i in tqdm(range(len(reliable_author.keys()))):
-#     i = keys[i]
-#     l = reliable_author[i]
-#     for j in range(bias,ap_edge.shape[1]):
-#         if i==ap_edge[0,j]:
-#             c+=1
-#             if ap_edge[1, j] in valid_idx:
-#                 if ap_edge[1, j] not in coverage.keys():
-#                     coverage[ap_edge[1, j]] = [l]
-#                 else:
-#                     coverage[ap_edge[1, j]].append(l)
-#                 true.append(new_label[ap_edge[1,j]])
-#                 relate.append(ap_edge[1, j])
-#                 new_label[ap_edge[1,j]] = l
-#         elif i<ap_edge[0,j]:
-#             bias = j
-#             break
-#
-# pred = new_label[relate]
-# print('total:',c)
-# print(len(relate))
-# print('valid precision:',accuracy_score(true,pred))
-# c = 0
-# for i in coverage.keys():
-#     if len(coverage[i]) >1:
-#         arr = np.array(coverage[i])
-#         if arr[arr == coverage[i][0]].shape[0] != arr.shape[0]:
-#             c += 1
-# print('valid coverage paper num:', c)
+new_label = deepcopy(paper_label)
+relate = []
+true = []
+pred = []
+c = 0
+# true = new_label[te_idx]
+coverage = {}
+bias = 0
+keys = np.sort(list(reliable_author.keys()))
+for i in tqdm(range(len(reliable_author.keys()))):
+    i = keys[i]
+    l = reliable_author[i]
+    for j in range(bias,ap_edge.shape[1]):
+        if i==ap_edge[0,j]:
+            c+=1
+            if ap_edge[1, j] in te_idx:
+                if ap_edge[1, j] not in coverage.keys():
+                    coverage[ap_edge[1, j]] = [l]
+                else:
+                    coverage[ap_edge[1, j]].append(l)
+                true.append(new_label[ap_edge[1,j]])
+                pred.append(l)
+                relate.append(ap_edge[1, j])
+        elif i<ap_edge[0,j]:
+            bias = j
+            break
+
+print('total:',c)
+print(len(relate))
+print('sub_test precision:',accuracy_score(true,pred))
+c = 0
+for i in coverage.keys():
+    if len(coverage[i]) >1:
+        arr = np.array(coverage[i])
+        if arr[arr==coverage[i][0]].shape[0]!=arr.shape[0]:
+            c+=1
+print('sub_test coverage paper num:', c)
+
+#______________valid___________________
+new_label = deepcopy(paper_label)
+relate = []
+true = []
+c = 0
+# true = new_label[te_idx]
+coverage = {}
+bias = 0
+keys = np.sort(list(reliable_author.keys()))
+for i in tqdm(range(len(reliable_author.keys()))):
+    i = keys[i]
+    l = reliable_author[i]
+    for j in range(bias,ap_edge.shape[1]):
+        if i==ap_edge[0,j]:
+            c+=1
+            if ap_edge[1, j] in valid_idx:
+                if ap_edge[1, j] not in coverage.keys():
+                    coverage[ap_edge[1, j]] = [l]
+                else:
+                    coverage[ap_edge[1, j]].append(l)
+                true.append(new_label[ap_edge[1,j]])
+                relate.append(ap_edge[1, j])
+                pred.append(l)
+        elif i<ap_edge[0,j]:
+            bias = j
+            break
+
+print('total:',c)
+print(len(relate))
+print('valid precision:',accuracy_score(true,pred))
+c = 0
+for i in coverage.keys():
+    if len(coverage[i]) >1:
+        arr = np.array(coverage[i])
+        if arr[arr == coverage[i][0]].shape[0] != arr.shape[0]:
+            c += 1
+print('valid coverage paper num:', c)
 #______________predict________________
 # new_label = deepcopy(paper_label)
 # new_tr = []
