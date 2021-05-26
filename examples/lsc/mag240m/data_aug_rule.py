@@ -12,9 +12,9 @@ from mag240m_mini_graph import MAG240MMINIDataset
 dataset = MAG240MMINIDataset(ROOT)
 
 train_idx = dataset.get_idx_split('train')
-te_id = np.random.choice(train_idx.shape[0], size=(int(np.round(train_idx.shape[0]*0.2)),), replace=False)
-te_idx = np.sort(train_idx[te_id])
-train_idx = np.sort(np.array(list(set(train_idx) - set(te_idx))))
+# te_id = np.random.choice(train_idx.shape[0], size=(int(np.round(train_idx.shape[0]*0.2)),), replace=False)
+# te_idx = np.sort(train_idx[te_id])
+# train_idx = np.sort(np.array(list(set(train_idx) - set(te_idx))))
 valid_idx = dataset.get_idx_split('valid')
 test_idx = dataset.get_idx_split('test')
 idx = np.concatenate([train_idx,valid_idx,test_idx],0)
@@ -194,35 +194,35 @@ ap_edge = dataset.edge_index('author', 'writes', 'paper')
 # # print('sub_test coverage paper num:', c)
 #
 # #______________valid___________________
-# new_label = deepcopy(paper_label)
-# relate = []
-# c = 0
-# pred = []
-# # true = new_label[te_idx]
-# coverage = {}
-# bias = 0
-# keys = np.sort(list(reliable_author.keys()))
-# for i in tqdm(range(len(reliable_author.keys()))):
-#     i = keys[i]
-#     l = reliable_author[i]
-#     for j in range(bias,ap_edge.shape[1]):
-#         if i==ap_edge[0,j]:
-#             c+=1
-#             if ap_edge[1, j] in valid_idx:
-#                 if ap_edge[1, j] not in relate:
-#                 # if ap_edge[1, j] not in coverage.keys():
-#                 #     coverage[ap_edge[1, j]] = [l]
-#                 # else:
-#                 #     coverage[ap_edge[1, j]].append(l)
-#                     relate.append(ap_edge[1, j])
-#                     pred.append(l)
-#         elif i<ap_edge[0,j]:
-#             bias = j
-#             break
-# true = new_label[relate]
-# print('total:',c)
-# print(len(relate))
-# print('valid precision:',accuracy_score(true,pred))
+new_label = deepcopy(paper_label)
+relate = []
+c = 0
+pred = []
+# true = new_label[te_idx]
+coverage = {}
+bias = 0
+keys = np.sort(list(reliable_author.keys()))
+for i in tqdm(range(len(reliable_author.keys()))):
+    i = keys[i]
+    l = reliable_author[i]
+    for j in range(bias,ap_edge.shape[1]):
+        if i==ap_edge[0,j]:
+            c+=1
+            if ap_edge[1, j] in valid_idx:
+                if ap_edge[1, j] not in relate:
+                # if ap_edge[1, j] not in coverage.keys():
+                #     coverage[ap_edge[1, j]] = [l]
+                # else:
+                #     coverage[ap_edge[1, j]].append(l)
+                    relate.append(ap_edge[1, j])
+                    pred.append(l)
+        elif i<ap_edge[0,j]:
+            bias = j
+            break
+true = new_label[relate]
+print('total:',c)
+print(len(relate))
+print('valid precision:',accuracy_score(true,pred))
 # c = 0
 # for i in coverage.keys():
 #     if len(coverage[i]) >1:
