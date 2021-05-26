@@ -152,7 +152,7 @@ if __name__ == '__main__':
     TF = 0
     FT = 0
     FF = 0
-    for i in range(y_valid.shape[1]):
+    for i in range(y_valid.shape[0]):
         if (y_valid[i] == initial_pred[i]) and (y_valid[i] == final_pred[i]):
             TT += 1
         elif (y_valid[i] == initial_pred[i]) and (y_valid[i] != final_pred[i]):
