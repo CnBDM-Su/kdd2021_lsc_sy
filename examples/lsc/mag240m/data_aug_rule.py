@@ -275,26 +275,36 @@ ap_edge = dataset.edge_index('author', 'writes', 'paper')
 # np.save(f'{dataset.dir}/changed_valid_idx.npy',valid_related)
 # np.save(f'{dataset.dir}/new_valid_label.npy',valid)
 
-valid = deepcopy(paper_label)
+# valid = deepcopy(paper_label)
 valid_related = []
 bias = 0
-coverage = {}
-row, col = torch.from_numpy(ap_edge)
+valid = np.zeros(shape=(valid_idx.shape[0],dataset.num_classes))
+for i in tqdm(range(valid_idx.shape[0])):
+    tmp = []
+    for j in range(bias, ap_edge.shape[1]):
+        if i == ap_edge[1,j]:
+            tmp.append(a_l[ap_edge[0,j]])
+        elif i < ap_edge[1,j]:
+            bias = j
+            break
+    valid[i] = np.mean(np.array(tmp),0)
 
-adj_t = SparseTensor(
-    row=col.long(), col=row.long(),
-    sparse_sizes=(dataset.num_papers, dataset.num_authors),
-    is_sorted=True)
-inputs = torch.from_numpy(a_l).float()
+# row, col = torch.from_numpy(ap_edge)
+#
+# adj_t = SparseTensor(
+#     row=col.long(), col=row.long(),
+#     sparse_sizes=(dataset.num_papers, dataset.num_authors),
+#     is_sorted=True)
+# inputs = torch.from_numpy(a_l).float()
 
-outputs = adj_t.matmul(inputs).numpy()
+# outputs = adj_t.matmul(inputs).numpy()
 # print('new label num:',len(new_tr))
 # valid_related = []
 # for i in coverage.keys():
 #     valid_related.append(i)
 #     counts = np.bincount(coverage[i])
 #     valid[i] = np.argmax(counts)
-valid = outputs[valid_idx]
+# valid = outputs[valid_idx]
 
 # valid_related = np.array(valid_related)
 # print(valid_related.shape)
