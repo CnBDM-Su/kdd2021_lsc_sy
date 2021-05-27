@@ -7,6 +7,7 @@ import os.path as osp
 from ogb.lsc import MAG240MDataset
 from root import ROOT
 from torch_sparse import SparseTensor
+from itertools import combinations
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -347,6 +348,37 @@ if __name__ == '__main__':
 
         torch.save(full_adj_t, path)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
+
+
+    path = f'{dataset.dir}/mini_graph/author_connect_graph.npy'
+    if not osp.exists(path):
+        print('generating mini author connect edge...')
+        pa_dict = {}
+        ap_dict = {}
+        connect = []
+        for i in tqdm(range(ap_edge.shape[1])):
+            if ap_edge[0,i] not in pa_dict.keys():
+                pa_dict[ap_edge[1,i]] = [ap_edge[0,i]]
+            else:
+                pa_dict[ap_edge[1,i]].append(ap_edge[0,i])
+
+        for i,v in tqdm(pa_dict.items()):
+            for j in combinations(v,2):
+                if j not in ap_dict.keys():
+                    ap_dict[j] = [i]
+                else:
+                    ap_dict[j].append(i)
+
+        for i,v in tqdm(ap_dict.items()):
+            if len(v)>1:
+                for j in combinations(v,2):
+                    connect.append(list(j))
+
+        connect = np.array(connect).T
+        np.save(path,connect)
+    else:
+        connect = np.load(path)
+
 
 
 
