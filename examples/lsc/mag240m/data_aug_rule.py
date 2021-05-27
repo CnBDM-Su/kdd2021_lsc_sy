@@ -41,7 +41,7 @@ reliable_author = {}
 for i in a_l.keys():
     if len(a_l[i]) > 1:
         arr = np.array(a_l[i])
-        if arr[arr == a_l[i][0]].shape[0] == arr.shape[0]:
+        if arr[arr == a_l[i][0]].shape[0] >= np.round(arr.shape[0]*(3/4)):
             reliable_author[i] = a_l[i][0]
 
 # ap_edge = dataset.edge_index('author', 'writes', 'paper')

@@ -144,10 +144,11 @@ if __name__ == '__main__':
             elif 1<ap_edge[0,j]:
                 bias = j
                 break
-        counts = np.bincount(tmp)
-        mode = np.argmax(counts)
-        if np.array(tmp)[np.array(tmp)==mode].shape[0]>=np.round(np.array(tmp).shape[0]*(3/4)):
-            modify_index += tmp_index
+        if len(tmp)!= 0:
+            counts = np.bincount(tmp)
+            mode = np.argmax(counts)
+            if np.array(tmp)[np.array(tmp)==mode].shape[0]>=np.round(np.array(tmp).shape[0]*(3/4)):
+                modify_index += tmp_index
 
     y_correct = np.load(f'{dataset.dir}/new_valid_label.npy')
     correct_index = np.load(f'{dataset.dir}/changed_valid_idx.npy')
