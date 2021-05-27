@@ -154,19 +154,28 @@ if __name__ == '__main__':
     TF = 0
     FT = 0
     FF = 0
+    TF_initial = []
+    TF_final = []
+    FT_initial = []
+    FT_final = []
     for i in correct_index:
         if (y_true[i] == initial_pred[i]) and (y_true[i] == final_pred[i]):
             TT += 1
         elif (y_true[i] == initial_pred[i]) and (y_true[i] != final_pred[i]):
             TF += 1
+            TF_initial.append(initial_pred[i])
+            TF_final.append(final_pred[i])
         elif (y_true[i] != initial_pred[i]) and (y_true[i] == final_pred[i]):
             FT += 1
+            FT_initial.append(initial_pred[i])
+            FT_final.append(final_pred[i])
         elif (y_true[i] != initial_pred[i]) and (y_true[i] != final_pred[i]):
             FF += 1
     print('TT:', TT)
     print('TF:', TF)
     print('FT:', FT)
     print('FF:', FF)
+    np.savez_compressed('confusion.npz', TF_initial=np.array(TF_initial), TF_final=np.array(TF_final), FT_initial=np.array(FT_initial), FT_final=np.array(FT_final))
 
     # res = {'y_pred': y_pred_[test_idx], 'y_pred_valid' : y_pred_[valid_idx]}
     # evaluator.save_test_submission(res, save_path)
