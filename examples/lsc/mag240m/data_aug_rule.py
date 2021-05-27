@@ -278,6 +278,7 @@ ap_edge = dataset.edge_index('author', 'writes', 'paper')
 # valid = deepcopy(paper_label)
 valid_related = []
 bias = 0
+c =0
 valid = np.zeros(shape=(valid_idx.shape[0],dataset.num_classes))
 for i in tqdm(range(valid_idx.shape[0])):
     tmp = []
@@ -287,8 +288,10 @@ for i in tqdm(range(valid_idx.shape[0])):
         elif i < ap_edge[1,j]:
             bias = j
             break
-    valid[i] = np.mean(np.array(tmp),0)
-
+    if len(tmp)!=0:
+        c+=1
+        valid[i] = np.mean(np.array(tmp),0)
+print(c)
 # row, col = torch.from_numpy(ap_edge)
 #
 # adj_t = SparseTensor(
