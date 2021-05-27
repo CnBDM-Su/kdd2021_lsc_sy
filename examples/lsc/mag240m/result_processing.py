@@ -165,6 +165,7 @@ if __name__ == '__main__':
     y_pred_ = deepcopy(y_pred)
     for i in range(valid_idx.shape[0]):
         ind = valid_idx[i]
+        print(y_correct[i])
         y_pred_[ind] = (y_pred[ind] + y_correct[i])/2
 
     train_acc = evaluator.eval({
