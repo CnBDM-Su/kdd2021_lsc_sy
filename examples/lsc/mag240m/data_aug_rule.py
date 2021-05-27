@@ -34,6 +34,7 @@ for i in tqdm(range(train_idx.shape[0])):
             bias = j
             break
 a_l = softmax(a_l, axis=1)
+print(a_l)
 print((a_l.sum(1)!=0).sum())
 # reliable_author = {}
 # for i in a_l.keys():
@@ -292,6 +293,7 @@ outputs = adj_t.matmul(inputs, reduce='mean').numpy()
 #     counts = np.bincount(coverage[i])
 #     valid[i] = np.argmax(counts)
 valid = outputs[valid_idx]
+print(valid)
 # valid_related = np.array(valid_related)
 # print(valid_related.shape)
 # np.save(f'{dataset.dir}/changed_valid_idx.npy',valid_related)
