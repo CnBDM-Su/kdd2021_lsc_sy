@@ -156,7 +156,7 @@ print((a_l.sum(1)!=0).sum())
 # print('reliable author sub_train & sub test coverage ratio:',cover_4_1)
 # print('reliable author sub_train & valid coverage ratio:',cover_4_2)
 # print('reliable author sub_train & test coverage ratio:',cover_4_3)
-ap_edge = dataset.edge_index('author', 'writes', 'paper')
+# ap_edge = dataset.edge_index('author', 'writes', 'paper')
 #______________sub test___________________
 # new_label = deepcopy(paper_label)
 # c = 0
