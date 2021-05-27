@@ -362,13 +362,20 @@ if __name__ == '__main__':
             pa_dict[ap_edge[1, i]].append(ap_edge[0, i])
 
         for i, v in tqdm(pa_dict.items()):
-            for j in combinations(v, 2):
-                ap_dict[j].append(i)
+            # for j in combinations(v, 2):
+            for j in v:
+                for k in v:
+                    if j!=k:
+                        ap_dict[(j,k)].append(i)
+
 
         for i, v in tqdm(ap_dict.items()):
             if len(v) > 1:
-                for j in combinations(v, 2):
-                    connect.append(list(j))
+                # for j in combinations(v, 2):
+                for j in v:
+                    for k in v:
+                        if j!=k:
+                            connect.append(list(j))
 
         connect = np.array(connect).T
         np.save(path, connect)
