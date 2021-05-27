@@ -357,7 +357,7 @@ if __name__ == '__main__':
         ap_dict = {}
         connect = []
         for i in tqdm(range(ap_edge.shape[1])):
-            if ap_edge[0,i] not in pa_dict.keys():
+            if ap_edge[1,i] not in pa_dict.keys():
                 pa_dict[ap_edge[1,i]] = [ap_edge[0,i]]
             else:
                 pa_dict[ap_edge[1,i]].append(ap_edge[0,i])
