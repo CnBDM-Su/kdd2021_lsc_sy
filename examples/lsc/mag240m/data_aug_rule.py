@@ -295,7 +295,7 @@ outputs = adj_t.matmul(inputs).numpy()
 #     counts = np.bincount(coverage[i])
 #     valid[i] = np.argmax(counts)
 valid = outputs[valid_idx]
-print(valid)
+print(valid.sum())
 # valid_related = np.array(valid_related)
 # print(valid_related.shape)
 # np.save(f'{dataset.dir}/changed_valid_idx.npy',valid_related)
