@@ -280,11 +280,13 @@ valid_related = []
 bias = 0
 coverage = {}
 row, col = torch.from_numpy(ap_edge)
+print(row,col)
 adj_t = SparseTensor(
     row=col.long(), col=row.long(),
     sparse_sizes=(dataset.num_papers, dataset.num_authors),
     is_sorted=True)
 inputs = torch.from_numpy(a_l).float()
+print(inputs)
 outputs = adj_t.matmul(inputs).numpy()
 # print('new label num:',len(new_tr))
 # valid_related = []
