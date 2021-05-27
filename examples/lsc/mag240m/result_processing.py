@@ -2,6 +2,7 @@ import os.path as osp
 import time
 import argparse
 from tqdm import tqdm
+from copy import deepcopy
 import torch
 import numpy as np
 from torch_sparse import SparseTensor
@@ -129,52 +130,56 @@ if __name__ == '__main__':
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     print('result processing...', end=' ', flush=True)
-    y_pred_ = y_pred.argmax(dim=-1)
+    # y_pred_ = y_pred.argmax(dim=-1)
     t = time.perf_counter()
-    print('Reading adjacency matrix...', end=' ', flush=True)
-    path = f'{dataset.dir}/modify_index.npy'
-    if not osp.exists(path):
-        ap_edge = dataset.edge_index('author', 'writes', 'paper')
-        bias = 0
-        modify_index = []
-        for i in tqdm(range(dataset.num_authors)):
-            tmp = []
-            tmp_index = []
-            for j in range(bias, ap_edge.shape[1]):
-                if i==ap_edge[0,j]:
-                    tmp.append(y_pred_[ap_edge[1,j]])
-                    tmp_index.append(ap_edge[1,j])
-                elif 1<ap_edge[0,j]:
-                    bias = j
-                    break
-            if len(tmp)!= 0:
-                counts = np.bincount(tmp)
-                mode = np.argmax(counts)
-                if np.array(tmp)[np.array(tmp)==mode].shape[0]>=np.round(np.array(tmp).shape[0]*(4/5)):
-                    modify_index += tmp_index
-        modify_index = np.array(modify_index)
-        np.save(path, modify_index)
-    else:
-        modify_index = np.load(path)
+    # print('Reading adjacency matrix...', end=' ', flush=True)
+    # path = f'{dataset.dir}/modify_index.npy'
+    # if not osp.exists(path):
+    #     ap_edge = dataset.edge_index('author', 'writes', 'paper')
+    #     bias = 0
+    #     modify_index = []
+    #     for i in tqdm(range(dataset.num_authors)):
+    #         tmp = []
+    #         tmp_index = []
+    #         for j in range(bias, ap_edge.shape[1]):
+    #             if i==ap_edge[0,j]:
+    #                 tmp.append(y_pred_[ap_edge[1,j]])
+    #                 tmp_index.append(ap_edge[1,j])
+    #             elif 1<ap_edge[0,j]:
+    #                 bias = j
+    #                 break
+    #         if len(tmp)!= 0:
+    #             counts = np.bincount(tmp)
+    #             mode = np.argmax(counts)
+    #             if np.array(tmp)[np.array(tmp)==mode].shape[0]>=np.round(np.array(tmp).shape[0]*(4/5)):
+    #                 modify_index += tmp_index
+    #     modify_index = np.array(modify_index)
+    #     np.save(path, modify_index)
+    # else:
+    #     modify_index = np.load(path)
     y_correct = np.load(f'{dataset.dir}/new_valid_label.npy')
-    correct_index = np.load(f'{dataset.dir}/changed_valid_idx.npy')
-    correct_index = np.array(list(set(correct_index) & set(modify_index)))
-    for i in correct_index:
-        y_pred_[i] = y_correct[i]
+    # correct_index = np.load(f'{dataset.dir}/changed_valid_idx.npy')
+    # correct_index = np.array(list(set(correct_index) & set(modify_index)))
+    # for i in correct_index:
+    #     y_pred_[i] = y_correct[i]
+    y_pred_ = deepcopy(y_pred)
+    for i in range(valid_idx.shape[0]):
+        ind = valid_idx[i]
+        y_pred_[ind] = (y_pred[ind] + y_correct[i])/2
 
     train_acc = evaluator.eval({
         'y_true': y_train,
-        'y_pred': y_pred_[train_idx]
+        'y_pred': y_pred_.argmax(dim=-1)[train_idx]
     })['acc']
     valid_acc = evaluator.eval({
         'y_true': y_valid,
-        'y_pred': y_pred_[valid_idx]
+        'y_pred': y_pred_.argmax(dim=-1)[valid_idx]
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
 
-    print('correct num:',correct_index.shape[0])
+    # print('correct num:',correct_index.shape[0])
     initial_pred = y_pred.argmax(dim=-1)
-    final_pred = y_pred_
+    final_pred = y_pred_.argmax(dim=-1)
     y_true = torch.from_numpy(paper_label).to(torch.long)
     TT = 0
     TF = 0
@@ -184,7 +189,7 @@ if __name__ == '__main__':
     TF_final = []
     FT_initial = []
     FT_final = []
-    for i in correct_index:
+    for i in valid_idx:
         if (y_true[i] == initial_pred[i]) and (y_true[i] == final_pred[i]):
             TT += 1
         elif (y_true[i] == initial_pred[i]) and (y_true[i] != final_pred[i]):
