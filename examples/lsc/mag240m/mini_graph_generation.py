@@ -8,6 +8,7 @@ from ogb.lsc import MAG240MDataset
 from root import ROOT
 from torch_sparse import SparseTensor
 from itertools import combinations
+from collections import defaultdict
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -51,7 +52,7 @@ if __name__ == '__main__':
         print('Searching meaningful nodes...')
         t = time.perf_counter()
         for layer in range(layer_num):
-            print('start searching layer:',layer+1)
+            print('start searching layer:', layer + 1)
             bias_1 = 0
             bias_2 = 0
             search_domain = []
@@ -60,28 +61,28 @@ if __name__ == '__main__':
                     search_domain.append(key)
             for i in tqdm(range(len(search_domain))):
                 i = search_domain[i]
-                for j in range(bias_1,pp_edge.shape[1]):
-                    if i==pp_edge[0,j]:
-                        if pp_edge[1,j] not in layer_info.keys():
-                            layer_info[pp_edge[1,j]] = layer + 1
-                    if i<pp_edge[0,j]:
+                for j in range(bias_1, pp_edge.shape[1]):
+                    if i == pp_edge[0, j]:
+                        if pp_edge[1, j] not in layer_info.keys():
+                            layer_info[pp_edge[1, j]] = layer + 1
+                    if i < pp_edge[0, j]:
                         bias_1 = j
                         break
 
-                for j in range(bias_2,ipp_edge.shape[1]):
-                    if i==ipp_edge[1,j]:
-                        if ipp_edge[0,j] not in layer_info.keys():
-                            layer_info[ipp_edge[0,j]] = layer + 1
-                    if i<ipp_edge[1,j]:
+                for j in range(bias_2, ipp_edge.shape[1]):
+                    if i == ipp_edge[1, j]:
+                        if ipp_edge[0, j] not in layer_info.keys():
+                            layer_info[ipp_edge[0, j]] = layer + 1
+                    if i < ipp_edge[1, j]:
                         bias_2 = j
                         break
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
         meaningful_idx = [i for i in layer_info.keys()]
-        print('meaningful nodes num:',len(meaningful_idx))
+        print('meaningful nodes num:', len(meaningful_idx))
 
         meaningful_idx = np.sort(meaningful_idx)
-        np.save(path,meaningful_idx)
+        np.save(path, meaningful_idx)
     else:
         meaningful_idx = np.load(path)
 
@@ -105,15 +106,15 @@ if __name__ == '__main__':
         bias_1 = 0
         for i in tqdm(range(meaningful_idx.shape[0])):
             i = meaningful_idx[i]
-            for j in range(bias_1,ap_edge.shape[1]):
-                if i==ap_edge[1,j]:
-                    meaningful_a.append(ap_edge[0,j])
-                if i<ap_edge[1,j]:
+            for j in range(bias_1, ap_edge.shape[1]):
+                if i == ap_edge[1, j]:
+                    meaningful_a.append(ap_edge[0, j])
+                if i < ap_edge[1, j]:
                     bias_1 = j
                     break
         meaningful_a = np.unique(meaningful_a)
-        np.save(path,meaningful_a)
-        print('meaningful author num:',meaningful_a.shape[0])
+        np.save(path, meaningful_a)
+        print('meaningful author num:', meaningful_a.shape[0])
     else:
         meaningful_a = np.load(path)
 
@@ -125,10 +126,10 @@ if __name__ == '__main__':
         for i in tqdm(range(meaningful_a.shape[0])):
             i = meaningful_a[i]
             tmp = []
-            for j in range(bias_1,ai_edge.shape[1]):
-                if i==ai_edge[0,j]:
-                    meaningful_i.append(ai_edge[1,j])
-                if i<ai_edge[0,j]:
+            for j in range(bias_1, ai_edge.shape[1]):
+                if i == ai_edge[0, j]:
+                    meaningful_i.append(ai_edge[1, j])
+                if i < ai_edge[0, j]:
                     bias_1 = j
                     break
 
@@ -145,7 +146,7 @@ if __name__ == '__main__':
         num_dict['author'] = meaningful_a.shape[0]
         num_dict['institution'] = meaningful_i.shape[0]
         num_dict['num_classes'] = 153
-        torch.save(num_dict,path)
+        torch.save(num_dict, path)
     else:
         num_dict = torch.load(path)
 
@@ -167,14 +168,14 @@ if __name__ == '__main__':
         t = time.perf_counter()
         N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
         x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
-                           mode='r', shape=(N, 768))
+                      mode='r', shape=(N, 768))
         y = x[meaningful_idx]
         y1 = x[meaningful_a + dataset.num_papers]
         y2 = x[meaningful_i + dataset.num_papers + dataset.num_authors]
 
-        y = np.concatenate([y,y1,y2],0)
+        y = np.concatenate([y, y1, y2], 0)
 
-        np.save(path,y)
+        np.save(path, y)
         with open(f'{dataset.dir}/full_feat_done.txt', 'w') as f:
             f.write('done')
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
@@ -225,7 +226,7 @@ if __name__ == '__main__':
             test_idx_new.append(p_ind_dict[i])
         split_dict['test'] = np.sort(test_idx_new)
 
-        torch.save(split_dict,path)
+        torch.save(split_dict, path)
     else:
         split_dict = torch.load(path)
 
@@ -234,10 +235,10 @@ if __name__ == '__main__':
         print('generating mini graph paper_paper edge...')
         pp_edge_new = []
         for i in tqdm(range(pp_edge.shape[1])):
-            if (pp_edge[0,i] in p_ind_dict.keys()) and (pp_edge[1,i] in p_ind_dict.keys()):
-                pp_edge_new.append([p_ind_dict[pp_edge[0,i]],p_ind_dict[pp_edge[1,i]]])
+            if (pp_edge[0, i] in p_ind_dict.keys()) and (pp_edge[1, i] in p_ind_dict.keys()):
+                pp_edge_new.append([p_ind_dict[pp_edge[0, i]], p_ind_dict[pp_edge[1, i]]])
         pp_edge = np.array(pp_edge_new).T
-        np.save(path,pp_edge)
+        np.save(path, pp_edge)
     else:
         pp_edge = np.load(path)
 
@@ -247,10 +248,10 @@ if __name__ == '__main__':
         ap_edge = dataset.edge_index('author', 'writes', 'paper')
         ap_edge_new = []
         for i in tqdm(range(ap_edge.shape[1])):
-            if ap_edge[1,i] in p_ind_dict.keys():
-                ap_edge_new.append([a_ind_dict[ap_edge[0,i]],p_ind_dict[ap_edge[1,i]]])
+            if ap_edge[1, i] in p_ind_dict.keys():
+                ap_edge_new.append([a_ind_dict[ap_edge[0, i]], p_ind_dict[ap_edge[1, i]]])
         ap_edge = np.array(ap_edge_new).T
-        np.save(path,ap_edge)
+        np.save(path, ap_edge)
     else:
         ap_edge = np.load(path)
 
@@ -259,10 +260,10 @@ if __name__ == '__main__':
         print('generating mini graph author_institution edge...')
         ai_edge_new = []
         for i in tqdm(range(ai_edge.shape[1])):
-            if ai_edge[0,i] in a_ind_dict.keys():
-                ai_edge_new.append([a_ind_dict[ai_edge[0,i]],i_ind_dict[ai_edge[1,i]]])
+            if ai_edge[0, i] in a_ind_dict.keys():
+                ai_edge_new.append([a_ind_dict[ai_edge[0, i]], i_ind_dict[ai_edge[1, i]]])
         ai_edge = np.array(ai_edge_new).T
-        np.save(path,ai_edge)
+        np.save(path, ai_edge)
     else:
         ai_edge = np.load(path)
 
@@ -349,43 +350,27 @@ if __name__ == '__main__':
         torch.save(full_adj_t, path)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-
     path = f'{dataset.dir}/mini_graph/author_connect_graph.npy'
     if not osp.exists(path):
         print('generating mini author connect edge...')
-        pa_dict = {}
-        ap_dict = {}
+        def zero():
+            return []
+        pa_dict = defaultdict(zero)
+        ap_dict = defaultdict(zero)
         connect = []
         for i in tqdm(range(ap_edge.shape[1])):
-            if ap_edge[1,i] not in pa_dict.keys():
-                pa_dict[ap_edge[1,i]] = [ap_edge[0,i]]
-            else:
-                pa_dict[ap_edge[1,i]].append(ap_edge[0,i])
+            pa_dict[ap_edge[1, i]].append(ap_edge[0, i])
 
-        for i,v in tqdm(pa_dict.items()):
-            for j in combinations(v,2):
-                if j not in ap_dict.keys():
-                    ap_dict[j] = [i]
-                else:
-                    ap_dict[j].append(i)
+        for i, v in tqdm(pa_dict.items()):
+            for j in combinations(v, 2):
+                ap_dict[j].append(i)
 
-        for i,v in tqdm(ap_dict.items()):
-            if len(v)>1:
-                for j in combinations(v,2):
+        for i, v in tqdm(ap_dict.items()):
+            if len(v) > 1:
+                for j in combinations(v, 2):
                     connect.append(list(j))
 
         connect = np.array(connect).T
-        np.save(path,connect)
+        np.save(path, connect)
     else:
         connect = np.load(path)
-
-
-
-
-
-
-
-
-
-
-
