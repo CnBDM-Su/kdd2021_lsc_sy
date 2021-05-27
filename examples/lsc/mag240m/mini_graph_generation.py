@@ -365,8 +365,8 @@ if __name__ == '__main__':
             # for j in combinations(v, 2):
             for j in v:
                 for k in v:
-                    if j!=k:
-                        ap_dict[(j,k)].append(i)
+                    # if j!=k:
+                    ap_dict[(j,k)].append(i)
 
 
         for i, v in tqdm(ap_dict.items()):
@@ -374,8 +374,8 @@ if __name__ == '__main__':
                 # for j in combinations(v, 2):
                 for j in v:
                     for k in v:
-                        if j!=k:
-                            connect.append(list(j))
+                        # if j!=k:
+                        connect.append(list(j))
 
         connect = np.array(connect).T
         np.save(path, connect)
