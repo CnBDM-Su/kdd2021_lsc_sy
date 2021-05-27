@@ -29,7 +29,7 @@ for i in tqdm(range(train_idx.shape[0])):
     i = train_idx[i]
     for j in range(bias,ap_edge.shape[1]):
         if i==ap_edge[1,j]:
-            a_l[ap_edge[0,j],paper_label[ap_edge[1,j]]] += 1
+            a_l[int(ap_edge[0,j]),int(paper_label[ap_edge[1,j]])] += 1
         elif i<ap_edge[1,j]:
             bias = j
             break
