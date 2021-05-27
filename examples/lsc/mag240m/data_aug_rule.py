@@ -2,13 +2,14 @@ from tqdm import tqdm
 import numpy as np
 from copy import deepcopy
 from root import ROOT
+import torch
 from ogb.utils.url import makedirs
 from sklearn.metrics import accuracy_score,precision_score
 import sys
 sys.path.append('/var/ogb/ogb/lsc')
 from mag240m_mini_graph import MAG240MMINIDataset
-
-
+from scipy.special import softmax
+from torch_sparse import SparseTensor
 dataset = MAG240MMINIDataset(ROOT)
 
 train_idx = dataset.get_idx_split('train')
@@ -22,29 +23,27 @@ paper_label = dataset.paper_label
 
 ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
 print('___________sub_train___________')
-a_l = {}
 bias = 0
+a_l = np.zeros(shape=(dataset.num_authors,dataset.num_classes))
 for i in tqdm(range(train_idx.shape[0])):
     i = train_idx[i]
     for j in range(bias,ap_edge.shape[1]):
         if i==ap_edge[1,j]:
-            if ap_edge[0,j] not in a_l.keys():
-                a_l[ap_edge[0,j]] = [paper_label[ap_edge[1,j]]]
-            else:
-                a_l[ap_edge[0, j]].append(paper_label[ap_edge[1,j]])
+            a_l[ap_edge[0,j],paper_label[ap_edge[1,j]]] += 1
         elif i<ap_edge[1,j]:
             bias = j
             break
+a_l = softmax(a_l, axis=1)
+print((a_l.sum(1)!=0).sum())
+# reliable_author = {}
+# for i in a_l.keys():
+#     if len(a_l[i]) > 1:
+#         arr = np.array(a_l[i])
 
-print(len(a_l.keys()))
-reliable_author = {}
-for i in a_l.keys():
-    if len(a_l[i]) > 1:
-        arr = np.array(a_l[i])
-        if arr[arr == a_l[i][0]].shape[0] >= np.round(arr.shape[0]*(4/5)):
-            counts = np.bincount(arr)
-            mode = np.argmax(counts)
-            reliable_author[i] = mode
+        # if arr[arr == a_l[i][0]].shape[0] >= np.round(arr.shape[0]*(4/5)):
+        #     counts = np.bincount(arr)
+        #     mode = np.argmax(counts)
+        #     reliable_author[i] = mode
 
 # ap_edge = dataset.edge_index('author', 'writes', 'paper')
 # related_paper = []
@@ -59,7 +58,7 @@ for i in a_l.keys():
 #             bias = j
 #             break
 # print('related paper num:',len(related_paper))
-print('reliable author num:',len(reliable_author.keys()))
+# print('reliable author num:',len(reliable_author.keys()))
 # print('___________sub_test___________')
 # a_l_2 = {}
 # bias = 0
@@ -245,33 +244,60 @@ ap_edge = dataset.edge_index('author', 'writes', 'paper')
 # np.save(f'{dataset.dir}/new_paper_label.npy',new_label)
 
 # ______________predict_valid____________
+# valid = deepcopy(paper_label)
+# valid_related = []
+# bias = 0
+# coverage = {}
+# keys = np.sort(list(reliable_author.keys()))
+# for i in tqdm(range(len(reliable_author.keys()))):
+#     i = keys[i]
+#     l = reliable_author[i]
+#     for j in range(bias,ap_edge.shape[1]):
+#         if i==ap_edge[0,j]:
+#             if ap_edge[1,j] in valid_idx:
+#                 if ap_edge[1, j] not in coverage.keys():
+#                     coverage[ap_edge[1, j]] = [l]
+#                 else:
+#                     coverage[ap_edge[1, j]].append(l)
+#         elif i<ap_edge[0,j]:
+#             bias = j
+#             break
+# # print('new label num:',len(new_tr))
+# valid_related = []
+# for i in coverage.keys():
+#     valid_related.append(i)
+#     counts = np.bincount(coverage[i])
+#     valid[i] = np.argmax(counts)
+#
+# valid_related = np.array(valid_related)
+# print(valid_related.shape)
+# np.save(f'{dataset.dir}/changed_valid_idx.npy',valid_related)
+# np.save(f'{dataset.dir}/new_valid_label.npy',valid)
+
 valid = deepcopy(paper_label)
 valid_related = []
 bias = 0
 coverage = {}
-keys = np.sort(list(reliable_author.keys()))
-for i in tqdm(range(len(reliable_author.keys()))):
-    i = keys[i]
-    l = reliable_author[i]
-    for j in range(bias,ap_edge.shape[1]):
-        if i==ap_edge[0,j]:
-            if ap_edge[1,j] in valid_idx:
-                if ap_edge[1, j] not in coverage.keys():
-                    coverage[ap_edge[1, j]] = [l]
-                else:
-                    coverage[ap_edge[1, j]].append(l)
-        elif i<ap_edge[0,j]:
-            bias = j
-            break
+row, col = torch.from_numpy(ap_edge)
+adj_t = SparseTensor(
+    row=col.long(), col=row.long(),
+    sparse_sizes=(dataset.num_papers, dataset.num_authors),
+    is_sorted=True)
+inputs = torch.from_numpy(a_l).float()
+outputs = adj_t.matmul(inputs, reduce='mean').numpy()
 # print('new label num:',len(new_tr))
-valid_related = []
-for i in coverage.keys():
-    valid_related.append(i)
-    counts = np.bincount(coverage[i])
-    valid[i] = np.argmax(counts)
-
-valid_related = np.array(valid_related)
-print(valid_related.shape)
-np.save(f'{dataset.dir}/changed_valid_idx.npy',valid_related)
+# valid_related = []
+# for i in coverage.keys():
+#     valid_related.append(i)
+#     counts = np.bincount(coverage[i])
+#     valid[i] = np.argmax(counts)
+valid = outputs[valid_idx]
+# valid_related = np.array(valid_related)
+# print(valid_related.shape)
+# np.save(f'{dataset.dir}/changed_valid_idx.npy',valid_related)
 np.save(f'{dataset.dir}/new_valid_label.npy',valid)
+
+
+
+
 
