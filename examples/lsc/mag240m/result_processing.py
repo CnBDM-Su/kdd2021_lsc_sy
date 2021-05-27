@@ -133,7 +133,7 @@ if __name__ == '__main__':
     t = time.perf_counter()
     print('Reading adjacency matrix...', end=' ', flush=True)
     path = f'{dataset.dir}/modify_index.npy'
-    if osp.exists(path):
+    if not osp.exists(path):
         ap_edge = dataset.edge_index('author', 'writes', 'paper')
         bias = 0
         modify_index = []
