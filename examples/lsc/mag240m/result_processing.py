@@ -150,7 +150,7 @@ if __name__ == '__main__':
             if len(tmp)!= 0:
                 counts = np.bincount(tmp)
                 mode = np.argmax(counts)
-                if np.array(tmp)[np.array(tmp)==mode].shape[0]>=np.round(np.array(tmp).shape[0]*(3/4)):
+                if np.array(tmp)[np.array(tmp)==mode].shape[0]>=np.round(np.array(tmp).shape[0]*(4/5)):
                     modify_index += tmp_index
         modify_index = np.array(modify_index)
         np.save(path, modify_index)
@@ -158,7 +158,7 @@ if __name__ == '__main__':
         modify_index = np.load(path)
     y_correct = np.load(f'{dataset.dir}/new_valid_label.npy')
     correct_index = np.load(f'{dataset.dir}/changed_valid_idx.npy')
-    correct_index = list(set(correct_index) & set(modify_index))
+    correct_index = np.array(list(set(correct_index) & set(modify_index)))
     for i in correct_index:
         y_pred_[i] = y_correct[i]
 
