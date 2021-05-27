@@ -367,31 +367,31 @@ if __name__ == '__main__':
         t3 = 0
         import time
         finished = []
-        c = 0
+        # c = 0
         for i,v in tqdm(pa_dict.items()):
-            c +=1
+            # c +=1
             finished.append(i)
             tmp = []
-            t = time.time()
+            # t = time.time()
             for j in v:
                 tmp += ap_dict[j]
-            t_2 = time.time()
+            # t_2 = time.time()
             # t1 += t_2-t
             tmp = list(set(tmp)-set(finished))
 
             for j in tmp:
                 a = pa_dict[j]
-                t_3 = time.time()
-                t2 += t_3 - t_2
+                # t_3 = time.time()
+                # t2 += t_3 - t_2
                 if len(list(set(v) & set(a)))>1:
                     connect.append([i,j])
-                t_4 = time.time()
-                t3 += t_4 - t_3
+                # t_4 = time.time()
+                # t3 += t_4 - t_3
 
 
             # print('t1',t1/c)
-            print('t2', t2 / c)
-            print('t3', t3 / c)
+            # print('t2', t2 / c)
+            # print('t3', t3 / c)
 
 
         # for i, v in tqdm(pa_dict.items()):
