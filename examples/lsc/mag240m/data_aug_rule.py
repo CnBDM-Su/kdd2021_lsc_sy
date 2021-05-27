@@ -280,7 +280,7 @@ valid_related = []
 bias = 0
 c =0
 valid = np.zeros(shape=(valid_idx.shape[0],dataset.num_classes))
-for i in tqdm(range(valid_idx.shape[0])):
+for i in tqdm(valid_idx):
     tmp = []
     for j in range(bias, ap_edge.shape[1]):
         if i == ap_edge[1,j]:
