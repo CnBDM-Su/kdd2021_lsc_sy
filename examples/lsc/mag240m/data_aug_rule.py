@@ -34,7 +34,7 @@ for i in tqdm(range(train_idx.shape[0])):
             bias = j
             break
 a_l = softmax(a_l, axis=1)
-print(a_l)
+# print(a_l)
 print((a_l.sum(1)!=0).sum())
 # reliable_author = {}
 # for i in a_l.keys():
@@ -285,7 +285,7 @@ adj_t = SparseTensor(
     sparse_sizes=(dataset.num_papers, dataset.num_authors),
     is_sorted=True)
 inputs = torch.from_numpy(a_l).float()
-outputs = adj_t.matmul(inputs, reduce='mean').numpy()
+outputs = adj_t.matmul(inputs).numpy()
 # print('new label num:',len(new_tr))
 # valid_related = []
 # for i in coverage.keys():
