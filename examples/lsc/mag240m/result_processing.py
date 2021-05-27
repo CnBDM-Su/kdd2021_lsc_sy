@@ -1,7 +1,7 @@
 import os.path as osp
 import time
 import argparse
-
+from tqdm import tqdm
 import torch
 import numpy as np
 from torch_sparse import SparseTensor
@@ -131,8 +131,27 @@ if __name__ == '__main__':
     t = time.perf_counter()
     print('result processing...', end=' ', flush=True)
     y_pred_ = y_pred.argmax(dim=-1)
+    ap_edge = dataset.edge_index('author', 'writes', 'paper')
+    bias = 0
+    modify_index = []
+    for i in tqdm(range(dataset.num_authors)):
+        tmp = []
+        tmp_index = []
+        for j in range(bias, ap_edge.shape[1]):
+            if i==ap_edge[0,j]:
+                tmp.append(y_pred_[ap_edge[1,j]])
+                tmp_index.append(ap_edge[1,j])
+            elif 1<ap_edge[0,j]:
+                bias = j
+                break
+        counts = np.bincount(tmp)
+        mode = np.argmax(counts)
+        if np.array(tmp)[np.array(tmp)==mode].shape[0]>=np.round(np.array(tmp).shape[0]*(3/4)):
+            modify_index += tmp_index
+
     y_correct = np.load(f'{dataset.dir}/new_valid_label.npy')
     correct_index = np.load(f'{dataset.dir}/changed_valid_idx.npy')
+    correct_index = list(set(correct_index) & set(modify_index))
     for i in correct_index:
         y_pred_[i] = y_correct[i]
 
@@ -163,19 +182,19 @@ if __name__ == '__main__':
             TT += 1
         elif (y_true[i] == initial_pred[i]) and (y_true[i] != final_pred[i]):
             TF += 1
-            TF_initial.append(initial_pred[i])
-            TF_final.append(final_pred[i])
+            # TF_initial.append(initial_pred[i])
+            # TF_final.append(final_pred[i])
         elif (y_true[i] != initial_pred[i]) and (y_true[i] == final_pred[i]):
             FT += 1
-            FT_initial.append(initial_pred[i])
-            FT_final.append(final_pred[i])
+            # FT_initial.append(initial_pred[i])
+            # FT_final.append(final_pred[i])
         elif (y_true[i] != initial_pred[i]) and (y_true[i] != final_pred[i]):
             FF += 1
     print('TT:', TT)
     print('TF:', TF)
     print('FT:', FT)
     print('FF:', FF)
-    np.savez_compressed('confusion.npz', TF_initial=np.array(TF_initial), TF_final=np.array(TF_final), FT_initial=np.array(FT_initial), FT_final=np.array(FT_final))
+    # np.savez_compressed('confusion.npz', TF_initial=np.array(TF_initial), TF_final=np.array(TF_final), FT_initial=np.array(FT_initial), FT_final=np.array(FT_final))
 
     # res = {'y_pred': y_pred_[test_idx], 'y_pred_valid' : y_pred_[valid_idx]}
     # evaluator.save_test_submission(res, save_path)
