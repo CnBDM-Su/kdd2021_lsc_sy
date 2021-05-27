@@ -376,16 +376,20 @@ if __name__ == '__main__':
             for j in v:
                 tmp += ap_dict[j]
             t_2 = time.time()
-            t1 += t_2-t
+            # t1 += t_2-t
             tmp = list(set(tmp)-set(finished))
-            t_3 = time.time()
-            t2 += t_3-t_2
+
             for j in tmp:
-                if len(list(set(v) & set(pa_dict[j])))>1:
+                a = pa_dict[j]
+                t_3 = time.time()
+                t2 += t_3 - t_2
+                if len(list(set(v) & set(a)))>1:
                     connect.append([i,j])
-            t_4 = time.time()
-            t3 += t_4-t_3
-            print('t1',t1/c)
+                t_4 = time.time()
+                t3 += t_4 - t_3
+
+
+            # print('t1',t1/c)
             print('t2', t2 / c)
             print('t3', t3 / c)
 
