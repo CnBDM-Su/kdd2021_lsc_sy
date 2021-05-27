@@ -360,20 +360,35 @@ if __name__ == '__main__':
         connect = []
         for i in tqdm(range(ap_edge.shape[1])):
             pa_dict[ap_edge[1, i]].append(ap_edge[0, i])
-
-        for i in tqdm(range(ap_edge.shape[1])):
             ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
 
+        t1 = 0
+        t2 = 0
+        t3 = 0
+        import time
         finished = []
+        c = 0
         for i,v in tqdm(pa_dict.items()):
+            c +=1
             finished.append(i)
             tmp = []
+            t = time.time()
             for j in v:
                 tmp += ap_dict[j]
+            t_2 = time.time()
+            t1 += t_2-t
             tmp = list(set(tmp)-set(finished))
+            t_3 = time.time()
+            t2 += t_3-t_2
             for j in tmp:
                 if len(list(set(v) & set(pa_dict[j])))>1:
                     connect.append([i,j])
+            t_4 = time.time()
+            t3 += t_4-t_3
+            print('t1',t1/c)
+            print('t2', t2 / c)
+            print('t3', t3 / c)
+
 
         # for i, v in tqdm(pa_dict.items()):
         #     # for j in combinations(v, 2):
@@ -392,6 +407,7 @@ if __name__ == '__main__':
         #                 connect.append(list(j))
 
         connect = np.array(connect).T
+        connect = connect[:, connect[0, :].argsort()]
         np.save(path, connect)
     else:
         connect = np.load(path)
