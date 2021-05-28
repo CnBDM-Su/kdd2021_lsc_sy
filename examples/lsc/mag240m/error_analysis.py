@@ -26,15 +26,15 @@ year = dataset.all_paper_year
 ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
 print('___________sub_train___________')
 # bias = 0
-# a_l = np.zeros(shape=(dataset.num_authors,dataset.num_classes))
-# for i in tqdm(range(train_idx.shape[0])):
-#     i = train_idx[i]
-#     for j in range(bias,ap_edge.shape[1]):
-#         if (i==ap_edge[1,j]):
-#             a_l[int(ap_edge[0,j]),int(paper_label[ap_edge[1,j]])] += 1
-#         elif i<ap_edge[1,j]:
-#             bias = j
-#             break
+all_ = np.zeros(shape=(dataset.num_authors,dataset.num_classes))
+for i in tqdm(range(train_idx.shape[0])):
+    i = train_idx[i]
+    for j in range(bias,ap_edge.shape[1]):
+        if (i==ap_edge[1,j]):
+            all_[int(ap_edge[0,j]),int(paper_label[ap_edge[1,j]])] += 1
+        elif i<ap_edge[1,j]:
+            bias = j
+            break
 # a_l = softmax(a_l, axis=1)
 # print(a_l)
 # print((a_l.sum(1)!=0).sum())
@@ -132,20 +132,31 @@ for i in tqdm(range(len(reliable_author.keys()))):
         elif i<ap_edge[0,j]:
             bias = j
             break
-
+def zero():
+    return []
+error_paper = {}
+pa_dict = defaultdict(zero)
+ap_dict = defaultdict(zero)
+for i in tqdm(range(ap_edge.shape[1])):
+    pa_dict[ap_edge[1, i]].append(ap_edge[0, i])
+    ap_dict[ap_edge[0, i]].append(all[ap_edge[1, i]])
 relate = []
 pred = []
-for i in coverage.keys():
+paper_lis = list(coverage.keys())
+for i in paper_lis:
     relate.append(i)
     counts = np.bincount(coverage[i])
     pred.append(np.argmax(counts))
 
 true = new_label[relate]
+for i in range(pred.shape[0]):
+    if true[i] != pred[i]:
+        error_paper[paper_lis[i]] = ap_dict[paper_lis[i]]
 print('total:',c)
 print(len(relate))
 print('valid precision:',accuracy_score(true,pred))
-
-
+for i,v in error_paper.items():
+    print(i,v)
 
 # # valid = deepcopy(paper_label)
 # valid_related = []
