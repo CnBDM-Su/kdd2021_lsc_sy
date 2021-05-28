@@ -138,8 +138,7 @@ error_paper = {}
 pa_dict = defaultdict(zero)
 ap_dict = defaultdict(zero)
 for i in tqdm(range(ap_edge.shape[1])):
-    pa_dict[ap_edge[1, i]].append(ap_edge[0, i])
-    ap_dict[ap_edge[0, i]].append(all_[ap_edge[1, i]])
+    pa_dict[ap_edge[1, i]].append(all_[ap_edge[0, i]])
 relate = []
 pred = []
 paper_lis = list(coverage.keys())
@@ -151,7 +150,7 @@ for i in paper_lis:
 true = new_label[relate]
 for i in range(pred.shape[0]):
     if true[i] != pred[i]:
-        error_paper[paper_lis[i]] = ap_dict[paper_lis[i]]
+        error_paper[paper_lis[i]] = pa_dict[paper_lis[i]]
 print('total:',c)
 print(len(relate))
 print('valid precision:',accuracy_score(true,pred))
