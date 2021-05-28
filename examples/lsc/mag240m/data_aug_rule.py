@@ -280,16 +280,16 @@ print((a_l.sum(1)!=0).sum())
 valid_related = []
 bias = 0
 c =0
-def zero():
-    return []
-ap_dict = defaultdict(zero)
-connect = []
-for i in tqdm(range(ap_edge.shape[1])):
-    ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
-
-author_weight = {}
-for i, v in tqdm(ap_dict.items()):
-    author_weight[i] = len(v)
+# def zero():
+#     return []
+# ap_dict = defaultdict(zero)
+# connect = []
+# for i in tqdm(range(ap_edge.shape[1])):
+#     ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
+#
+# author_weight = {}
+# for i, v in tqdm(ap_dict.items()):
+#     author_weight[i] = len(v)
 
 valid = np.zeros(shape=(valid_idx.shape[0],dataset.num_classes))
 for i in tqdm(range(valid_idx.shape[0])):
@@ -299,13 +299,13 @@ for i in tqdm(range(valid_idx.shape[0])):
     for j in range(bias, ap_edge.shape[1]):
         if ind == ap_edge[1,j]:
             tmp.append(a_l[ap_edge[0,j]])
-            tmp_w.append(author_weight[ap_edge[0,j]])
+            # tmp_w.append(author_weight[ap_edge[0,j]])
         elif ind < ap_edge[1,j]:
             bias = j
             break
     if len(tmp)!=0:
         c+=1
-        tmp_w = np.array(softmax(tmp_w)).reshape(-1,1)
+        # tmp_w = np.array(softmax(tmp_w)).reshape(-1,1)
         valid[i] = np.mean(np.array(tmp)*tmp_w,0)
 print(c)
 # row, col = torch.from_numpy(ap_edge)
