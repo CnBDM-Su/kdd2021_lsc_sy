@@ -144,7 +144,7 @@ def zero():
 error_paper = {}
 pa_dict = defaultdict(zero)
 for i in tqdm(range(ap_edge.shape[1])):
-    pa_dict[ap_edge[1, i]].append(all_2[ap_edge[0, i]])
+    pa_dict[ap_edge[1, i]].append([ap_edge[0, i],all_2[ap_edge[0, i]]])
 relate = []
 pred = []
 paper_lis = list(coverage.keys())
