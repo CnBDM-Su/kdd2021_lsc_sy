@@ -21,6 +21,7 @@ valid_idx = dataset.get_idx_split('valid')
 test_idx = dataset.get_idx_split('test')
 idx = np.concatenate([train_idx,valid_idx,test_idx],0)
 paper_label = dataset.paper_label
+year = dataset.all_paper_year
 
 ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
 print('___________sub_train___________')
@@ -29,7 +30,7 @@ a_l = np.zeros(shape=(dataset.num_authors,dataset.num_classes))
 for i in tqdm(range(train_idx.shape[0])):
     i = train_idx[i]
     for j in range(bias,ap_edge.shape[1]):
-        if i==ap_edge[1,j]:
+        if (i==ap_edge[1,j]) and (year[int(ap_edge[0,j])]>=2010):
             a_l[int(ap_edge[0,j]),int(paper_label[ap_edge[1,j]])] += 1
         elif i<ap_edge[1,j]:
             bias = j
@@ -290,7 +291,6 @@ c =0
 # author_weight = {}
 # for i, v in tqdm(ap_dict.items()):
 #     author_weight[i] = len(v)
-
 valid = np.zeros(shape=(valid_idx.shape[0],dataset.num_classes))
 for i in tqdm(range(valid_idx.shape[0])):
     ind = valid_idx[i]
