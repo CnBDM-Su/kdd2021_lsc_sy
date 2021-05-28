@@ -365,29 +365,25 @@ if __name__ == '__main__':
         path_ = f'{dataset.dir}/mini_graph/pair_list.npy'
         if not osp.exists(path_):
 
-        # author_weight = {}
-        # for i,v in tqdm(ap_dict.items()):
-        #     author_weight[i] = len(v)
-        #
-        # for i,v in tqdm(pa_dict.items()):
-        #     tmp = []
-        #     for k in v:
-        #         tmp.append(author_weight[k])
-        #     ind = np.argsort(tmp)
-        #     pa_dict[i] = np.array(v)[ind][::-1].tolist()
+            pa_keys = list(pa_dict.keys())
+            pa_values = list(pa_dict.values())
 
-            finished = []
-            # c = 0
-            pair = []
-            for i,v in tqdm(pa_dict.items()):
-                # c +=1
-                finished.append(i)
+            def create_pair(i):
+                pair = []
                 tmp = []
-                for j in v:
+                for j in pa_values[i]:
                     tmp += ap_dict[j]
-                tmp = list(set(tmp)-set(finished))
+                # tmp = list(set(tmp)-set(finished))
+                tmp = list(set(tmp))
                 for j in tmp:
-                    pair.append([i,j])
+                    pair.append([pa_keys[i],j])
+                return pair
+
+            pair_ = Parallel(n_jobs=32)(delayed(create_pair)(i) for i in range(len(pa_keys)))
+            pair = []
+            for i in pair_:
+                for j in i:
+                    pair.append(j)
             np.save(path,np.array(pair))
         else:
             pair = np.load(path)
