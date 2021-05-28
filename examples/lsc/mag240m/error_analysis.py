@@ -49,7 +49,6 @@ print('___________sub_train___________')
 #             reliable_author[i] = mode
 #
 
-ap_edge = dataset.edge_index('author', 'writes', 'paper')
 # related_paper = []
 # bias = 0
 # keys = np.sort(list(reliable_author.keys()))
@@ -77,6 +76,7 @@ for i in tqdm(range(train_idx.shape[0])):
             bias = j
             break
 print(len(a_l.keys()))
+ap_edge = dataset.edge_index('author', 'writes', 'paper')
 reliable_author = {}
 for i in a_l.keys():
     if len(a_l[i]) > 1:
