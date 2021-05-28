@@ -305,7 +305,8 @@ for i in tqdm(range(valid_idx.shape[0])):
             break
     if len(tmp)!=0:
         c+=1
-        valid[i] = np.mean(np.array(tmp)*np.array(tmp_w).reshape(-1,1),0)
+        tmp_w = np.array(softmax(tmp_w)).reshape(-1,1)
+        valid[i] = np.mean(np.array(tmp)*tmp_w,0)
 print(c)
 # row, col = torch.from_numpy(ap_edge)
 #
