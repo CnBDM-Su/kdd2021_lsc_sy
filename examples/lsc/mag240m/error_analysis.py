@@ -154,15 +154,18 @@ for i in paper_lis:
     pred.append(np.argmax(counts))
 
 true = new_label[relate]
+true_error = {}
 for i in range(len(pred)):
     if true[i] != pred[i]:
         error_paper[paper_lis[i]] = pa_dict[paper_lis[i]]
+        true_error[paper_lis[i]] = true[i]
 print('total:',c)
 print(len(relate))
 print('valid precision:',accuracy_score(true,pred))
 for i,v in error_paper.items():
     print('_______________________________________________')
     print(i,v)
+    print('true',true_error[i])
 
 # # valid = deepcopy(paper_label)
 # valid_related = []
