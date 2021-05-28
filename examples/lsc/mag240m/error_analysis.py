@@ -168,7 +168,7 @@ for i,v in error_paper.items():
     print('_______________________________________________')
     print(i,v)
     print('true',true_error[i])
-    print('pred', true_error[i])
+    print('pred', pred_error[i])
 
 # # valid = deepcopy(paper_label)
 # valid_related = []
