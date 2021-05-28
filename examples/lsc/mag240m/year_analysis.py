@@ -39,4 +39,4 @@ if __name__ == '__main__':
         ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
 
     for i in ap_dict[args.author]:
-        print(i,year[i])
+        print(i,year[i],paper_label[i])
