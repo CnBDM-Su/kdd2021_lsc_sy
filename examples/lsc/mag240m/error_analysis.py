@@ -35,20 +35,21 @@ for i in tqdm(range(train_idx.shape[0])):
         elif i<ap_edge[1,j]:
             bias = j
             break
-a_l = softmax(a_l, axis=1)
+# a_l = softmax(a_l, axis=1)
 # print(a_l)
-print((a_l.sum(1)!=0).sum())
-# reliable_author = {}
+# print((a_l.sum(1)!=0).sum())
+reliable_author = {}
 # for i in a_l.keys():
 #     if len(a_l[i]) > 1:
 #         arr = np.array(a_l[i])
+#
+#         if arr[arr == a_l[i][0]].shape[0] >= np.round(arr.shape[0]*(4/5)):
+#             counts = np.bincount(arr)
+#             mode = np.argmax(counts)
+#             reliable_author[i] = mode
+#
 
-        # if arr[arr == a_l[i][0]].shape[0] >= np.round(arr.shape[0]*(4/5)):
-        #     counts = np.bincount(arr)
-        #     mode = np.argmax(counts)
-        #     reliable_author[i] = mode
-
-# ap_edge = dataset.edge_index('author', 'writes', 'paper')
+ap_edge = dataset.edge_index('author', 'writes', 'paper')
 # related_paper = []
 # bias = 0
 # keys = np.sort(list(reliable_author.keys()))
@@ -62,6 +63,17 @@ print((a_l.sum(1)!=0).sum())
 #             break
 # print('related paper num:',len(related_paper))
 # print('reliable author num:',len(reliable_author.keys()))
+
+reliable_author = {}
+for i in a_l.keys():
+    if len(a_l[i]) > 1:
+        arr = np.array(a_l[i])
+        if arr[arr == a_l[i][0]].shape[0] == arr.shape[0]:
+            counts = np.bincount(arr)
+            mode = np.argmax(counts)
+            reliable_author[i] = mode
+
+print(len(reliable_author.keys()))
 # print('___________sub_test___________')
 # a_l_2 = {}
 # bias = 0
@@ -85,40 +97,17 @@ print((a_l.sum(1)!=0).sum())
 #             reliable_author_2[i] = a_l_2[i][0]
 #
 # print(len(reliable_author_2.keys()))
-print('___________valid___________')
-a_l_3 = {}
-bias = 0
-for i in tqdm(range(valid_idx.shape[0])):
-    i = valid_idx[i]
-    for j in range(bias,ap_edge.shape[1]):
-        if i==ap_edge[1,j]:
-            if ap_edge[0,j] not in a_l_3.keys():
-                a_l_3[ap_edge[0,j]] = [paper_label[ap_edge[1,j]]]
-            else:
-                a_l_3[ap_edge[0, j]].append(paper_label[ap_edge[1,j]])
-        elif i<ap_edge[1,j]:
-            bias = j
-            break
-print(len(a_l_3.keys()))
-reliable_author_3 = {}
-for i in a_l_3.keys():
-    if len(a_l_3[i]) > 1:
-        arr = np.array(a_l_3[i])
-        if arr[arr == a_l_3[i][0]].shape[0] == arr.shape[0]:
-            reliable_author_3[i] = a_l_3[i][0]
-
-print(len(reliable_author_3.keys()))
 
 #______________valid___________________
 new_label = deepcopy(paper_label)
-ap_edge = dataset.edge_index('author', 'writes', 'paper')
+# ap_edge = dataset.edge_index('author', 'writes', 'paper')
 c = 0
 coverage = {}
 bias = 0
-keys = np.sort(list(reliable_author_3.keys()))
-for i in tqdm(range(len(reliable_author_3.keys()))):
+keys = np.sort(list(reliable_author.keys()))
+for i in tqdm(range(len(reliable_author.keys()))):
     i = keys[i]
-    l = reliable_author_3[i]
+    l = reliable_author[i]
     for j in range(bias,ap_edge.shape[1]):
         if i==ap_edge[0,j]:
             c+=1
