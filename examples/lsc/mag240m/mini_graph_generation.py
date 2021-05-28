@@ -362,9 +362,17 @@ if __name__ == '__main__':
             pa_dict[ap_edge[1, i]].append(ap_edge[0, i])
             ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
 
-        t1 = 0
-        t2 = 0
-        t3 = 0
+        author_weight = {}
+        for i,v in tqdm(ap_dict.items()):
+            author_weight[i] = len(v)
+
+        for i,v in tqdm(pa_dict.items()):
+            tmp = []
+            for k in v:
+                tmp.append(author_weight[k])
+            ind = np.argsort(tmp)
+            pa_dict[i] = np.array(v)[ind][::-1].tolist()
+
         import time
         finished = []
         # c = 0
@@ -372,26 +380,15 @@ if __name__ == '__main__':
             # c +=1
             finished.append(i)
             tmp = []
-            # t = time.time()
-            for j in v:
+            for j in v[:5]:
                 tmp += ap_dict[j]
-            # t_2 = time.time()
-            # t1 += t_2-t
             tmp = list(set(tmp)-set(finished))
 
             for j in tmp:
                 a = pa_dict[j]
-                # t_3 = time.time()
-                # t2 += t_3 - t_2
                 if len(list(set(v) & set(a)))>1:
                     connect.append([i,j])
-                # t_4 = time.time()
-                # t3 += t_4 - t_3
 
-
-            # print('t1',t1/c)
-            # print('t2', t2 / c)
-            # print('t3', t3 / c)
 
 
         # for i, v in tqdm(pa_dict.items()):
