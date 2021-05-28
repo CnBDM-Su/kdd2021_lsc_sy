@@ -8,6 +8,7 @@ from ogb.lsc import MAG240MDataset
 from root import ROOT
 from torch_sparse import SparseTensor
 from itertools import combinations
+from joblib import Parallel,delayed
 from collections import defaultdict
 
 if __name__ == '__main__':
@@ -352,44 +353,50 @@ if __name__ == '__main__':
 
     path = f'{dataset.dir}/mini_graph/author_connect_graph.npy'
     if not osp.exists(path):
-        print('generating mini author connect edge...')
         def zero():
             return []
         pa_dict = defaultdict(zero)
         ap_dict = defaultdict(zero)
-        connect = []
+
         for i in tqdm(range(ap_edge.shape[1])):
             pa_dict[ap_edge[1, i]].append(ap_edge[0, i])
             ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
+        print('generating mini author connect edge...')
+        path_ = f'{dataset.dir}/mini_graph/pair_list.npy'
+        if not osp.exists(path_):
 
-        author_weight = {}
-        for i,v in tqdm(ap_dict.items()):
-            author_weight[i] = len(v)
+        # author_weight = {}
+        # for i,v in tqdm(ap_dict.items()):
+        #     author_weight[i] = len(v)
+        #
+        # for i,v in tqdm(pa_dict.items()):
+        #     tmp = []
+        #     for k in v:
+        #         tmp.append(author_weight[k])
+        #     ind = np.argsort(tmp)
+        #     pa_dict[i] = np.array(v)[ind][::-1].tolist()
 
-        for i,v in tqdm(pa_dict.items()):
-            tmp = []
-            for k in v:
-                tmp.append(author_weight[k])
-            ind = np.argsort(tmp)
-            pa_dict[i] = np.array(v)[ind][::-1].tolist()
+            finished = []
+            # c = 0
+            pair = []
+            for i,v in tqdm(pa_dict.items()):
+                # c +=1
+                finished.append(i)
+                tmp = []
+                for j in v:
+                    tmp += ap_dict[j]
+                tmp = list(set(tmp)-set(finished))
+                for j in tmp:
+                    pair.append([i,j])
+            np.save(path,np.array(pair))
+        else:
+            pair = np.load(path)
 
-        import time
-        finished = []
-        # c = 0
-        for i,v in tqdm(pa_dict.items()):
-            # c +=1
-            finished.append(i)
-            tmp = []
-            for j in v[:5]:
-                tmp += ap_dict[j]
-            tmp = list(set(tmp)-set(finished))
+        def line(pair):
+            if len(list(set(pa_dict[pair[0]]) & set(pa_dict[pair[1]])))>1:
+                return pair
 
-            for j in tmp:
-                a = pa_dict[j]
-                if len(list(set(v) & set(a)))>1:
-                    connect.append([i,j])
-
-
+        connect = Parallel(n_jobs=32)(delayed(line)(i) for i in pair)
 
         # for i, v in tqdm(pa_dict.items()):
         #     # for j in combinations(v, 2):

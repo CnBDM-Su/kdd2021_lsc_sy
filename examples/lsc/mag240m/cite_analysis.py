@@ -10,7 +10,7 @@ from mag240m_mini_graph import MAG240MMINIDataset
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--author', type=int, default=0)
+    parser.add_argument('--paper', type=int, default=0)
 
     args = parser.parse_args()
     dataset = MAG240MMINIDataset(ROOT)
