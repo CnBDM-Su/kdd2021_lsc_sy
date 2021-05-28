@@ -163,12 +163,14 @@ if __name__ == '__main__':
     # for i in correct_index:
     #     y_pred_[i] = y_correct[i]
     y_pred_ = deepcopy(y_pred)
-    c=0
+    c = 0
+    a = 1
+    b = 0.3
     for i in range(valid_idx.shape[0]):
         ind = valid_idx[i]
         if y_correct[i].sum()!=0:
             c+=1
-        y_pred_[ind] = (y_pred[ind] + 0.2 * y_correct[i])/1.2
+        y_pred_[ind] = (a * y_pred[ind] + b * y_correct[i])/(a+b)
 
     print(c)
     train_acc = evaluator.eval({
