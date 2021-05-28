@@ -14,17 +14,17 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     dataset = MAG240MMINIDataset(ROOT)
-    ap_edge = dataset.edge_index('author', 'writes', 'paper')
+    pp_edge = dataset.edge_index('paper', 'sites', 'paper')
     paper_label = dataset.paper_label
     year = dataset.all_paper_year
     def zero():
         return []
-    pa_dict = defaultdict(zero)
-    ap_dict = defaultdict(zero)
+    pp_dict = defaultdict(zero)
     connect = []
-    for i in tqdm(range(ap_edge.shape[1])):
+    for i in tqdm(range(pp_edge.shape[1])):
         # pa_dict[ap_edge[1, i]].append(ap_edge[0, i])
-        ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
+        pp_dict[pp_edge[0, i]].append(pp_edge[1, i])
+        pp_dict[pp_edge[1, i]].append(pp_edge[0, i])
 
-    for i in ap_dict[args.author]:
+    for i in pp_dict[args.author]:
         print(i,year[i],paper_label[i])
