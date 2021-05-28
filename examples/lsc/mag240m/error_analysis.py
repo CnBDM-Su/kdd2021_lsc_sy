@@ -25,7 +25,7 @@ year = dataset.all_paper_year
 
 ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
 print('___________sub_train___________')
-# bias = 0
+bias = 0
 all_ = np.zeros(shape=(dataset.num_authors,dataset.num_classes))
 for i in tqdm(range(train_idx.shape[0])):
     i = train_idx[i]
