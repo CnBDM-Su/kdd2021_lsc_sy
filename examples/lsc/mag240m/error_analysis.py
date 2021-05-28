@@ -69,9 +69,9 @@ for i in tqdm(range(train_idx.shape[0])):
     for j in range(bias,ap_edge.shape[1]):
         if i==ap_edge[1,j]:
             if ap_edge[0,j] not in a_l.keys():
-                a_l[ap_edge[0,j]] = [paper_label[ap_edge[1,j]]]
+                a_l[ap_edge[0,j]] = [int(paper_label[ap_edge[1,j]])]
             else:
-                a_l[ap_edge[0, j]].append(paper_label[ap_edge[1,j]])
+                a_l[ap_edge[0, j]].append(int(paper_label[ap_edge[1,j]]))
         elif i<ap_edge[1,j]:
             bias = j
             break
@@ -81,7 +81,6 @@ reliable_author = {}
 for i in a_l.keys():
     if len(a_l[i]) > 1:
         arr = np.array(a_l[i])
-        print(arr)
         if arr[arr == a_l[i][0]].shape[0] == arr.shape[0]:
             counts = np.bincount(arr)
             mode = np.argmax(counts)
