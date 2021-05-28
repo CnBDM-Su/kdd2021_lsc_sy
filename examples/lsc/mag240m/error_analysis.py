@@ -111,6 +111,7 @@ print(len(reliable_author_3.keys()))
 
 #______________valid___________________
 new_label = deepcopy(paper_label)
+ap_edge = dataset.edge_index('author', 'writes', 'paper')
 c = 0
 coverage = {}
 bias = 0
