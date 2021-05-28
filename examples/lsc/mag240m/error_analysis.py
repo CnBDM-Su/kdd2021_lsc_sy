@@ -36,7 +36,7 @@ for i in tqdm(range(train_idx.shape[0])):
             bias = j
             break
 all_2 = {}
-for i in range(all_.shape[0]):
+for i in tqdm(range(all_.shape[0])):
     tmp = []
     for j in range(all_[i].shape[0]):
         if all_[i][j] != 0:
