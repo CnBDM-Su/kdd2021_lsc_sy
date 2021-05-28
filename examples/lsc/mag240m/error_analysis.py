@@ -35,6 +35,13 @@ for i in tqdm(range(train_idx.shape[0])):
         elif i<ap_edge[1,j]:
             bias = j
             break
+all_2 = {}
+for i in range(all_.shape[0]):
+    tmp = []
+    for j in range(all_[i].shape[0]):
+        if all_[i][j] != 0:
+            tmp.append((j,all_[i][j]))
+    all_2[i] = tmp
 # a_l = softmax(a_l, axis=1)
 # print(a_l)
 # print((a_l.sum(1)!=0).sum())
@@ -137,7 +144,7 @@ def zero():
 error_paper = {}
 pa_dict = defaultdict(zero)
 for i in tqdm(range(ap_edge.shape[1])):
-    pa_dict[ap_edge[1, i]].append(all_[ap_edge[0, i]])
+    pa_dict[ap_edge[1, i]].append(all_2[ap_edge[0, i]])
 relate = []
 pred = []
 paper_lis = list(coverage.keys())
@@ -154,6 +161,7 @@ print('total:',c)
 print(len(relate))
 print('valid precision:',accuracy_score(true,pred))
 for i,v in error_paper.items():
+    print('_______________________________________________')
     print(i,v)
 
 # # valid = deepcopy(paper_label)
