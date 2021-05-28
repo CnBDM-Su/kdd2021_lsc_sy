@@ -26,7 +26,7 @@ year_w = []
 def zero():
     return []
 ly_dict = defaultdict(zero)
-for i in tqdm(train_idx:
+for i in tqdm(train_idx):
     ly_dict[paper_label[i]].append(year[i])
 
 for i,v in ly_dict.items():
