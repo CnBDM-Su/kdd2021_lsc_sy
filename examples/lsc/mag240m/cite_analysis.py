@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     dataset = MAG240MMINIDataset(ROOT)
-    pp_edge = dataset.edge_index('paper', 'sites', 'paper')
+    pp_edge = dataset.edge_index('paper', 'cites', 'paper')
     paper_label = dataset.paper_label
     year = dataset.all_paper_year
     def zero():
