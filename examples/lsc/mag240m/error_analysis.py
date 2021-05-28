@@ -136,7 +136,6 @@ def zero():
     return []
 error_paper = {}
 pa_dict = defaultdict(zero)
-ap_dict = defaultdict(zero)
 for i in tqdm(range(ap_edge.shape[1])):
     pa_dict[ap_edge[1, i]].append(all_[ap_edge[0, i]])
 relate = []
@@ -148,7 +147,7 @@ for i in paper_lis:
     pred.append(np.argmax(counts))
 
 true = new_label[relate]
-for i in range(pred.shape[0]):
+for i in range(len(pred)):
     if true[i] != pred[i]:
         error_paper[paper_lis[i]] = pa_dict[paper_lis[i]]
 print('total:',c)
