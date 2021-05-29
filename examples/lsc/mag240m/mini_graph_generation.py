@@ -368,6 +368,8 @@ if __name__ == '__main__':
             pa_keys = list(pa_dict.keys())
             pa_values = list(pa_dict.values())
 
+            print('setup done')
+
             def create_pair(i):
                 pair = []
                 tmp = []
@@ -379,7 +381,7 @@ if __name__ == '__main__':
                     pair.append([pa_keys[i],j])
                 return pair
 
-            pair_ = Parallel(n_jobs=32)(delayed(create_pair)(i) for i in range(len(pa_keys)))
+            pair_ = Parallel(n_jobs=32)(delayed(create_pair)(i) for i in tqdm(range(len(pa_keys))))
             pair = []
             for i in pair_:
                 for j in i:
@@ -392,7 +394,7 @@ if __name__ == '__main__':
             if len(list(set(pa_dict[pair[0]]) & set(pa_dict[pair[1]])))>1:
                 return pair
 
-        connect = Parallel(n_jobs=32)(delayed(line)(i) for i in pair)
+        connect = Parallel(n_jobs=32)(delayed(line)(i) for i in tqdm(pair))
 
         # for i, v in tqdm(pa_dict.items()):
         #     # for j in combinations(v, 2):
