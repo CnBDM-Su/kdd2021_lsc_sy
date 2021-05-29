@@ -381,7 +381,9 @@ if __name__ == '__main__':
                     pair.append([i,j])
                 return pair
 
-            pair_ = Parallel(n_jobs=4)(delayed(create_pair)(i) for i in tqdm(pa_dict.keys()))
+            # pair_ = Parallel(n_jobs=4)(delayed(create_pair)(i) for i in tqdm(pa_dict.keys()))
+            for i in tqdm(pa_dict.keys()):
+                pair_ = create_pair(i)
             pair = []
             for i in pair_:
                 for j in i:
