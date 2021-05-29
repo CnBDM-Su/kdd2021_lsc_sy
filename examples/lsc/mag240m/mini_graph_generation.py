@@ -398,7 +398,7 @@ if __name__ == '__main__':
         for i in lis:
             pa_lis.append(pa_dict[i])
 
-        print(pa_lis.shape)
+        print(len(pa_lis))
         def line(pair):
             if len(list(set(pa_lis[pair[0]]) & set(pa_lis[pair[1]])))>1:
                 return list(pair)
