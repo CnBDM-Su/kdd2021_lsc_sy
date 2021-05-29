@@ -369,7 +369,7 @@ if __name__ == '__main__':
             if len(list(set(pa_dict[pair[0]]) & set(pa_dict[pair[1]])))>1:
                 return list(pair)
 
-        connect = Parallel(n_jobs=32)(delayed(line)(i) for i in tqdm(pair))
+        connect = Parallel(n_jobs=4)(delayed(line)(i) for i in tqdm(pair))
 
         # for i, v in tqdm(pa_dict.items()):
         #     # for j in combinations(v, 2):
