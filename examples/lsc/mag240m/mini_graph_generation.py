@@ -393,8 +393,14 @@ if __name__ == '__main__':
         #     pair = np.load(path)
         pair = combinations(range(dataset.num_papers),2)
 
+        lis = np.sort(list(pa_dict.keys()))
+        pa_lis = []
+        for i in lis:
+            pa_lis.append(pa_dict[i])
+
+        print(pa_lis.shape)
         def line(pair):
-            if len(list(set(pa_dict[pair[0]]) & set(pa_dict[pair[1]])))>1:
+            if len(list(set(pa_lis[pair[0]]) & set(pa_lis[pair[1]])))>1:
                 return list(pair)
 
         # connect = Parallel(n_jobs=4)(delayed(line)(i) for i in tqdm(pair))
