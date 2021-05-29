@@ -362,39 +362,40 @@ if __name__ == '__main__':
             pa_dict[ap_edge[1, i]].append(ap_edge[0, i])
             ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
         print('generating mini author connect edge...')
-        path_ = f'{dataset.dir}/mini_graph/pair_list.npy'
-        if not osp.exists(path_):
-
-            pa_keys = list(pa_dict.keys())
-            pa_values = list(pa_dict.values())
-
-            print('setup done')
-
-            def create_pair(i):
-                pair = []
-                tmp = []
-                for j in pa_dict[i]:
-                    tmp += ap_dict[j]
-                # tmp = list(set(tmp)-set(finished))
-                tmp = list(set(tmp))
-                for j in tmp:
-                    pair.append([i,j])
-                return pair
-
-            # pair_ = Parallel(n_jobs=4)(delayed(create_pair)(i) for i in tqdm(pa_dict.keys()))
-            for i in tqdm(pa_dict.keys()):
-                pair_ = create_pair(i)
-            pair = []
-            for i in pair_:
-                for j in i:
-                    pair.append(j)
-            np.save(path,np.array(pair))
-        else:
-            pair = np.load(path)
+        # path_ = f'{dataset.dir}/mini_graph/pair_list.npy'
+        # if not osp.exists(path_):
+        # 
+        #     pa_keys = list(pa_dict.keys())
+        #     pa_values = list(pa_dict.values())
+        # 
+        #     print('setup done')
+        # 
+        #     def create_pair(i):
+        #         pair = []
+        #         tmp = []
+        #         for j in pa_dict[i]:
+        #             tmp += ap_dict[j]
+        #         # tmp = list(set(tmp)-set(finished))
+        #         tmp = list(set(tmp))
+        #         for j in tmp:
+        #             pair.append([i,j])
+        #         return pair
+        # 
+        #     # pair_ = Parallel(n_jobs=4)(delayed(create_pair)(i) for i in tqdm(pa_dict.keys()))
+        #     for i in tqdm(pa_dict.keys()):
+        #         pair_ = create_pair(i)
+        #     pair = []
+        #     for i in pair_:
+        #         for j in i:
+        #             pair.append(j)
+        #     np.save(path,np.array(pair))
+        # else:
+        #     pair = np.load(path)
+        pair = combinations(range(dataset.num_papers),2)
 
         def line(pair):
             if len(list(set(pa_dict[pair[0]]) & set(pa_dict[pair[1]])))>1:
-                return pair
+                return list(pair)
 
         connect = Parallel(n_jobs=4)(delayed(line)(i) for i in tqdm(pair))
 
