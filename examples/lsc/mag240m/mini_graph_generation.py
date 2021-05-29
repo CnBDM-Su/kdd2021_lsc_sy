@@ -363,7 +363,7 @@ if __name__ == '__main__':
             ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
         print('generating mini author connect edge...')
 
-        pair = combinations()
+        pair = combinations(range(dataset.num_papers),2)
 
         def line(pair):
             if len(list(set(pa_dict[pair[0]]) & set(pa_dict[pair[1]])))>1:
