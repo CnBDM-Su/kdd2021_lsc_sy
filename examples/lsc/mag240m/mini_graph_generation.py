@@ -373,15 +373,15 @@ if __name__ == '__main__':
             def create_pair(i):
                 pair = []
                 tmp = []
-                for j in pa_values[i]:
+                for j in pa_dict[i]:
                     tmp += ap_dict[j]
                 # tmp = list(set(tmp)-set(finished))
                 tmp = list(set(tmp))
                 for j in tmp:
-                    pair.append([pa_keys[i],j])
+                    pair.append([i,j])
                 return pair
 
-            pair_ = Parallel(n_jobs=4)(delayed(create_pair)(i) for i in tqdm(range(len(pa_keys))))
+            pair_ = Parallel(n_jobs=4)(delayed(create_pair)(i) for i in tqdm(pa_dict.keys()))
             pair = []
             for i in pair_:
                 for j in i:
