@@ -362,7 +362,11 @@ if __name__ == '__main__':
         for i in tqdm(range(ap_edge.shape[1])):
             pa_dict[ap_edge[1, i]].append(ap_edge[0, i])
             ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
-
+        c=0
+        for i,v in ap_dict.items():
+            if len(v)>1:
+                c+=1
+        print('author_num:',c)
         author_weight = {}
         for i,v in tqdm(ap_dict.items()):
             author_weight[i] = len(v)
