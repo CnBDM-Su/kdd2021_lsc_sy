@@ -49,7 +49,8 @@ for i in tqdm(a_l.keys()):
         # if arr[arr == a_l[i][0]].shape[0] >= np.round(arr.shape[0]*(4/5)):
         counts = np.bincount(arr)
         mode = np.argmax(counts)
-        reliable_author[i] = mode
+        if mode/np.unique(arr).shape[0] > 1:
+            reliable_author[i] = mode
 
 ap_edge = dataset.edge_index('author', 'writes', 'paper')
 related_paper = []
