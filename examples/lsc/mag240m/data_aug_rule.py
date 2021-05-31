@@ -50,7 +50,7 @@ for i in tqdm(a_l.keys()):
         counts = np.bincount(arr)
         mode = np.argmax(counts)
         if arr[arr == mode].shape[0] >= np.round(arr.shape[0]*(4/5)):
-            reliable_author[i] = mode
+            reliable_author[i] = [mode,arr[arr == mode].shape[0]]
 
 ap_edge = dataset.edge_index('author', 'writes', 'paper')
 related_paper = []
@@ -207,12 +207,13 @@ bias = 0
 keys = np.sort(list(reliable_author.keys()))
 for i in tqdm(range(len(reliable_author.keys()))):
     i = keys[i]
-    l = reliable_author[i]
+    # l = reliable_author[i][0]
+    # num = reliable_author[i][1]
     for j in range(bias,ap_edge.shape[1]):
         if i==ap_edge[0,j]:
             c+=1
             if ap_edge[1, j] in valid_idx:
-                coverage[ap_edge[1, j]].append(l)
+                coverage[ap_edge[1, j]].append(reliable_author[i])
         elif i<ap_edge[0,j]:
             bias = j
             break
@@ -221,8 +222,15 @@ relate = []
 pred = []
 for i in coverage.keys():
     relate.append(i)
-    counts = np.bincount(coverage[i])
-    pred.append(np.argmax(counts))
+    count = {}
+    for j in i:
+        if j[0] not in count.keys():
+            count[j[0]] = j[1]
+        else:
+            count[j[0]] += j[1]
+    pred.append(max(count.items(), key=lambda x: x[1])[0])
+    # counts = np.bincount(coverage[i])
+    # pred.append(np.argmax(counts))
 
 true = new_label[relate]
 print('total:',c)
