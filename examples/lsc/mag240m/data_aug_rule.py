@@ -44,7 +44,7 @@ for i in tqdm(range(train_idx.shape[0])):
 reliable_author = {}
 for i in tqdm(a_l.keys()):
     if len(a_l[i]) > 1:
-        arr = np.array(a_l[i])
+        arr = np.array(a_l[i]).astype(int)
 
         # if arr[arr == a_l[i][0]].shape[0] >= np.round(arr.shape[0]*(4/5)):
         counts = np.bincount(arr)
