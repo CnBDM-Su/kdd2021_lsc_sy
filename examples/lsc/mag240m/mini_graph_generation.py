@@ -377,8 +377,8 @@ if __name__ == '__main__':
         import time
         # c = 0
         for i,v in tqdm(pa_dict.items()):
-            if len(v)<2:
-                continue
+            # if len(v)<2:
+            #     continue
             # c +=1
             tmp = []
             for j in v[:10]:
