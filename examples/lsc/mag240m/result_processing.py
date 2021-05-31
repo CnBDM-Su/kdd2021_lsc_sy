@@ -130,40 +130,21 @@ if __name__ == '__main__':
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     print('result processing...', end=' ', flush=True)
+    print(y_pred.shape)
+    from sklearn.ensemble import RandomForestClassifier
+    y_correct = np.load(f'{dataset.dir}/new_all_label.npy')
+    model_rf = RandomForestClassifier()
+    y_pred_ = deepcopy(y_pred)
+    rf_train_x = np.concatenate([y_pred_,y_correct],1)
     # y_pred_ = y_pred.argmax(dim=-1)
     t = time.perf_counter()
-    # print('Reading adjacency matrix...', end=' ', flush=True)
-    # path = f'{dataset.dir}/modify_index.npy'
-    # if not osp.exists(path):
-    #     ap_edge = dataset.edge_index('author', 'writes', 'paper')
-    #     bias = 0
-    #     modify_index = []
-    #     for i in tqdm(range(dataset.num_authors)):
-    #         tmp = []
-    #         tmp_index = []
-    #         for j in range(bias, ap_edge.shape[1]):
-    #             if i==ap_edge[0,j]:
-    #                 tmp.append(y_pred_[ap_edge[1,j]])
-    #                 tmp_index.append(ap_edge[1,j])
-    #             elif 1<ap_edge[0,j]:
-    #                 bias = j
-    #                 break
-    #         if len(tmp)!= 0:
-    #             counts = np.bincount(tmp)
-    #             mode = np.argmax(counts)
-    #             if np.array(tmp)[np.array(tmp)==mode].shape[0]>=np.round(np.array(tmp).shape[0]*(4/5)):
-    #                 modify_index += tmp_index
-    #     modify_index = np.array(modify_index)
-    #     np.save(path, modify_index)
-    # else:
-    #     modify_index = np.load(path)
-    y_correct = np.load(f'{dataset.dir}/new_valid_label.npy')
+
     # correct_index = np.load(f'{dataset.dir}/changed_valid_idx.npy')
     # correct_index = np.array(list(set(correct_index) & set(modify_index)))
     # for i in correct_index:
     #     y_pred_[i] = y_correct[i]
-    y_pred_ = deepcopy(y_pred)
-    from sklearn.ensemble import RandomForestClassifier
+
+
     # c = 0
     # a = 1
     # b = 0.2
