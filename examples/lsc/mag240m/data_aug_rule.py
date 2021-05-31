@@ -313,7 +313,7 @@ for i in tqdm(range(idx.shape[0])):
         res[i] = np.mean(np.array(tmp),0)
 print(c)
 
-np.save(f'{dataset.dir}/new_valid_label.npy',res)
+np.save(f'{dataset.dir}/new_all_label.npy',res)
 
 
 
