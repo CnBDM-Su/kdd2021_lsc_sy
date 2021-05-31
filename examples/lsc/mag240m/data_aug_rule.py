@@ -23,7 +23,6 @@ idx = np.concatenate([train_idx,valid_idx,test_idx],0)
 paper_label = dataset.paper_label
 year = dataset.all_paper_year
 year_w = []
-for i in year:
 
 ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
 print('___________sub_train___________')
