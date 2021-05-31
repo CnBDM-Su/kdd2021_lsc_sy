@@ -404,7 +404,9 @@ if __name__ == '__main__':
         # for i,v in tqdm(pp_dict.items()):
             for j in tmp:
                 a = pa_dict[j]
-                if len(set(v) & set(a))>1:
+                tmp = [val for val in a if val in v]
+                if len(tmp)>1:
+                # if len(set(v) & set(a))>1:
                     connect.append([i,j])
 
         connect = np.array(connect).T
