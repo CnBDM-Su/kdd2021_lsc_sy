@@ -42,7 +42,7 @@ for i in tqdm(range(train_idx.shape[0])):
 # a_l = softmax(a_l, axis=1)
 # print(a_l)
 reliable_author = {}
-for i in tqdm(range(dataset.num_authors)):
+for i in tqdm(a_l.keys()):
     if len(a_l[i]) > 1:
         arr = np.array(a_l[i])
 
