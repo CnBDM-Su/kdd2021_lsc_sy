@@ -36,12 +36,12 @@ for i in tqdm(range(train_idx.shape[0])):
         elif i<ap_edge[1,j]:
             bias = j
             break
-a_l = softmax(a_l, axis=1)
+# a_l = softmax(a_l, axis=1)
 # print(a_l)
 print((a_l.sum(1)!=0).sum())
 
 reliable_author = {}
-for i in a_l.keys():
+for i in range(dataset.num_authors):
     if len(a_l[i]) > 1:
         arr = np.array(a_l[i])
 
