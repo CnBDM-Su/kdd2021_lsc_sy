@@ -368,11 +368,6 @@ if __name__ == '__main__':
             if len(set(pa_dict[pp_edge[0,i]]) & set(pa_dict[pp_edge[1,i]])):
                 connect.append([pp_edge[0,i],pp_edge[1,i]])
 
-        # a = []
-        # for i,v in ap_dict.items():
-        #     if len(v)>4:
-        #         a.append(i)
-
         # author_weight = {}
         # for i,v in tqdm(ap_dict.items()):
         #     author_weight[i] = len(v)
