@@ -132,16 +132,17 @@ if __name__ == '__main__':
     print('result processing...', end=' ', flush=True)
     print(y_pred.shape)
     from sklearn.ensemble import RandomForestClassifier
-    from sklearn.neural_network import MLPClassifier
+    # from sklearn.neural_network import MLPClassifier
     from sklearn.preprocessing import MinMaxScaler
+    from sklearn.tree import DecisionTreeClassifier
     y_correct = np.load(f'{dataset.dir}/new_all_label.npy')
-    model_rf = MLPClassifier()
+    model_rf = DecisionTreeClassifier()
     y_pred_ = deepcopy(y_pred).numpy()
     new_data = np.concatenate([y_pred_[idx],y_correct],1)
     # rf_valid = new_data[train_idx.shape[0]:valid_idx.shape[0]+train_idx.shape[0]]
     # rf_test = new_data[valid_idx.shape[0]+train_idx.shape[0]:]
-    mm = MinMaxScaler()
-    new_data = mm.fit_transform(new_data)
+    # mm = MinMaxScaler()
+    # new_data = mm.fit_transform(new_data)
     rf_train_x = new_data[:train_idx.shape[0]]
     rf_train_y = y_train.numpy()
     model_rf.fit(rf_train_x,rf_train_y)
