@@ -363,10 +363,10 @@ if __name__ == '__main__':
             pa_dict[ap_edge[1, i]].append(ap_edge[0, i])
             ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
 
-        a = []
-        for i,v in ap_dict.items():
-            if len(v)>4:
-                a.append(i)
+        # a = []
+        # for i,v in ap_dict.items():
+        #     if len(v)>4:
+        #         a.append(i)
 
         # author_weight = {}
         # for i,v in tqdm(ap_dict.items()):
@@ -378,29 +378,30 @@ if __name__ == '__main__':
         #         tmp.append(author_weight[k])
         #     ind = np.argsort(tmp)
         #     pa_dict[i] = np.array(v)[ind][::-1].tolist()
-        def cross(pair):
-            a = [pair,len(set(ap_dict[pair[0]]) & set(ap_dict[pair[1]]))]
-            return a
+        # def cross(pair):
+        #     a = [pair,len(set(ap_dict[pair[0]]) & set(ap_dict[pair[1]]))]
+        #     return a
 
         # connect = Parallel(n_jobs=4)(delayed(cross)(pair) for pair in tqdm(combinations(a,2)))
-        for pair in tqdm(combinations(a,2)):
-            connect = cross(pair)
+        # for pair in tqdm(combinations(a,2)):
+        #     connect = cross(pair)
 
             # import time
-        # # c = 0
-        # for i,v in tqdm(pa_dict.items()):
-        #     # if len(v)<2:
-        #     #     continue
-        #     # c +=1
-        #     tmp = []
-        #     for j in v[:10]:
-        #         tmp += ap_dict[j]
-        #     tmp = list(set(tmp))
-        #
-        #     for j in tmp:
-        #         a = pa_dict[j]
-        #         if len(set(v) & set(a))>1:
-        #             connect.append([i,j])
+        # c = 0
+        for i,v in tqdm(pa_dict.items()):
+            # if len(v)<2:
+            #     continue
+            # c +=1
+            tmp = []
+            for j in v:
+                tmp += ap_dict[j]
+
+            # tmp = list(set(tmp))
+
+            # for j in tmp:
+            #     a = pa_dict[j]
+            #     if len(set(v) & set(a))>1:
+            #         connect.append([i,j])
 
         connect = np.array(connect).T
         connect = connect[:, connect[0, :].argsort()]
