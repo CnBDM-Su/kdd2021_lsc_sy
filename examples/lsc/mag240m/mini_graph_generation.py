@@ -388,7 +388,7 @@ if __name__ == '__main__':
 
             # import time
         # c = 0
-        pp_li = np.zeros(shape=(dataset.num_papers,1))
+        pp_dict = {}
         for i,v in tqdm(pa_dict.items()):
             # if len(v)<2:
             #     continue
@@ -398,8 +398,8 @@ if __name__ == '__main__':
                 tmp += ap_dict[j]
 
             tmp = list(set(tmp))
-            pp_li[i] = tmp
-        np.save('paper_related_range.npy',pp_li)
+            pp_dict[i] = tmp
+        np.save('paper_related_range.npy',pp_dict)
 
             # for j in tmp:
             #     a = pa_dict[j]
