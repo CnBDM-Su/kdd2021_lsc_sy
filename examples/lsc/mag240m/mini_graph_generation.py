@@ -382,7 +382,7 @@ if __name__ == '__main__':
             a = [pair,len(set(ap_dict[pair[0]]) & set(ap_dict[pair[1]]))]
             return a
 
-        Parallel(n_jobs=4)(delayed(cross)(pair) for pair in combinations(a,2))
+        connect = Parallel(n_jobs=4)(delayed(cross)(pair) for pair in combinations(a,2))
 
 
         # import time
