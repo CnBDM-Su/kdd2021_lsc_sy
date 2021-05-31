@@ -195,39 +195,39 @@ print('reliable author num:',len(reliable_author.keys()))
 # print(len(relate))
 # print('sub_test precision:',accuracy_score(true,pred))
 
-# #______________valid___________________
-# new_label = deepcopy(paper_label)
-# c = 0
-# # true = new_label[te_idx]
-# coverage = {}
-# bias = 0
-# keys = np.sort(list(reliable_author.keys()))
-# for i in tqdm(range(len(reliable_author.keys()))):
-#     i = keys[i]
-#     l = reliable_author[i]
-#     for j in range(bias,ap_edge.shape[1]):
-#         if i==ap_edge[0,j]:
-#             c+=1
-#             if ap_edge[1, j] in valid_idx:
-#                 if ap_edge[1, j] not in coverage.keys():
-#                     coverage[ap_edge[1, j]] = [l]
-#                 else:
-#                     coverage[ap_edge[1, j]].append(l)
-#         elif i<ap_edge[0,j]:
-#             bias = j
-#             break
-#
-# relate = []
-# pred = []
-# for i in coverage.keys():
-#     relate.append(i)
-#     counts = np.bincount(coverage[i])
-#     pred.append(np.argmax(counts))
-#
-# true = new_label[relate]
-# print('total:',c)
-# print(len(relate))
-# print('valid precision:',accuracy_score(true,pred))
+#______________valid___________________
+new_label = deepcopy(paper_label)
+c = 0
+# true = new_label[te_idx]
+coverage = {}
+bias = 0
+keys = np.sort(list(reliable_author.keys()))
+for i in tqdm(range(len(reliable_author.keys()))):
+    i = keys[i]
+    l = reliable_author[i]
+    for j in range(bias,ap_edge.shape[1]):
+        if i==ap_edge[0,j]:
+            c+=1
+            if ap_edge[1, j] in valid_idx:
+                if ap_edge[1, j] not in coverage.keys():
+                    coverage[ap_edge[1, j]] = [l]
+                else:
+                    coverage[ap_edge[1, j]].append(l)
+        elif i<ap_edge[0,j]:
+            bias = j
+            break
+
+relate = []
+pred = []
+for i in coverage.keys():
+    relate.append(i)
+    counts = np.bincount(coverage[i])
+    pred.append(np.argmax(counts))
+
+true = new_label[relate]
+print('total:',c)
+print(len(relate))
+print('valid precision:',accuracy_score(true,pred))
 
 #______________predict________________
 # new_label = deepcopy(paper_label)
