@@ -394,7 +394,7 @@ if __name__ == '__main__':
             #     continue
             # c +=1
             tmp = []
-            for j in v:
+            for j in v[:3]:
                 tmp += ap_dict[j]
 
             # tmp = list(set(tmp))
@@ -404,9 +404,7 @@ if __name__ == '__main__':
         # for i,v in tqdm(pp_dict.items()):
             for j in tmp:
                 a = pa_dict[j]
-                q = [val for val in a if val in v]
-                if len(q)>1:
-                # if len(set(v) & set(a))>1:
+                if len(set(v) & set(a))>1:
                     connect.append([i,j])
 
         connect = np.array(connect).T
