@@ -388,26 +388,27 @@ if __name__ == '__main__':
 
             # import time
         # c = 0
-        pp_dict = {}
-        for i,v in tqdm(pa_dict.items()):
-            # if len(v)<2:
-            #     continue
-            # c +=1
-            tmp = []
+        # pp_dict = {}
+        # for i,v in tqdm(pa_dict.items()):
+        #     # if len(v)<2:
+        #     #     continue
+        #     # c +=1
+        #     tmp = []
+        #     for j in v:
+        #         tmp += ap_dict[j]
+        #
+        #     # tmp = list(set(tmp))
+        #     pp_dict[i] = tmp
+        # np.save('paper_related_range.npy',pp_dict)
+        pp_dict = np.load('paper_related_range.npy',allow_pickle=True).item()
+        for i,v in tqdm(pp_dict.items()):
             for j in v:
-                tmp += ap_dict[j]
+                a = pa_dict[j]
+                if len(set(v) & set(a))>1:
+                    connect.append([i,j])
 
-            # tmp = list(set(tmp))
-            pp_dict[i] = tmp
-        np.save('paper_related_range.npy',pp_dict)
-
-            # for j in tmp:
-            #     a = pa_dict[j]
-            #     if len(set(v) & set(a))>1:
-            #         connect.append([i,j])
-
-    #     connect = np.array(connect).T
-    #     connect = connect[:, connect[0, :].argsort()]
-    #     np.save(path, connect)
-    # else:
-    #     connect = np.load(path)
+        connect = np.array(connect).T
+        connect = connect[:, connect[0, :].argsort()]
+        np.save(path, connect)
+    else:
+        connect = np.load(path)
