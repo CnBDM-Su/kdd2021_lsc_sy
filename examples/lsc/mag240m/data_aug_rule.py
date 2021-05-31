@@ -39,7 +39,7 @@ for i in tqdm(range(train_idx.shape[0])):
 # a_l = softmax(a_l, axis=1)
 # print(a_l)
 print((a_l.sum(1)!=0).sum())
-
+a_l = a_l.astype(int)
 reliable_author = {}
 for i in range(dataset.num_authors):
     if len(a_l[i]) > 1:
