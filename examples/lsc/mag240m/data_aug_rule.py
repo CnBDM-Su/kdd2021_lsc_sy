@@ -39,30 +39,33 @@ for i in tqdm(range(train_idx.shape[0])):
 a_l = softmax(a_l, axis=1)
 # print(a_l)
 print((a_l.sum(1)!=0).sum())
-# reliable_author = {}
-# for i in a_l.keys():
-#     if len(a_l[i]) > 1:
-#         arr = np.array(a_l[i])
+
+reliable_author = {}
+for i in a_l.keys():
+    if len(a_l[i]) > 1:
+        arr = np.array(a_l[i])
 
         # if arr[arr == a_l[i][0]].shape[0] >= np.round(arr.shape[0]*(4/5)):
-        #     counts = np.bincount(arr)
-        #     mode = np.argmax(counts)
-        #     reliable_author[i] = mode
+        counts = np.bincount(arr)
+        mode = np.argmax(counts)
+        reliable_author[i] = mode
 
-# ap_edge = dataset.edge_index('author', 'writes', 'paper')
-# related_paper = []
-# bias = 0
-# keys = np.sort(list(reliable_author.keys()))
-# for i in tqdm(range(len(reliable_author.keys()))):
-#     i = keys[i]
-#     for j in range(bias,ap_edge.shape[1]):
-#         if i==ap_edge[0,j]:
-#             related_paper.append(ap_edge[1, j])
-#         elif i<ap_edge[0,j]:
-#             bias = j
-#             break
-# print('related paper num:',len(related_paper))
-# print('reliable author num:',len(reliable_author.keys()))
+ap_edge = dataset.edge_index('author', 'writes', 'paper')
+related_paper = []
+bias = 0
+keys = np.sort(list(reliable_author.keys()))
+for i in tqdm(range(len(reliable_author.keys()))):
+    i = keys[i]
+    for j in range(bias,ap_edge.shape[1]):
+        if i==ap_edge[0,j]:
+            related_paper.append(ap_edge[1, j])
+        elif i<ap_edge[0,j]:
+            bias = j
+            break
+print('related paper num:',len(related_paper))
+print('reliable author num:',len(reliable_author.keys()))
+
+
 # print('___________sub_test___________')
 # a_l_2 = {}
 # bias = 0
@@ -292,26 +295,7 @@ c =0
 # author_weight = {}
 # for i, v in tqdm(ap_dict.items()):
 #     author_weight[i] = len(v)
-res = np.zeros(shape=(idx.shape[0],dataset.num_classes))
-for i in tqdm(range(idx.shape[0])):
-    ind = idx[i]
-    tmp = []
-    tmp_w = []
-    for j in range(bias, ap_edge.shape[1]):
-        if ind == ap_edge[1,j]:
-            tmp.append(a_l[ap_edge[0,j]])
-            # tmp_w.append(author_weight[ap_edge[0,j]])
-        elif ind < ap_edge[1,j]:
-            bias = j
-            break
-    if len(tmp)!=0:
-        c+=1
-        # tmp_w = np.array(softmax(tmp_w)).reshape(-1,1)
-        # valid[i] = np.mean(np.array(tmp)*tmp_w,0)
-        res[i] = np.mean(np.array(tmp),0)
-print(c)
 
-np.save(f'{dataset.dir}/new_all_label.npy',res)
 
 
 
