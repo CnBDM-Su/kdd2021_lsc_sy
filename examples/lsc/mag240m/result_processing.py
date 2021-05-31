@@ -134,8 +134,15 @@ if __name__ == '__main__':
     from sklearn.ensemble import RandomForestClassifier
     y_correct = np.load(f'{dataset.dir}/new_all_label.npy')
     model_rf = RandomForestClassifier()
-    y_pred_ = deepcopy(y_pred)
-    rf_train_x = np.concatenate([y_pred_,y_correct],1)
+    y_pred_ = deepcopy(y_pred).numpy()
+    new_data = np.concatenate([y_pred_[idx],y_correct],1)
+    # rf_valid = new_data[train_idx.shape[0]:valid_idx.shape[0]+train_idx.shape[0]]
+    # rf_test = new_data[valid_idx.shape[0]+train_idx.shape[0]:]
+    rf_train_x = new_data[:train_idx.shape[0]]
+    rf_train_y = y_train.numpy()
+    model_rf.fit(rf_train_x,rf_train_y)
+    y_pred_ = torch.from_numpy(model_rf.predict_proba(new_data))
+
     # y_pred_ = y_pred.argmax(dim=-1)
     t = time.perf_counter()
 
@@ -157,13 +164,22 @@ if __name__ == '__main__':
     # print(c)
     train_acc = evaluator.eval({
         'y_true': y_train,
-        'y_pred': y_pred_.argmax(dim=-1)[train_idx]
+        'y_pred': y_pred_.argmax(dim=-1)[:train_idx.shape[0]]
     })['acc']
     valid_acc = evaluator.eval({
         'y_true': y_valid,
-        'y_pred': y_pred_.argmax(dim=-1)[valid_idx]
+        'y_pred': y_pred_.argmax(dim=-1)[train_idx.shape[0]:valid_idx.shape[0]+train_idx.shape[0]]
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
+    # train_acc = evaluator.eval({
+    #     'y_true': y_train,
+    #     'y_pred': y_pred_.argmax(dim=-1)[train_idx]
+    # })['acc']
+    # valid_acc = evaluator.eval({
+    #     'y_true': y_valid,
+    #     'y_pred': y_pred_.argmax(dim=-1)[valid_idx]
+    # })['acc']
+    # print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
 
     # print('correct num:',correct_index.shape[0])
     initial_pred = y_pred.argmax(dim=-1)
