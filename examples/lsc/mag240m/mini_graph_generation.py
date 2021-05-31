@@ -388,6 +388,7 @@ if __name__ == '__main__':
 
             # import time
         # c = 0
+        pp_li = np.zeros(shape=(dataset.num_papers,1))
         for i,v in tqdm(pa_dict.items()):
             # if len(v)<2:
             #     continue
@@ -396,15 +397,17 @@ if __name__ == '__main__':
             for j in v:
                 tmp += ap_dict[j]
 
-            # tmp = list(set(tmp))
+            tmp = list(set(tmp))
+            pp_li[i] = tmp
+        np.save('paper_related_range.npy',pp_li)
 
             # for j in tmp:
             #     a = pa_dict[j]
             #     if len(set(v) & set(a))>1:
             #         connect.append([i,j])
 
-        connect = np.array(connect).T
-        connect = connect[:, connect[0, :].argsort()]
-        np.save(path, connect)
-    else:
-        connect = np.load(path)
+    #     connect = np.array(connect).T
+    #     connect = connect[:, connect[0, :].argsort()]
+    #     np.save(path, connect)
+    # else:
+    #     connect = np.load(path)
