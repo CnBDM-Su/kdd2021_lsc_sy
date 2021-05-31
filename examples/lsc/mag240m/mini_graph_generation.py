@@ -353,69 +353,42 @@ if __name__ == '__main__':
 
     path = f'{dataset.dir}/mini_graph/author_connect_graph.npy'
     if not osp.exists(path):
+        print('generating mini author connect edge...')
         def zero():
             return []
         pa_dict = defaultdict(zero)
         ap_dict = defaultdict(zero)
-
+        connect = []
         for i in tqdm(range(ap_edge.shape[1])):
             pa_dict[ap_edge[1, i]].append(ap_edge[0, i])
             ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
-        print('generating mini author connect edge...')
-        # path_ = f'{dataset.dir}/mini_graph/pair_list.npy'
-        # if not osp.exists(path_):
-        # 
-        #     pa_keys = list(pa_dict.keys())
-        #     pa_values = list(pa_dict.values())
-        # 
-        #     print('setup done')
-        # 
-        #     def create_pair(i):
-        #         pair = []
-        #         tmp = []
-        #         for j in pa_dict[i]:
-        #             tmp += ap_dict[j]
-        #         # tmp = list(set(tmp)-set(finished))
-        #         tmp = list(set(tmp))
-        #         for j in tmp:
-        #             pair.append([i,j])
-        #         return pair
-        # 
-        #     # pair_ = Parallel(n_jobs=4)(delayed(create_pair)(i) for i in tqdm(pa_dict.keys()))
-        #     for i in tqdm(pa_dict.keys()):
-        #         pair_ = create_pair(i)
-        #     pair = []
-        #     for i in pair_:
-        #         for j in i:
-        #             pair.append(j)
-        #     np.save(path,np.array(pair))
-        # else:
-        #     pair = np.load(path)
-        pair = combinations(range(dataset.num_papers),2)
 
-        def line(pair):
-            if len(set(pa_dict[pair[0]]) & set(pa_dict[pair[1]]))>1:
-                return list(pair)
+        author_weight = {}
+        for i,v in tqdm(ap_dict.items()):
+            author_weight[i] = len(v)
 
-        # connect = Parallel(n_jobs=4)(delayed(line)(i) for i in tqdm(pair))
-        connect = []
-        for i in tqdm(pair):
-            connect.append(line(i))
-        # for i, v in tqdm(pa_dict.items()):
-        #     # for j in combinations(v, 2):
-        #     for j in v:
-        #         for k in v:
-        #             # if j!=k:
-        #             ap_dict[(j,k)].append(i)
-        #
-        #
-        # for i, v in tqdm(ap_dict.items()):
-        #     if len(v) > 1:
-        #         # for j in combinations(v, 2):
-        #         for j in v:
-        #             for k in v:
-        #                 # if j!=k:
-        #                 connect.append(list(j))
+        for i,v in tqdm(pa_dict.items()):
+            tmp = []
+            for k in v:
+                tmp.append(author_weight[k])
+            ind = np.argsort(tmp)
+            pa_dict[i] = np.array(v)[ind][::-1].tolist()
+
+        import time
+        # c = 0
+        for i,v in tqdm(pa_dict.items()):
+            if len(v)<2:
+                continue
+            # c +=1
+            tmp = []
+            for j in v[:10]:
+                tmp += ap_dict[j]
+            tmp = list(set(tmp))
+
+            for j in tmp:
+                a = pa_dict[j]
+                if len(set(v) & set(a))>1:
+                    connect.append([i,j])
 
         connect = np.array(connect).T
         connect = connect[:, connect[0, :].argsort()]
