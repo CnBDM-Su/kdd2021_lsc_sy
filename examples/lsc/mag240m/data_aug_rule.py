@@ -292,7 +292,6 @@ c =0
 # author_weight = {}
 # for i, v in tqdm(ap_dict.items()):
 #     author_weight[i] = len(v)
-idx = np.concatenate([train_idx,valid_idx,test_idx],0)
 res = np.zeros(shape=(idx.shape[0],dataset.num_classes))
 for i in tqdm(range(idx.shape[0])):
     ind = idx[i]
