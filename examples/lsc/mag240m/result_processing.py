@@ -163,16 +163,17 @@ if __name__ == '__main__':
     # for i in correct_index:
     #     y_pred_[i] = y_correct[i]
     y_pred_ = deepcopy(y_pred)
-    c = 0
-    a = 1
-    b = 0.2
-    for i in range(valid_idx.shape[0]):
-        ind = valid_idx[i]
-        if y_correct[i].sum()!=0:
-            c+=1
-        y_pred_[ind] = (a * y_pred[ind] + b * y_correct[i])/(a+b)
-
-    print(c)
+    from sklearn.ensemble import RandomForestClassifier
+    # c = 0
+    # a = 1
+    # b = 0.2
+    # for i in range(valid_idx.shape[0]):
+    #     ind = valid_idx[i]
+    #     if y_correct[i].sum()!=0:
+    #         c+=1
+    #     y_pred_[ind] = (a * y_pred[ind] + b * y_correct[i])/(a+b)
+    #
+    # print(c)
     train_acc = evaluator.eval({
         'y_true': y_train,
         'y_pred': y_pred_.argmax(dim=-1)[train_idx]

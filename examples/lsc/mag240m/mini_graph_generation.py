@@ -397,7 +397,7 @@ if __name__ == '__main__':
             for j in v:
                 tmp += ap_dict[j]
 
-            tmp = list(set(tmp))
+            # tmp = list(set(tmp))
             pp_dict[i] = tmp
         np.save('paper_related_range.npy',pp_dict)
 
