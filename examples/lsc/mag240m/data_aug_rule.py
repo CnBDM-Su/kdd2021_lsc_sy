@@ -200,8 +200,9 @@ print('reliable author num:',len(reliable_author.keys()))
 #______________valid___________________
 new_label = deepcopy(paper_label)
 c = 0
-# true = new_label[te_idx]
-coverage = {}
+def zero():
+    return []
+coverage = defaultdict(zero)
 bias = 0
 keys = np.sort(list(reliable_author.keys()))
 for i in tqdm(range(len(reliable_author.keys()))):
@@ -211,10 +212,7 @@ for i in tqdm(range(len(reliable_author.keys()))):
         if i==ap_edge[0,j]:
             c+=1
             if ap_edge[1, j] in valid_idx:
-                if ap_edge[1, j] not in coverage.keys():
-                    coverage[ap_edge[1, j]] = [l]
-                else:
-                    coverage[ap_edge[1, j]].append(l)
+                coverage[ap_edge[1, j]].append(l)
         elif i<ap_edge[0,j]:
             bias = j
             break
