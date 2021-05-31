@@ -106,6 +106,7 @@ if __name__ == '__main__':
 
     y_train = torch.from_numpy(paper_label[train_idx]).to(torch.long)
     y_valid = torch.from_numpy(paper_label[valid_idx]).to(torch.long)
+    y_test = torch.from_numpy(paper_label[test_idx]).to(torch.long)
     # edge_index = np.load(f'{dataset.dir}/weighted_paper_paper_edge.npy')
     # edge_index = torch.from_numpy(edge_index)
     # adj_t = adj_t.set_value(edge_index[2], layout='coo')
@@ -129,7 +130,7 @@ if __name__ == '__main__':
     print('Smoothing predictions...', end=' ', flush=True)
     y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    print('sum2',y_pred.sum())
+    print('sum2',y_pred.sum()+y_valid.shape[0]+y_test.shape[0])
 
     train_acc = evaluator.eval({
         'y_true': y_train,
