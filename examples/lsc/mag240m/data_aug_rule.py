@@ -223,7 +223,7 @@ pred = []
 for i in coverage.keys():
     relate.append(i)
     count = {}
-    for j in i:
+    for j in coverage[i]:
         if j[0] not in count.keys():
             count[j[0]] = j[1]
         else:
