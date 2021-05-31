@@ -382,10 +382,11 @@ if __name__ == '__main__':
             a = [pair,len(set(ap_dict[pair[0]]) & set(ap_dict[pair[1]]))]
             return a
 
-        connect = Parallel(n_jobs=4)(delayed(cross)(pair) for pair in combinations(a,2))
+        # connect = Parallel(n_jobs=4)(delayed(cross)(pair) for pair in tqdm(combinations(a,2)))
+        for pair in tqdm(combinations(a,2)):
+            connect = cross(pair)
 
-
-        # import time
+            # import time
         # # c = 0
         # for i,v in tqdm(pa_dict.items()):
         #     # if len(v)<2:
