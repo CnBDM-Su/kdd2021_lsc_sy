@@ -364,7 +364,7 @@ if __name__ == '__main__':
             ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
         c=0
         for i,v in ap_dict.items():
-            if len(v)5:
+            if len(v)>4:
                 c+=1
         print('author_num:',c)
         author_weight = {}
