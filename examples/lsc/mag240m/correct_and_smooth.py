@@ -211,7 +211,7 @@ if __name__ == '__main__':
     print(train_idx.max())
     print(test_idx.max())
     print(valid_idx.max())
-    print(y_pred.index)
+    print(y_pred.shape)
     print('sum2',y_pred.sum())
 
     train_acc = evaluator.eval({
