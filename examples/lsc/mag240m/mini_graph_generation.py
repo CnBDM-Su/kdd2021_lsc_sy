@@ -373,10 +373,11 @@ if __name__ == '__main__':
             i = train_idx[i]
             for j in range(bias, ap_edge.shape[1]):
                 if i == ap_edge[1, j]:
+                    print(label[i])
                     if ap_edge[0, j] not in a_l.keys():
-                        a_l[ap_edge[0, j]] = [label[ap_edge[1, j]]]
+                        a_l[ap_edge[0, j]] = [label[i]]
                     else:
-                        a_l[ap_edge[0, j]].append(label[ap_edge[1, j]])
+                        a_l[ap_edge[0, j]].append(label[i])
                 elif i < ap_edge[1, j]:
                     bias = j
                     break
