@@ -3,11 +3,11 @@
 import os.path as osp
 import time
 import argparse
-
+from copy import deepcopy
 import torch
 import numpy as np
 from torch_sparse import SparseTensor
-# from torch_geometric.nn import CorrectAndSmooth
+from torch_geometric.nn import CorrectAndSmooth
 from torch_geometric.nn.conv.gcn_conv import gcn_norm
 from ogb.lsc import MAG240MDataset, MAG240MEvaluator
 from root import ROOT
@@ -48,85 +48,6 @@ from mag240m_mini_graph import MAG240MMINIDataset
 #         makedirs(dir_path)
 #         filename = osp.join(dir_path, 'y_pred_mag240m')
 #         np.savez_compressed(filename, y_pred=y_pred, y_pred_valid=y_pred_valid)
-from torch_geometric.typing import Adj, OptTensor
-
-import torch
-from torch import Tensor
-import torch.nn.functional as F
-
-from torch_geometric.nn.models import LabelPropagation
-
-
-class CorrectAndSmooth(torch.nn.Module):
-
-    def __init__(self, num_correction_layers: int, correction_alpha: float,
-                 num_smoothing_layers: int, smoothing_alpha: float,
-                 autoscale: bool = True, scale: float = 1.0):
-        super(CorrectAndSmooth, self).__init__()
-        self.autoscale = autoscale
-        self.scale = scale
-
-        self.prop1 = LabelPropagation(num_correction_layers, correction_alpha)
-        self.prop2 = LabelPropagation(num_smoothing_layers, smoothing_alpha)
-
-    def correct(self, y_soft: Tensor, y_true: Tensor, mask: Tensor,
-                edge_index: Adj, edge_weight: OptTensor = None) -> Tensor:
-
-        assert abs((float(y_soft.sum()) / y_soft.size(0)) - 1.0) < 1e-2
-
-        numel = int(mask.sum()) if mask.dtype == torch.bool else mask.size(0)
-        assert y_true.size(0) == numel
-
-        if y_true.dtype == torch.long:
-            y_true = F.one_hot(y_true.view(-1), y_soft.size(-1))
-            y_true = y_true.to(y_soft.dtype)
-
-        error = torch.zeros_like(y_soft)
-        error[mask] = y_true - y_soft[mask]
-
-        if self.autoscale:
-            smoothed_error = self.prop1(error, edge_index,
-                                        edge_weight=edge_weight,
-                                        post_step=lambda x: x.clamp_(-1., 1.))
-            print(smoothed_error.shape)
-
-            sigma = error[mask].abs().sum() / numel
-            scale = sigma / smoothed_error.abs().sum(dim=1, keepdim=True)
-            scale[scale.isinf() | (scale > 1000)] = 1.0
-            return y_soft + scale * smoothed_error
-        else:
-
-            def fix_input(x):
-                x[mask] = error[mask]
-                return x
-
-            smoothed_error = self.prop1(error, edge_index,
-                                        edge_weight=edge_weight,
-                                        post_step=fix_input)
-            return y_soft + self.scale * smoothed_error
-
-    def smooth(self, y_soft: Tensor, y_true: Tensor, mask: Tensor,
-               edge_index: Adj, edge_weight: OptTensor = None) -> Tensor:
-
-        numel = int(mask.sum()) if mask.dtype == torch.bool else mask.size(0)
-        assert y_true.size(0) == numel
-
-        if y_true.dtype == torch.long:
-            y_true = F.one_hot(y_true.view(-1), y_soft.size(-1))
-            y_true = y_true.to(y_soft.dtype)
-
-        y_soft[mask] = y_true
-
-        return self.prop2(y_soft, edge_index, edge_weight=edge_weight)
-
-    def __repr__(self):
-        L1, alpha1 = self.prop1.num_layers, self.prop1.alpha
-        L2, alpha2 = self.prop2.num_layers, self.prop2.alpha
-        return (f'{self.__class__.__name__}(\n'
-                f'    correct: num_layers={L1}, alpha={alpha1}\n'
-                f'    smooth:  num_layers={L2}, alpha={alpha2}\n'
-                f'    autoscale={self.autoscale}, scale={self.scale}\n'
-                ')')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -189,28 +110,54 @@ if __name__ == '__main__':
     # edge_index = torch.from_numpy(edge_index)
     # adj_t = adj_t.set_value(edge_index[2], layout='coo')
 
-    model = CorrectAndSmooth(args.num_correction_layers, args.correction_alpha,
-                             args.num_smoothing_layers, args.smoothing_alpha,
-                             autoscale=True)
+    def train(smoothing_alpha, y_pred=y_pred):
 
-    t = time.perf_counter()
+        model = CorrectAndSmooth(args.num_correction_layers, args.correction_alpha,
+                                 args.num_smoothing_layers, smoothing_alpha,
+                                 autoscale=True)
 
-    print('Correcting predictions...', end=' ', flush=True)
-    assert abs((float(y_pred.sum()) / y_pred.size(0)) - 1.0) < 1e-2
+        t = time.perf_counter()
+        y_pred = deepcopy(y_pred)
 
-    numel = int(train_idx.sum()) if train_idx.dtype == torch.bool else train_idx.size(0)
-    assert y_train.size(0) == numel
+        print('Correcting predictions...', end=' ', flush=True)
+        assert abs((float(y_pred.sum()) / y_pred.size(0)) - 1.0) < 1e-2
 
-    y_pred = model.correct(y_pred, y_train, train_idx, adj_t)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    print('sum1', y_pred.sum())
-    t = time.perf_counter()
-    print('Smoothing predictions...', end=' ', flush=True)
-    y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
+        numel = int(train_idx.sum()) if train_idx.dtype == torch.bool else train_idx.size(0)
+        assert y_train.size(0) == numel
 
-    print('sum2',y_pred.sum())
+        y_pred = model.correct(y_pred, y_train, train_idx, adj_t)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
+        print('sum1', y_pred.sum())
+        t = time.perf_counter()
 
+        print('Smoothing predictions...', end=' ', flush=True)
+        y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
+
+        print('sum2',y_pred.sum())
+
+        train_acc = evaluator.eval({
+            'y_true': y_train,
+            'y_pred': y_pred[train_idx].argmax(dim=-1)
+        })['acc']
+        valid_acc = evaluator.eval({
+            'y_true': y_valid,
+            'y_pred': y_pred[valid_idx].argmax(dim=-1)
+        })['acc']
+        print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
+        return y_pred, train_acc
+    acc_lis = []
+    alpha_lis = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0]
+    for i in alpha_lis:
+        y_pred_tmp, train_acc = train(i)
+        acc_lis.append(train_acc)
+        if len(acc_lis)>1:
+            if acc_lis[-1] > acc_lis[-2]:
+                y_pred_best = deepcopy(y_pred_tmp)
+            else:
+                y_pred = y_pred_best
+                break
+    print('smooth alpha is',alpha_lis[i])
     train_acc = evaluator.eval({
         'y_true': y_train,
         'y_pred': y_pred[train_idx].argmax(dim=-1)
