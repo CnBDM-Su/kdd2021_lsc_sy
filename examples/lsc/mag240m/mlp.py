@@ -204,6 +204,8 @@ if __name__ == '__main__':
         model = MLP(dataset.num_paper_features, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
+        if args.parallel == True:
+            model = torch.nn.DataParallel(model, device_ids=gpus)
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
 
         y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[valid_idx]
