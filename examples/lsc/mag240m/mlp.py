@@ -196,7 +196,7 @@ if __name__ == '__main__':
                   f'Best: {best_valid_acc:.4f}')
 
     y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[valid_idx]
-    y_mlp = model(x_valid).argmax(dim=-1).numpy()
+    y_mlp = model(x_valid).argmax(dim=-1).cpu().numpy()
     a = set(np.where(y_rule != y_valid.numpy()))
     b = set(np.where(y_mlp == y_valid.numpy()))
     print('rule_wrong:',len(a))
