@@ -122,7 +122,7 @@ if __name__ == '__main__':
     print(y_pred.sum())
     print(y_pred.size(0))
     print('Correcting predictions...', end=' ', flush=True)
-    # assert abs((float(y_pred.sum()) / y_pred.size(0)) - 1.0) < 1e-2
+    assert abs((float(y_pred.sum()) / y_pred.size(0)) - 1.0) < 1e-2
 
     numel = int(train_idx.sum()) if train_idx.dtype == torch.bool else train_idx.size(0)
     assert y_train.size(0) == numel
