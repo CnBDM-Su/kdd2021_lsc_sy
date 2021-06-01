@@ -405,9 +405,9 @@ if __name__ == '__main__':
                 lis += pa_dict[j]
             for j in lis:
                 con = set(ap_dict[i]) & set(ap_dict[j])
-            if len(con)>1:
-                for j in combinations(con,2):
-                    connect.append(list(j))
+                if len(con)>1:
+                    for k in combinations(con,2):
+                        connect.append(list(k))
 
 
         # for i in tqdm(range(pp_edge.shape[1])):
