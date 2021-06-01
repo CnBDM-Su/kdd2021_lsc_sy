@@ -137,6 +137,7 @@ if __name__ == '__main__':
     from sklearn.preprocessing import MinMaxScaler
     # from sklearn.tree import DecisionTreeClassifier
     y_correct = np.load(f'{dataset.dir}/data_rule_result.npy')
+    print(y_correct)
     # model_rf = DecisionTreeClassifier()
     # y_pred_ = deepcopy(y_pred).numpy()
     # new_data = np.concatenate([y_pred_[idx],y_correct],1)
@@ -156,7 +157,6 @@ if __name__ == '__main__':
     # correct_index = np.array(list(set(correct_index) & set(modify_index)))
     # for i in correct_index:
     #     y_pred_[i] = y_correct[i]
-
 
     c = 0
     b_lis = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
