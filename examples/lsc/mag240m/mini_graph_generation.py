@@ -408,6 +408,7 @@ if __name__ == '__main__':
         #         if len(con)>1:
         #             for k in combinations(con,2):
         #                 connect.append(list(k))
+        print(len(author_lis))
         for i in tqdm(combinations(author_lis,2)):
             con = set(ap_dict[i[0]]) & set(ap_dict[i[1]])
             if len(con)>1:
