@@ -390,12 +390,12 @@ if __name__ == '__main__':
                     break
         reliable_author = {}
         for i in tqdm(a_l.keys()):
-            if len(a_l[i]) > 3:
+            if len(a_l[i]) > 5:
                 arr = np.array(a_l[i]).astype(int)
 
                 counts = np.bincount(arr)
                 mode = np.argmax(counts)
-                if arr[arr == mode].shape[0] >= np.round(arr.shape[0] * (4 / 5)):
+                if arr[arr == mode].shape[0] >= np.round(arr.shape[0] * (7 / 8)):
                     reliable_author[i] = [mode, arr[arr == mode].shape[0]]
 
         author_lis = list(reliable_author.keys())

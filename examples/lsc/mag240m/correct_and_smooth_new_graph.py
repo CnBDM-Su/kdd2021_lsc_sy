@@ -104,7 +104,6 @@ if __name__ == '__main__':
         adj_t = gcn_norm(adj_t, add_self_loops=True)
         torch.save(adj_t, path)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    print(np.load(f'{dataset.dir}/author_connect_graph.npy').shape)
 
     y_train = torch.from_numpy(paper_label[train_idx]).to(torch.long)
     y_valid = torch.from_numpy(paper_label[valid_idx]).to(torch.long)
