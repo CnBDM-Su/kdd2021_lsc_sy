@@ -206,7 +206,7 @@ if __name__ == '__main__':
     print('sum1', y_pred.sum())
     t = time.perf_counter()
     print('Smoothing predictions...', end=' ', flush=True)
-    # y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
+    y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     print('sum2',y_pred.sum())
@@ -221,7 +221,7 @@ if __name__ == '__main__':
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
 
-    np.save('results/rgat_cs/rgat_cs_pred.npy',y_pred)
+    # np.save('results/rgat_cs/rgat_cs_pred.npy',y_pred)
 
     # res = {'y_pred': y_pred[test_idx].argmax(dim=-1)}
     # evaluator.save_test_submission(res, save_path)
