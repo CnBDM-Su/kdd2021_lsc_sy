@@ -131,7 +131,7 @@ if __name__ == '__main__':
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     print('result processing...', end=' ', flush=True)
-    print(y_pred.shape)
+    # print(y_pred.shape)
     from sklearn.ensemble import RandomForestClassifier
     # from sklearn.neural_network import MLPClassifier
     from sklearn.preprocessing import MinMaxScaler
@@ -167,8 +167,8 @@ if __name__ == '__main__':
         for i in range(valid_idx.shape[0]):
             ind = valid_idx[i]
             if y_correct[i].sum()!=0:
-                # print(y_pred[ind].shape)
-                # print(y_correct[ind].shape)
+                print(y_pred[ind].shape)
+                print(y_correct[ind].shape)
                 y_pred_[ind] = (a * y_pred[ind] + b * y_correct[ind])/(a+b)
 
         train_acc = evaluator.eval({
