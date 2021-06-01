@@ -234,6 +234,7 @@ for i in coverage.keys():
     # pred.append(np.argmax(counts))
 
 # true = new_label[relate]
+np.save(f'{dataset.dir}/data_rule_result_relate.npy',np.array(relate))
 np.save(f'{dataset.dir}/data_rule_result.npy',new_label)
 print('total:',c)
 print(len(relate))
