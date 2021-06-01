@@ -377,12 +377,10 @@ if __name__ == '__main__':
         else:
             ap_edge = np.load(path_)
         a_l = {}
-        for i in tqdm(range(train_idx.shape[0])):
-            i = train_idx[i]
+        for i in tqdm(range(split_dict['train'].shape[0])):
+            i = split_dict['train'][i]
             for j in range(bias, ap_edge.shape[1]):
                 if i == ap_edge[1, j]:
-                    print(label[i])
-                    print(i)
                     if ap_edge[0, j] not in a_l.keys():
                         a_l[ap_edge[0, j]] = [label[i]]
                     else:
@@ -394,7 +392,6 @@ if __name__ == '__main__':
         for i in tqdm(a_l.keys()):
             if len(a_l[i]) > 1:
                 arr = np.array(a_l[i]).astype(int)
-                print(arr)
 
                 counts = np.bincount(arr)
                 mode = np.argmax(counts)
