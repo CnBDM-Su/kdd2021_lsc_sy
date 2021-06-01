@@ -157,7 +157,7 @@ if __name__ == '__main__':
             else:
                 y_pred = y_pred_best
                 break
-    print('smooth alpha is',alpha_lis[i])
+    print('smooth alpha is',i)
     train_acc = evaluator.eval({
         'y_true': y_train,
         'y_pred': y_pred[train_idx].argmax(dim=-1)
