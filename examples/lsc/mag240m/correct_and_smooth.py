@@ -221,7 +221,7 @@ if __name__ == '__main__':
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
 
-    # np.save('results/rgat_cs/rgat_cs_pred.npy',y_pred)
+    np.save('results/rgat_cs/rgat_cs_pred.npy',y_pred)
 
     # res = {'y_pred': y_pred[test_idx].argmax(dim=-1)}
     # evaluator.save_test_submission(res, save_path)
