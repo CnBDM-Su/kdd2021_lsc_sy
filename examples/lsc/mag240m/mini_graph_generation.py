@@ -366,37 +366,41 @@ if __name__ == '__main__':
             ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
 
         connect = []
-        # bias = 0
-        # ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
-        # a_l = {}
-        # for i in tqdm(range(train_idx.shape[0])):
-        #     i = train_idx[i]
-        #     for j in range(bias, ap_edge.shape[1]):
-        #         if i == ap_edge[1, j]:
-        #             if ap_edge[0, j] not in a_l.keys():
-        #                 a_l[ap_edge[0, j]] = [label[ap_edge[1, j]]]
-        #             else:
-        #                 a_l[ap_edge[0, j]].append(label[ap_edge[1, j]])
-        #         elif i < ap_edge[1, j]:
-        #             bias = j
-        #             break
-        # reliable_author = {}
-        # for i in tqdm(a_l.keys()):
-        #     if len(a_l[i]) > 1:
-        #         arr = np.array(a_l[i]).astype(int)
-        #
-        #         counts = np.bincount(arr)
-        #         mode = np.argmax(counts)
-        #         if arr[arr == mode].shape[0] >= np.round(arr.shape[0] * (4 / 5)):
-        #             reliable_author[i] = [mode, arr[arr == mode].shape[0]]
-        #
-        # author_lis = list(reliable_author.keys())
-        # for i in tqdm(combinations(author_lis,2)):
+        bias = 0
+        ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
+        a_l = {}
+        for i in tqdm(range(train_idx.shape[0])):
+            i = train_idx[i]
+            for j in range(bias, ap_edge.shape[1]):
+                if i == ap_edge[1, j]:
+                    if ap_edge[0, j] not in a_l.keys():
+                        a_l[ap_edge[0, j]] = [label[ap_edge[1, j]]]
+                    else:
+                        a_l[ap_edge[0, j]].append(label[ap_edge[1, j]])
+                elif i < ap_edge[1, j]:
+                    bias = j
+                    break
+        reliable_author = {}
+        for i in tqdm(a_l.keys()):
+            if len(a_l[i]) > 1:
+                arr = np.array(a_l[i]).astype(int)
+
+                counts = np.bincount(arr)
+                mode = np.argmax(counts)
+                if arr[arr == mode].shape[0] >= np.round(arr.shape[0] * (4 / 5)):
+                    reliable_author[i] = [mode, arr[arr == mode].shape[0]]
+
+        author_lis = list(reliable_author.keys())
+        for i in tqdm(combinations(author_lis,2)):
+            con = set(ap_dict[i[0]]) & set(ap_dict[i[1]])
+            if len(con)>1:
+                for j in combinations(con,2):
+                    connect.append(list(j))
 
 
-        for i in tqdm(range(pp_edge.shape[1])):
-            if len(set(pa_dict[pp_edge[0,i]]) & set(pa_dict[pp_edge[1,i]]))>1:
-                connect.append([pp_edge[0,i],pp_edge[1,i]])
+        # for i in tqdm(range(pp_edge.shape[1])):
+        #     if len(set(pa_dict[pp_edge[0,i]]) & set(pa_dict[pp_edge[1,i]]))>1:
+        #         connect.append([pp_edge[0,i],pp_edge[1,i]])
 
         # author_weight = {}
         # for i,v in tqdm(ap_dict.items()):
