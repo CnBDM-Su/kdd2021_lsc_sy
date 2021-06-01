@@ -390,7 +390,7 @@ if __name__ == '__main__':
                     break
         reliable_author = {}
         for i in tqdm(a_l.keys()):
-            if len(a_l[i]) > 10:
+            if len(a_l[i]) > 15:
                 arr = np.array(a_l[i]).astype(int)
 
                 counts = np.bincount(arr)
