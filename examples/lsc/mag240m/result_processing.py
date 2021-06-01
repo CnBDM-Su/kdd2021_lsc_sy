@@ -78,7 +78,8 @@ if __name__ == '__main__':
 
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
-    y_pred = torch.from_numpy(np.load(save_path+'/rgat_pred.npz')['y_pred'])
+    # y_pred = torch.from_numpy(np.load(save_path+'/rgat_pred.npz')['y_pred'])
+    y_pred = torch.from_numpy(np.load(save_path + '/rgat_cs_pred.npy'))
     # y_pred = torch.from_numpy(np.load(save_path+'/pred.npy'))
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
@@ -134,19 +135,19 @@ if __name__ == '__main__':
     from sklearn.ensemble import RandomForestClassifier
     # from sklearn.neural_network import MLPClassifier
     from sklearn.preprocessing import MinMaxScaler
-    from sklearn.tree import DecisionTreeClassifier
-    y_correct = np.load(f'{dataset.dir}/new_all_label.npy')
-    model_rf = DecisionTreeClassifier()
-    y_pred_ = deepcopy(y_pred).numpy()
-    new_data = np.concatenate([y_pred_[idx],y_correct],1)
+    # from sklearn.tree import DecisionTreeClassifier
+    y_correct = np.load(f'{dataset.dir}/data_rule_result.npy')
+    # model_rf = DecisionTreeClassifier()
+    # y_pred_ = deepcopy(y_pred).numpy()
+    # new_data = np.concatenate([y_pred_[idx],y_correct],1)
     # rf_valid = new_data[train_idx.shape[0]:valid_idx.shape[0]+train_idx.shape[0]]
     # rf_test = new_data[valid_idx.shape[0]+train_idx.shape[0]:]
     # mm = MinMaxScaler()
     # new_data = mm.fit_transform(new_data)
-    rf_train_x = new_data[:train_idx.shape[0]]
-    rf_train_y = y_train.numpy()
-    model_rf.fit(rf_train_x,rf_train_y)
-    y_pred_ = torch.from_numpy(model_rf.predict_proba(new_data))
+    # rf_train_x = new_data[:train_idx.shape[0]]
+    # rf_train_y = y_train.numpy()
+    # model_rf.fit(rf_train_x,rf_train_y)
+    # y_pred_ = torch.from_numpy(model_rf.predict_proba(new_data))
 
     # y_pred_ = y_pred.argmax(dim=-1)
     t = time.perf_counter()
@@ -157,64 +158,80 @@ if __name__ == '__main__':
     #     y_pred_[i] = y_correct[i]
 
 
-    # c = 0
-    # a = 1
-    # b = 0.2
-    # for i in range(valid_idx.shape[0]):
-    #     ind = valid_idx[i]
-    #     if y_correct[i].sum()!=0:
-    #         c+=1
-    #     y_pred_[ind] = (a * y_pred[ind] + b * y_correct[i])/(a+b)
-    #
-    # print(c)
+    c = 0
+    b_lis = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+    acc_lis = []
+    def best_ratio(b, y_pred=y_pred, y_correct=y_correct):
+        a = 1
+        y_pred_ = y_pred.argmax(dim=-1)
+        for i in range(valid_idx.shape[0]):
+            ind = valid_idx[i]
+            if y_correct[i].sum()!=0:
+                c+=1
+            y_pred_[ind] = (a * y_pred[ind] + b * y_correct[i])/(a+b)
+
+        print(c)
+        train_acc = evaluator.eval({
+            'y_true': y_train,
+            'y_pred': y_pred_.argmax(dim=-1)[:train_idx.shape[0]]
+        })['acc']
+        valid_acc = evaluator.eval({
+            'y_true': y_valid,
+            'y_pred': y_pred_.argmax(dim=-1)[train_idx.shape[0]:valid_idx.shape[0]+train_idx.shape[0]]
+        })['acc']
+        print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
+
+        return y_pred_, train_acc
+
+    for i in b_lis:
+        y_pred_tmp, train_acc = best_ratio(i)
+        acc_lis.append(train_acc)
+        if len(acc_lis)>1:
+            if acc_lis[-1] > acc_lis[-2]:
+                y_pred_best = y_pred_tmp
+            else:
+                y_pred = y_pred_best
+                break
+
     train_acc = evaluator.eval({
         'y_true': y_train,
-        'y_pred': y_pred_.argmax(dim=-1)[:train_idx.shape[0]]
+        'y_pred': y_pred.argmax(dim=-1)[train_idx]
     })['acc']
     valid_acc = evaluator.eval({
         'y_true': y_valid,
-        'y_pred': y_pred_.argmax(dim=-1)[train_idx.shape[0]:valid_idx.shape[0]+train_idx.shape[0]]
+        'y_pred': y_pred.argmax(dim=-1)[valid_idx]
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
-    # train_acc = evaluator.eval({
-    #     'y_true': y_train,
-    #     'y_pred': y_pred_.argmax(dim=-1)[train_idx]
-    # })['acc']
-    # valid_acc = evaluator.eval({
-    #     'y_true': y_valid,
-    #     'y_pred': y_pred_.argmax(dim=-1)[valid_idx]
-    # })['acc']
-    # print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
 
     # print('correct num:',correct_index.shape[0])
-    initial_pred = y_pred.argmax(dim=-1)
-    final_pred = y_pred_.argmax(dim=-1)
-    y_true = torch.from_numpy(paper_label).to(torch.long)
-    TT = 0
-    TF = 0
-    FT = 0
-    FF = 0
-    TF_initial = []
-    TF_final = []
-    FT_initial = []
-    FT_final = []
-    for i in valid_idx:
-        if (y_true[i] == initial_pred[i]) and (y_true[i] == final_pred[i]):
-            TT += 1
-        elif (y_true[i] == initial_pred[i]) and (y_true[i] != final_pred[i]):
-            TF += 1
-            # TF_initial.append(initial_pred[i])
-            # TF_final.append(final_pred[i])
-        elif (y_true[i] != initial_pred[i]) and (y_true[i] == final_pred[i]):
-            FT += 1
-            # FT_initial.append(initial_pred[i])
-            # FT_final.append(final_pred[i])
-        elif (y_true[i] != initial_pred[i]) and (y_true[i] != final_pred[i]):
-            FF += 1
-    print('TT:', TT)
-    print('TF:', TF)
-    print('FT:', FT)
-    print('FF:', FF)
+    # initial_pred = y_pred.argmax(dim=-1)
+    # final_pred = y_pred_.argmax(dim=-1)
+    # y_true = torch.from_numpy(paper_label).to(torch.long)
+    # TT = 0
+    # TF = 0
+    # FT = 0
+    # FF = 0
+    # TF_initial = []
+    # TF_final = []
+    # FT_initial = []
+    # FT_final = []
+    # for i in valid_idx:
+    #     if (y_true[i] == initial_pred[i]) and (y_true[i] == final_pred[i]):
+    #         TT += 1
+    #     elif (y_true[i] == initial_pred[i]) and (y_true[i] != final_pred[i]):
+    #         TF += 1
+    #         # TF_initial.append(initial_pred[i])
+    #         # TF_final.append(final_pred[i])
+    #     elif (y_true[i] != initial_pred[i]) and (y_true[i] == final_pred[i]):
+    #         FT += 1
+    #         # FT_initial.append(initial_pred[i])
+    #         # FT_final.append(final_pred[i])
+    #     elif (y_true[i] != initial_pred[i]) and (y_true[i] != final_pred[i]):
+    #         FF += 1
+    # print('TT:', TT)
+    # print('TF:', TF)
+    # print('FT:', FT)
+    # print('FF:', FF)
     # np.savez_compressed('confusion.npz', TF_initial=np.array(TF_initial), TF_final=np.array(TF_final), FT_initial=np.array(FT_initial), FT_final=np.array(FT_final))
 
     # res = {'y_pred': y_pred_[test_idx], 'y_pred_valid' : y_pred_[valid_idx]}
