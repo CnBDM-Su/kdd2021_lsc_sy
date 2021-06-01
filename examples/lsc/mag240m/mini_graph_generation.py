@@ -87,16 +87,16 @@ if __name__ == '__main__':
     else:
         meaningful_idx = np.load(path)
 
-    path = f'{dataset.dir}/sorted_author_paper_edge.npy'
-    if not osp.exists(path):
-        print('Generating sorted author paper edges...')
-        t = time.perf_counter()
-        ap_edge = dataset.edge_index('author', 'writes', 'paper')
-        ap_edge = ap_edge[:, ap_edge[1, :].argsort()]
-        np.save(path, ap_edge)
-        print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    else:
-        ap_edge = np.load(path)
+    # path = f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy'
+    # if not osp.exists(path):
+    #     print('Generating sorted author paper edges...')
+    #     t = time.perf_counter()
+    #     ap_edge = dataset.edge_index('author', 'writes', 'paper')
+    #     ap_edge = ap_edge[:, ap_edge[1, :].argsort()]
+    #     np.save(path, ap_edge)
+    #     print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    # else:
+    #     ap_edge = np.load(path)
 
     meaningful_idx = np.sort(meaningful_idx)
     ai_edge = dataset.edge_index('author', 'affiliated_with', 'institution')
@@ -367,7 +367,15 @@ if __name__ == '__main__':
 
         connect = []
         bias = 0
-        ap_edge = np.load(f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy')
+        path = f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy'
+        if not osp.exists(path):
+            print('Generating sorted author paper edges...')
+            t = time.perf_counter()
+            ap_edge = ap_edge[:, ap_edge[1, :].argsort()]
+            np.save(path, ap_edge)
+            print(f'Done! [{time.perf_counter() - t:.2f}s]')
+        else:
+            ap_edge = np.load(path)
         a_l = {}
         for i in tqdm(range(train_idx.shape[0])):
             i = train_idx[i]
