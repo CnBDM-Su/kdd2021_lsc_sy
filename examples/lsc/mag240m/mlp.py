@@ -178,7 +178,6 @@ if __name__ == '__main__':
     num_params = sum([p.numel() for p in model.parameters()])
     print(f'#Params: {num_params}')
 
-    y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')
 
     best_valid_acc = 0
     for epoch in range(1, args.epochs + 1):
@@ -189,9 +188,18 @@ if __name__ == '__main__':
             best_valid_acc = valid_acc
             with torch.no_grad():
                 model.eval()
-                res = {'y_pred': model(x_test).argmax(dim=-1),'y_pred_valid': model(x_valid).argmax(dim=-1)}
-                evaluator.save_test_submission(res, 'results/mlp')
+                # res = {'y_pred': model(x_test).argmax(dim=-1),'y_pred_valid': model(x_valid).argmax(dim=-1)}
+                # evaluator.save_test_submission(res, 'results/mlp')
         if epoch % 1 == 0:
             print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
                   f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
                   f'Best: {best_valid_acc:.4f}')
+
+    y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[valid_idx]
+    y_mlp = model(x_valid).argmax(dim=-1).numpy()
+    a = set(np.where(y_rule != y_valid.numpy()))
+    b = set(np.where(y_mlp == y_valid.numpy()))
+    print('rule_wrong:',len(a))
+    print('mlp_right:', len(b))
+    res = a & b
+    print('cross:',len(res))
