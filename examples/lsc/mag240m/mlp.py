@@ -121,6 +121,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=0.01)
     parser.add_argument('--batch_size', type=int, default=380000)
     parser.add_argument('--epochs', type=int, default=1000)
+    parser.add_argument('--evaluate', type=bool, default=False)
     args = parser.parse_args()
     print(args)
 
@@ -168,38 +169,48 @@ if __name__ == '__main__':
     y_valid = torch.from_numpy(label[valid_idx])
     y_valid = y_valid.to(device, torch.long)
 
-    model = MLP(dataset.num_paper_features, args.hidden_channels,
-                dataset.num_classes, args.num_layers, args.dropout,
-                not args.no_batch_norm, args.relu_last).to(device)
+    if args.evaluate:
 
-    if args.parallel == True:
-        model = torch.nn.DataParallel(model, device_ids=gpus)
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-    num_params = sum([p.numel() for p in model.parameters()])
-    print(f'#Params: {num_params}')
+        model = MLP(dataset.num_paper_features, args.hidden_channels,
+                    dataset.num_classes, args.num_layers, args.dropout,
+                    not args.no_batch_norm, args.relu_last).to(device)
+
+        if args.parallel == True:
+            model = torch.nn.DataParallel(model, device_ids=gpus)
+        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+        num_params = sum([p.numel() for p in model.parameters()])
+        print(f'#Params: {num_params}')
 
 
-    best_valid_acc = 0
-    for epoch in range(1, args.epochs + 1):
-        loss = train(model, x_train, y_train, args.batch_size, optimizer)
-        train_acc = test(model, x_train, y_train, evaluator)
-        valid_acc = test(model, x_valid, y_valid, evaluator)
-        if valid_acc > best_valid_acc:
-            best_valid_acc = valid_acc
-            with torch.no_grad():
-                model.eval()
-                # res = {'y_pred': model(x_test).argmax(dim=-1),'y_pred_valid': model(x_valid).argmax(dim=-1)}
-                # evaluator.save_test_submission(res, 'results/mlp')
-        if epoch % 1 == 0:
-            print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
-                  f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
-                  f'Best: {best_valid_acc:.4f}')
+        best_valid_acc = 0
+        for epoch in range(1, args.epochs + 1):
+            loss = train(model, x_train, y_train, args.batch_size, optimizer)
+            train_acc = test(model, x_train, y_train, evaluator)
+            valid_acc = test(model, x_valid, y_valid, evaluator)
+            if valid_acc > best_valid_acc:
+                best_valid_acc = valid_acc
+                with torch.no_grad():
+                    model.eval()
+                    # res = {'y_pred': model(x_test).argmax(dim=-1),'y_pred_valid': model(x_valid).argmax(dim=-1)}
+                    # evaluator.save_test_submission(res, 'results/mlp')
+            if epoch % 1 == 0:
+                print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
+                      f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
+                      f'Best: {best_valid_acc:.4f}')
 
-    y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[valid_idx]
-    y_mlp = model(x_valid).argmax(dim=-1).cpu().numpy()
-    a = set(np.where(y_rule != y_valid.cpu().numpy())[0])
-    b = set(np.where(y_mlp == y_valid.cpu().numpy())[0])
-    print('rule_wrong:',len(a))
-    print('mlp_right:', len(b))
-    res = a & b
-    print('cross:',len(res))
+        # 保存
+        torch.save(model.state_dict(), 'results/mlp/model.pkl')
+    else:
+        model = MLP(dataset.num_paper_features, args.hidden_channels,
+                    dataset.num_classes, args.num_layers, args.dropout,
+                    not args.no_batch_norm, args.relu_last).to(device)
+        model.load_state_dict(torch.load('results/mlp/model.pkl'))
+
+        y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[valid_idx]
+        y_mlp = model(x_valid).argmax(dim=-1).cpu().numpy()
+        a = set(np.where(y_rule != y_valid.cpu().numpy())[0])
+        b = set(np.where(y_mlp == y_valid.cpu().numpy())[0])
+        print('rule_wrong:',len(a))
+        print('mlp_right:', len(b))
+        res = a & b
+        print('cross:',len(res))
