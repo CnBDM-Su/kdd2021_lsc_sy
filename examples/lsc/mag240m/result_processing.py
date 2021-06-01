@@ -167,6 +167,8 @@ if __name__ == '__main__':
         for i in range(valid_idx.shape[0]):
             ind = valid_idx[i]
             if y_correct[i].sum()!=0:
+                print(y_pred[ind].shape)
+                print(y_correct[i].shape)
                 y_pred_[ind] = (a * y_pred[ind] + b * y_correct[i])/(a+b)
 
         train_acc = evaluator.eval({
