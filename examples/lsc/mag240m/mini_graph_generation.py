@@ -382,6 +382,7 @@ if __name__ == '__main__':
             for j in range(bias, ap_edge.shape[1]):
                 if i == ap_edge[1, j]:
                     print(label[i])
+                    print(i)
                     if ap_edge[0, j] not in a_l.keys():
                         a_l[ap_edge[0, j]] = [label[i]]
                     else:
