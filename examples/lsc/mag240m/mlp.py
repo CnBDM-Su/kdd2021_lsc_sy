@@ -168,7 +168,7 @@ if __name__ == '__main__':
     # y_valid = torch.from_numpy(dataset.paper_label[valid_idx])
     y_valid = torch.from_numpy(label[valid_idx])
     y_valid = y_valid.to(device, torch.long)
-
+    print(args.evaluate)
     if not args.evaluate:
 
         model = MLP(dataset.num_paper_features, args.hidden_channels,
