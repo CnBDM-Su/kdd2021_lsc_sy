@@ -384,6 +384,7 @@ if __name__ == '__main__':
         for i in tqdm(a_l.keys()):
             if len(a_l[i]) > 1:
                 arr = np.array(a_l[i]).astype(int)
+                print(arr)
 
                 counts = np.bincount(arr)
                 mode = np.argmax(counts)
