@@ -104,8 +104,6 @@ if __name__ == '__main__':
         adj_t = gcn_norm(adj_t, add_self_loops=True)
         torch.save(adj_t, path)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    print(y_pred)
-    print(y_pred.shape)
     print(np.load(f'{dataset.dir}/author_connect_graph.npy').shape)
 
     y_train = torch.from_numpy(paper_label[train_idx]).to(torch.long)
@@ -132,7 +130,7 @@ if __name__ == '__main__':
 
     t = time.perf_counter()
     print('Smoothing predictions...', end=' ', flush=True)
-    y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
+    # y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     train_acc = evaluator.eval({
