@@ -127,14 +127,11 @@ if __name__ == '__main__':
 
         y_pred = model.correct(y_pred, y_train, train_idx, adj_t)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
-        print('sum1', y_pred.sum())
         t = time.perf_counter()
 
         print('Smoothing predictions...', end=' ', flush=True)
         y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
-        print('sum2',y_pred.sum())
 
         train_acc = evaluator.eval({
             'y_true': y_train,
