@@ -390,12 +390,12 @@ if __name__ == '__main__':
                     break
         reliable_author = {}
         for i in tqdm(a_l.keys()):
-            if len(a_l[i]) > 5:
+            if len(a_l[i]) > 10:
                 arr = np.array(a_l[i]).astype(int)
 
                 counts = np.bincount(arr)
                 mode = np.argmax(counts)
-                if arr[arr == mode].shape[0] >= np.round(arr.shape[0] * (7 / 8)):
+                if arr[arr == mode].shape[0] >= np.round(arr.shape[0] * (9 / 10)):
                     reliable_author[i] = [mode, arr[arr == mode].shape[0]]
 
         author_lis = list(reliable_author.keys())
@@ -415,6 +415,11 @@ if __name__ == '__main__':
             if len(con)>1:
                 for k in combinations(con,2):
                     connect.append(list(k))
+        a = set()
+        for i in connect:
+            a.add(tuple(i))
+        connect = np.array(list(a)).T
+        print(connect.shape)
 
 
         # for i in tqdm(range(pp_edge.shape[1])):
@@ -460,7 +465,7 @@ if __name__ == '__main__':
         #         if len(set(v) & set(a))>1:
         #             connect.append([i,j])
 
-        connect = np.array(connect).T
+        # connect = np.array(connect).T
         connect = connect[:, connect[0, :].argsort()]
         np.save(path, connect)
     else:
