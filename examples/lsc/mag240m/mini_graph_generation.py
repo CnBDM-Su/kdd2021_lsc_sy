@@ -390,7 +390,7 @@ if __name__ == '__main__':
                     break
         reliable_author = {}
         for i in tqdm(a_l.keys()):
-            if len(a_l[i]) > 1:
+            if len(a_l[i]) > 3:
                 arr = np.array(a_l[i]).astype(int)
 
                 counts = np.bincount(arr)
@@ -399,15 +399,20 @@ if __name__ == '__main__':
                     reliable_author[i] = [mode, arr[arr == mode].shape[0]]
 
         author_lis = list(reliable_author.keys())
-        for i in tqdm(author_lis):
-            lis = []
-            for j in ap_dict[i]:
-                lis += pa_dict[j]
-            for j in lis:
-                con = set(ap_dict[i]) & set(ap_dict[j])
-                if len(con)>1:
-                    for k in combinations(con,2):
-                        connect.append(list(k))
+        # for i in tqdm(author_lis):
+        #     lis = []
+        #     for j in ap_dict[i]:
+        #         lis += pa_dict[j]
+        #     for j in lis:
+        #         con = set(ap_dict[i]) & set(ap_dict[j])
+        #         if len(con)>1:
+        #             for k in combinations(con,2):
+        #                 connect.append(list(k))
+        for i in tqdm(combinations(author_lis,2)):
+            con = set(ap_dict[i[0]]) & set(ap_dict[i[1]])
+            if len(con)>1:
+                for k in combinations(con,2):
+                    connect.append(list(k))
 
 
         # for i in tqdm(range(pp_edge.shape[1])):
