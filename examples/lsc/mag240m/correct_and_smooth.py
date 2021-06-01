@@ -206,12 +206,9 @@ if __name__ == '__main__':
     print('sum1', y_pred.sum())
     t = time.perf_counter()
     print('Smoothing predictions...', end=' ', flush=True)
-    y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
+    # y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    print(train_idx.max())
-    print(test_idx.max())
-    print(valid_idx.max())
-    print(y_pred.shape)
+
     print('sum2',y_pred.sum())
 
     train_acc = evaluator.eval({
