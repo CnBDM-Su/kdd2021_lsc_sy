@@ -152,7 +152,10 @@ if __name__ == '__main__':
             if acc_lis[-1]-acc_lis[-2] > 0.001:
                 y_pred_best = y_pred_tmp
             else:
-                y_pred = y_pred_best
+                try:
+                    y_pred = y_pred_best
+                except:
+                    y_pred = y_pred_tmp
                 break
     print('smooth alpha is',i)
     train_acc = evaluator.eval({
