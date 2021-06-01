@@ -213,8 +213,10 @@ if __name__ == '__main__':
         a = set(np.where(y_rule != y_valid.cpu().numpy())[0])
         b = set(np.where(y_mlp == y_valid.cpu().numpy())[0])
         c = set(np.where(y_rule == y_valid.cpu().numpy())[0])
+        d = set(np.where(y_mlp != y_valid.cpu().numpy())[0])
         print('rule_right',len(c))
         print('rule_wrong:',len(a))
         print('mlp_right:', len(b))
+        print('mlp_wrong:', len(d))
         res = a & b
         print('cross:',len(res))
