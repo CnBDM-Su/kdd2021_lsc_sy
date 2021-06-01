@@ -138,8 +138,8 @@ if __name__ == '__main__':
     evaluator = MAG240MEvaluator()
 
 
-    # train_idx = dataset.get_idx_split('train')
-    train_idx = np.load(f'{dataset.dir}/new_train_idx.npy')
+    train_idx = dataset.get_idx_split('train')
+    # train_idx = np.load(f'{dataset.dir}/new_train_idx.npy')
     valid_idx = dataset.get_idx_split('valid')
     test_idx = dataset.get_idx_split('test')
 
@@ -159,7 +159,8 @@ if __name__ == '__main__':
     x_test = torch.from_numpy(x_test).to(torch.float).to(device)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-    label = np.load(f'{dataset.dir}/new_paper_label.npy')
+    # label = np.load(f'{dataset.dir}/new_paper_label.npy')
+    label = dataset.all_paper_label
     # y_train = torch.from_numpy(dataset.paper_label[train_idx])
     y_train = torch.from_numpy(label[train_idx])
     y_train = y_train.to(device, torch.long)
@@ -176,6 +177,8 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     num_params = sum([p.numel() for p in model.parameters()])
     print(f'#Params: {num_params}')
+
+    y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')
 
     best_valid_acc = 0
     for epoch in range(1, args.epochs + 1):

@@ -367,7 +367,7 @@ if __name__ == '__main__':
 
         connect = []
         bias = 0
-        ap_edge = np.load(f'{dataset.dir}/sorted_author_paper_edge.npy')
+        ap_edge = np.load(f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy')
         a_l = {}
         for i in tqdm(range(train_idx.shape[0])):
             i = train_idx[i]
