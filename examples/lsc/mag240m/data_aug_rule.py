@@ -228,14 +228,16 @@ for i in coverage.keys():
             count[j[0]] = j[1]
         else:
             count[j[0]] += j[1]
-    pred.append(max(count.items(), key=lambda x: x[1])[0])
+    new_label[i] = max(count.items(), key=lambda x: x[1])[0]
+    # pred.append(max(count.items(), key=lambda x: x[1])[0])
     # counts = np.bincount(coverage[i])
     # pred.append(np.argmax(counts))
 
-true = new_label[relate]
+# true = new_label[relate]
+np.save(f'{dataset.dir}/data_rule_result.npy',new_label)
 print('total:',c)
 print(len(relate))
-print('valid precision:',accuracy_score(true,pred))
+# print('valid precision:',accuracy_score(true,pred))
 
 #______________predict________________
 # new_label = deepcopy(paper_label)
