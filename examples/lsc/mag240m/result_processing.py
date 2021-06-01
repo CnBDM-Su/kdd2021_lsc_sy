@@ -136,7 +136,7 @@ if __name__ == '__main__':
     # from sklearn.neural_network import MLPClassifier
     from sklearn.preprocessing import MinMaxScaler
     # from sklearn.tree import DecisionTreeClassifier
-    y_correct = np.load(f'{dataset.dir}/data_rule_result.npy')
+    y_correct = torch.from_numpy(np.load(f'{dataset.dir}/data_rule_result.npy'))
     index_correct = np.load(f'{dataset.dir}/data_rule_result_relate.npy')
     # model_rf = DecisionTreeClassifier()
     # y_pred_ = deepcopy(y_pred).numpy()
