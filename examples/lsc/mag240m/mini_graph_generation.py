@@ -367,15 +367,15 @@ if __name__ == '__main__':
 
         connect = []
         bias = 0
-        path = f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy'
-        if not osp.exists(path):
+        path_ = f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy'
+        if not osp.exists(path_):
             print('Generating sorted author paper edges...')
             t = time.perf_counter()
             ap_edge = ap_edge[:, ap_edge[1, :].argsort()]
             np.save(path, ap_edge)
             print(f'Done! [{time.perf_counter() - t:.2f}s]')
         else:
-            ap_edge = np.load(path)
+            ap_edge = np.load(path_)
         a_l = {}
         for i in tqdm(range(train_idx.shape[0])):
             i = train_idx[i]

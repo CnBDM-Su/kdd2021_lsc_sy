@@ -197,8 +197,8 @@ if __name__ == '__main__':
 
     y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[valid_idx]
     y_mlp = model(x_valid).argmax(dim=-1).cpu().numpy()
-    a = set(np.where(y_rule != y_valid.cpu().numpy()))
-    b = set(np.where(y_mlp == y_valid.cpu().numpy()))
+    a = set(np.where(y_rule != y_valid.cpu().numpy())[0])
+    b = set(np.where(y_mlp == y_valid.cpu().numpy())[0])
     print('rule_wrong:',len(a))
     print('mlp_right:', len(b))
     res = a & b
