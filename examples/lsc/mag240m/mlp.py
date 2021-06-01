@@ -121,7 +121,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=0.01)
     parser.add_argument('--batch_size', type=int, default=380000)
     parser.add_argument('--epochs', type=int, default=1000)
-    parser.add_argument('--evaluate', type=bool, default=False)
+    parser.add_argument('--evaluate', type=int, default=0)
     args = parser.parse_args()
     print(args)
 
@@ -169,7 +169,7 @@ if __name__ == '__main__':
     y_valid = torch.from_numpy(label[valid_idx])
     y_valid = y_valid.to(device, torch.long)
     print(args.evaluate)
-    if not args.evaluate:
+    if args.evaluate ==0:
 
         model = MLP(dataset.num_paper_features, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
