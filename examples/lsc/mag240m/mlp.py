@@ -210,12 +210,13 @@ if __name__ == '__main__':
 
         y_relate = np.load(f'{dataset.dir}/data_rule_result_relate.npy')
         y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[y_relate]
+        y_relate_true = torch.from_numpy(label[y_relate])
         x_relate = torch.from_numpy(dataset.paper_feat[y_relate]).to(torch.float).to('cpu')
         y_mlp = model(x_relate).argmax(dim=-1).cpu().numpy()
-        a = set(np.where(y_rule != y_valid.cpu().numpy())[0])
-        b = set(np.where(y_mlp == y_valid.cpu().numpy())[0])
-        c = set(np.where(y_rule == y_valid.cpu().numpy())[0])
-        d = set(np.where(y_mlp != y_valid.cpu().numpy())[0])
+        a = set(np.where(y_rule != y_relate_true.cpu().numpy())[0])
+        b = set(np.where(y_mlp == y_relate_true.cpu().numpy())[0])
+        c = set(np.where(y_rule == y_relate_true.cpu().numpy())[0])
+        d = set(np.where(y_mlp != y_relate_true.cpu().numpy())[0])
         print('rule_right',len(c))
         print('rule_wrong:',len(a))
         print('mlp_right:', len(b))
