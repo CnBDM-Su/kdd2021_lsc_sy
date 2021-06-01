@@ -208,8 +208,10 @@ if __name__ == '__main__':
             model = torch.nn.DataParallel(model, device_ids=gpus)
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
 
-        y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[valid_idx]
-        y_mlp = model(x_valid).argmax(dim=-1).cpu().numpy()
+        y_relate = np.load(f'{dataset.dir}/data_rule_result_relate.npy')
+        y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[y_relate]
+        x_relate = torch.from_numpy(dataset.paper_feat[y_relate]).to(torch.float).to('cpu')
+        y_mlp = model(x_relate).argmax(dim=-1).cpu().numpy()
         a = set(np.where(y_rule != y_valid.cpu().numpy())[0])
         b = set(np.where(y_mlp == y_valid.cpu().numpy())[0])
         c = set(np.where(y_rule == y_valid.cpu().numpy())[0])
