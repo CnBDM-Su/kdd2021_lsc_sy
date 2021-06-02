@@ -48,7 +48,6 @@ class MLP(torch.nn.Module):
             else:
                 x = batch_norm(x.relu_())
             x = F.dropout(x, p=self.dropout, training=self.training)
-        self.hidden = x
         x = self.lins[-1](x)
         return x
 
@@ -208,13 +207,6 @@ if __name__ == '__main__':
         if args.parallel == True:
             model = torch.nn.DataParallel(model, device_ids=gpus)
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
-        print(model.state_dict().keys())
-        print(model.state_dict()['module.lins.1.weight'].shape)
-        print(model.state_dict()['module.lins.1.weight'])
-        print(model.state_dict()['module.lins.1.bias'])
-        print(model.state_dict()['module.lins.0.weight'].shape)
-        print(model.state_dict()['module.lins.0.weight'])
-        print(model.state_dict()['module.lins.0.bias'])
 
         y_relate = np.load(f'{dataset.dir}/data_rule_result_relate.npy')
         y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[y_relate]
@@ -234,11 +226,15 @@ if __name__ == '__main__':
         print('easy:',len(mlp_easy))
         print('hard:', len(mlp_hard))
         mlp_hard = mlp_hard[:len(mlp_easy)]
-        # x_easy = dataset.paper_feat[mlp_easy]
-        x_easy = model.hidden[mlp_easy].numpy()
+        print('bias',model.state_dict()['module.lins.0.bias'].shape)
+        feat = dataset.paper_feat
+        w = torch.t(model.state_dict()['module.lins.0.weight'])
+        feat = torch.matmul(torch.from_numpy(feat),w) + torch.t(model.state_dict()['module.lins.0.bias'])
+        print(feat.shape)
+
+        x_easy = feat[mlp_easy]
         label_easy = dataset.all_paper_label[mlp_easy]
-        # x_hard = dataset.paper_feat[mlp_hard]
-        x_hard = model.hidden[mlp_hard].numpy()
+        x_hard = feat[mlp_hard]
         label_hard = dataset.all_paper_label[mlp_hard]
 
         from sklearn.metrics.pairwise import cosine_distances
