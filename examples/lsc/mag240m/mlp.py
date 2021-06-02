@@ -221,7 +221,14 @@ if __name__ == '__main__':
         print('rule_wrong:',len(a))
         print('mlp_right:', len(b))
         print('mlp_wrong:', len(d))
-        res = a & b
-        print('cross:',len(res))
+        mlp_easy = a & b
+        mlp_hard = c & d
+        print('easy:',len(mlp_easy))
+        print('hard:', len(mlp_hard))
+        x_easy = dataset.paper_feat[mlp_easy]
+        x_easy = torch.from_numpy(x_easy).to(torch.float).to(device)
+
+        x_hard = dataset.paper_feat[mlp_easy]
+        x_easy = torch.from_numpy(x_easy).to(torch.float).to(device)
 
 

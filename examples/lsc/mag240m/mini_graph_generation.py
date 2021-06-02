@@ -527,13 +527,37 @@ if __name__ == '__main__':
             paper_lis += ap_dict[i]
 
         paper_lis = np.sort(paper_lis)
+        pair_1 = []
         paper_connect = []
-        for i in tqdm(range(pp_edge.shape[1])):
-            if pp_edge[0,i] not in paper_lis:
-                continue
+        for i in tqdm(paper_lis):
+            for j in range(bias,pp_edge.shape[1]):
+            if pp_edge[0,j] == i:
+                pair_1.append(j)
             else:
-                if pp_edge[1,i] in paper_lis:
-                    paper_connect.append([pp_edge[0,i],pp_edge[1,i]])
+                if i<pp_edge[0,j]:
+                    bias = j
+                    break
+        path_ = f'{dataset.dir}/mini_graph/sorted_partial_paper_paper_edge.npy'
+        if not osp.exists(path_):
+            print('Generating sorted paper paper edges...')
+            t = time.perf_counter()
+            pp_edge = pp_edge[:,pair_1]
+            pp_edge = pp_edge[:, pp_edge[1, :].argsort()]
+            np.save(path, pp_edge)
+            print(f'Done! [{time.perf_counter() - t:.2f}s]')
+        else:
+            pp_edge = np.load(path_)
+
+        pair_1 = []
+        for i in tqdm(paper_lis):
+            for j in range(bias, pp_edge.shape[1]):
+                if pp_edge[1, j] == i:
+                    paper_connect.append([pp_edge[0,j],pp_edge[1,j]])
+                else:
+                    if i < pp_edge[1, j]:
+                        bias = j
+                        break
+
 
         print(len(paper_connect))
 
