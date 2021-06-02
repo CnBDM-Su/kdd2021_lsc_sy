@@ -531,12 +531,12 @@ if __name__ == '__main__':
         paper_connect = []
         for i in tqdm(paper_lis):
             for j in range(bias,pp_edge.shape[1]):
-            if pp_edge[0,j] == i:
-                pair_1.append(j)
-            else:
-                if i<pp_edge[0,j]:
-                    bias = j
-                    break
+                if pp_edge[0,j] == i:
+                    pair_1.append(j)
+                else:
+                    if i<pp_edge[0,j]:
+                        bias = j
+                        break
         path_ = f'{dataset.dir}/mini_graph/sorted_partial_paper_paper_edge.npy'
         if not osp.exists(path_):
             print('Generating sorted paper paper edges...')
