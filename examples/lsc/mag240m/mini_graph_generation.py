@@ -529,8 +529,11 @@ if __name__ == '__main__':
         paper_lis = np.sort(paper_lis)
         paper_connect = []
         for i in tqdm(range(pp_edge.shape[1])):
-            if (pp_edge[0,i] in paper_lis) and (pp_edge[1,i] in paper_lis):
-                paper_connect.append([pp_edge[0,i],pp_edge[1,i]])
+            if pp_edge[0,i] not in paper_lis:
+                break
+            else:
+                if pp_edge[1,i] in paper_lis:
+                    paper_connect.append([pp_edge[0,i],pp_edge[1,i]])
 
         print(len(paper_connect))
 
