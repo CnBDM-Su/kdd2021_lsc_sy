@@ -223,3 +223,5 @@ if __name__ == '__main__':
         print('mlp_wrong:', len(d))
         res = a & b
         print('cross:',len(res))
+
+

@@ -530,7 +530,7 @@ if __name__ == '__main__':
         paper_connect = []
         for i in tqdm(range(pp_edge.shape[1])):
             if pp_edge[0,i] not in paper_lis:
-                break
+                continue
             else:
                 if pp_edge[1,i] in paper_lis:
                     paper_connect.append([pp_edge[0,i],pp_edge[1,i]])
