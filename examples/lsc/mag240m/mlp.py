@@ -208,7 +208,7 @@ if __name__ == '__main__':
         if args.parallel == True:
             model = torch.nn.DataParallel(model, device_ids=gpus)
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
-        print(model.state_dict.keys())
+        print(model.state_dict().keys())
 
         y_relate = np.load(f'{dataset.dir}/data_rule_result_relate.npy')
         y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[y_relate]
