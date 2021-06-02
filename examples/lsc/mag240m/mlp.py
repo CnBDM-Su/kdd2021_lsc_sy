@@ -232,7 +232,7 @@ if __name__ == '__main__':
         from sklearn.metrics.pairwise import cosine_distances
         easy_dis = cosine_distances(x_easy)
         hard_dis = cosine_distances(x_hard)
-        print('easy distance:',easy_dis)
-        print('hard distance:', hard_dis)
+        print('easy distance:',np.mean(easy_dis))
+        print('hard distance:', np.mean(hard_dis))
 
 
