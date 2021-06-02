@@ -226,9 +226,12 @@ if __name__ == '__main__':
         print('easy:',len(mlp_easy))
         print('hard:', len(mlp_hard))
         x_easy = dataset.paper_feat[mlp_easy]
-        x_easy = torch.from_numpy(x_easy).to(torch.float).to(device)
+        x_hard = dataset.paper_feat[mlp_hard]
 
-        x_hard = dataset.paper_feat[mlp_easy]
-        x_easy = torch.from_numpy(x_easy).to(torch.float).to(device)
+        from sklearn.metrics.pairwise import cosine_distances
+        easy_dis = cosine_distances(x_easy)
+        hard_dis = cosine_distances(x_hard)
+        print('easy distance:',easy_dis)
+        print('hard distance:', hard_dis)
 
 
