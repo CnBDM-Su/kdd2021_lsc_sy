@@ -221,10 +221,11 @@ if __name__ == '__main__':
         print('rule_wrong:',len(a))
         print('mlp_right:', len(b))
         print('mlp_wrong:', len(d))
-        mlp_easy = a & b
-        mlp_hard = c & d
+        mlp_easy = list(a & b)
+        mlp_hard = list(c & d)
         print('easy:',len(mlp_easy))
         print('hard:', len(mlp_hard))
+        mlp_hard = mlp_hard[:len(mlp_easy)]
         x_easy = dataset.paper_feat[mlp_easy]
         x_hard = dataset.paper_feat[mlp_hard]
 
