@@ -48,6 +48,7 @@ class MLP(torch.nn.Module):
             else:
                 x = batch_norm(x.relu_())
             x = F.dropout(x, p=self.dropout, training=self.training)
+        self.hidden = x
         x = self.lins[-1](x)
         return x
 
@@ -226,9 +227,11 @@ if __name__ == '__main__':
         print('easy:',len(mlp_easy))
         print('hard:', len(mlp_hard))
         mlp_hard = mlp_hard[:len(mlp_easy)]
-        x_easy = dataset.paper_feat[mlp_easy]
+        # x_easy = dataset.paper_feat[mlp_easy]
+        x_easy = model.hidden[mlp_easy].numpy()
         label_easy = dataset.all_paper_label[mlp_easy]
-        x_hard = dataset.paper_feat[mlp_hard]
+        # x_hard = dataset.paper_feat[mlp_hard]
+        x_hard = model.hidden[mlp_hard].numpy()
         label_hard = dataset.all_paper_label[mlp_hard]
 
         from sklearn.metrics.pairwise import cosine_distances
