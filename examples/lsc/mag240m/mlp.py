@@ -227,11 +227,23 @@ if __name__ == '__main__':
         print('hard:', len(mlp_hard))
         mlp_hard = mlp_hard[:len(mlp_easy)]
         x_easy = dataset.paper_feat[mlp_easy]
+        label_easy = dataset.all_paper_label[mlp_easy]
         x_hard = dataset.paper_feat[mlp_hard]
+        label_hard = dataset.all_paper_label[mlp_hard]
 
         from sklearn.metrics.pairwise import cosine_distances
-        easy_dis = cosine_distances(x_easy)
-        hard_dis = cosine_distances(x_hard)
+        easy_dis = []
+        hard_dis = []
+        for i in range(153):
+            try:
+                easy_dis.append(cosine_distances(x_easy[label_easy==i]))
+            except:
+                continue
+        for i in range(153):
+            try:
+                hard_dis.append(cosine_distances(x_hard[label_hard==i]))
+            except:
+                continue
         print('easy distance:',np.mean(easy_dis))
         print('hard distance:', np.mean(hard_dis))
 
