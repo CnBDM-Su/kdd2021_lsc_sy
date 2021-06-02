@@ -147,6 +147,7 @@ if __name__ == '__main__':
     assert y_train.size(0) == numel
     y_pred_ = deepcopy(y_pred)
 
+    print('_______co_author___________')
     y_pred = model.correct(y_pred, y_train, train_idx, adj_t)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
@@ -165,7 +166,11 @@ if __name__ == '__main__':
         'y_pred': y_pred[valid_idx].argmax(dim=-1)
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
+    y_true = y_valid.numpy()
+    y_pred = y_pred[valid_idx].argmax(dim=-1).numpy()
+    cross = np.where(y_true==y_pred)[0]
  #________________________________________________________
+    print('______patial_paper__________')
     y_pred_ = model.correct(y_pred_, y_train, train_idx, adj_t_2)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
@@ -185,5 +190,15 @@ if __name__ == '__main__':
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
 
+    y_true = y_valid.numpy()
+    y_pred_ = y_pred_[valid_idx].argmax(dim=-1).numpy()
+    cross_2 = np.where(y_true==y_pred_)[0]
+
+    print('co_author_right:',cross.shape)
+    print('partial_paper_right:', cross_2.shape)
+    print('cross right:',len(set(cross) & set(cross_2)))
+    print('share right:', len(set(cross) | set(cross_2)))
+
+    set(cross) & set(cross_2)
     # res = {'y_pred': y_pred[test_idx].argmax(dim=-1)}
     # evaluator.save_test_submission(res, save_path)
