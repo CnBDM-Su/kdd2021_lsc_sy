@@ -226,14 +226,15 @@ if __name__ == '__main__':
         print('easy:',len(mlp_easy))
         print('hard:', len(mlp_hard))
         mlp_hard = mlp_hard[:len(mlp_easy)]
-        feat = dataset.paper_feat
+        x_easy = dataset.paper_feat[mlp_easy]
+        x_hard = dataset.paper_feat[mlp_hard]
         w = torch.t(model.state_dict()['module.lins.0.weight'])
-        feat = torch.matmul(torch.from_numpy(feat).cpu().to(torch.half),w.cpu().to(torch.half)) + model.state_dict()['module.lins.0.bias'].cpu().to(torch.half)
-        print(feat.shape)
+        x_easy = torch.matmul(torch.from_numpy(x_easy).cpu().to(torch.half),w.cpu().to(torch.half)) + model.state_dict()['module.lins.0.bias'].cpu().to(torch.half)
+        x_hard = torch.matmul(torch.from_numpy(x_hard).cpu().to(torch.half),w.cpu().to(torch.half)) + model.state_dict()['module.lins.0.bias'].cpu().to(torch.half)
+        print(x_easy.shape)
+        print(x_hard.shape)
 
-        x_easy = feat[mlp_easy]
         label_easy = dataset.all_paper_label[mlp_easy]
-        x_hard = feat[mlp_hard]
         label_hard = dataset.all_paper_label[mlp_hard]
 
         from sklearn.metrics.pairwise import cosine_distances
