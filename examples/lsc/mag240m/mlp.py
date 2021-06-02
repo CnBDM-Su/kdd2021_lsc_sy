@@ -236,12 +236,12 @@ if __name__ == '__main__':
         hard_dis = []
         for i in range(153):
             try:
-                easy_dis.append(cosine_distances(x_easy[label_easy==i]))
+                easy_dis.append(np.mean(cosine_distances(x_easy[label_easy==i])))
             except:
                 continue
         for i in range(153):
             try:
-                hard_dis.append(cosine_distances(x_hard[label_hard==i]))
+                hard_dis.append(np.mean(cosine_distances(x_hard[label_hard==i])))
             except:
                 continue
         print('easy distance:',np.mean(easy_dis))
