@@ -209,6 +209,12 @@ if __name__ == '__main__':
             model = torch.nn.DataParallel(model, device_ids=gpus)
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
         print(model.state_dict().keys())
+        print(model.state_dict()['module.lins.1.weight'].shape)
+        print(model.state_dict()['module.lins.1.weight'])
+        print(model.state_dict()['module.lins.1.bias'])
+        print(model.state_dict()['module.lins.0.weight'].shape)
+        print(model.state_dict()['module.lins.0.weight'])
+        print(model.state_dict()['module.lins.0.bias'])
 
         y_relate = np.load(f'{dataset.dir}/data_rule_result_relate.npy')
         y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[y_relate]
