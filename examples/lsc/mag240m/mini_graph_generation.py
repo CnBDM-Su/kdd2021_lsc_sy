@@ -470,3 +470,72 @@ if __name__ == '__main__':
         np.save(path, connect)
     else:
         connect = np.load(path)
+
+    path = f'{dataset.dir}/mini_graph/paper_connect_graph.npy'
+    if not osp.exists(path):
+        print('generating mini paper connect edge...')
+
+
+        def zero():
+            return []
+
+        pa_dict = defaultdict(zero)
+        ap_dict = defaultdict(zero)
+        connect = []
+        for i in tqdm(range(ap_edge.shape[1])):
+            pa_dict[ap_edge[1, i]].append(ap_edge[0, i])
+            ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
+
+        connect = []
+        bias = 0
+        path_ = f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy'
+        if not osp.exists(path_):
+            print('Generating sorted author paper edges...')
+            t = time.perf_counter()
+            ap_edge = ap_edge[:, ap_edge[1, :].argsort()]
+            np.save(path, ap_edge)
+            print(f'Done! [{time.perf_counter() - t:.2f}s]')
+        else:
+            ap_edge = np.load(path_)
+        a_l = {}
+        for i in tqdm(range(split_dict['train'].shape[0])):
+            i = split_dict['train'][i]
+            for j in range(bias, ap_edge.shape[1]):
+                if i == ap_edge[1, j]:
+                    if ap_edge[0, j] not in a_l.keys():
+                        a_l[ap_edge[0, j]] = [label[i]]
+                    else:
+                        a_l[ap_edge[0, j]].append(label[i])
+                elif i < ap_edge[1, j]:
+                    bias = j
+                    break
+        reliable_author = {}
+        for i in tqdm(a_l.keys()):
+            if (len(a_l[i]) > 15) and (len(a_l[i]) < 50):
+                arr = np.array(a_l[i]).astype(int)
+
+                counts = np.bincount(arr)
+                mode = np.argmax(counts)
+                if arr[arr == mode].shape[0] >= np.round(arr.shape[0] * (9 / 10)):
+                    reliable_author[i] = [mode, arr[arr == mode].shape[0]]
+
+        author_lis = list(reliable_author.keys())
+
+        print(len(author_lis))
+        paper_lis = []
+        for i in tqdm(author_lis):
+            paper_lis += ap_dict[i]
+
+        paper_lis = np.sort(paper_lis)
+        paper_connect = []
+        for i in tqdm(range(pp_edge.shape[1])):
+            if (pp_edge[0,i] in paper_lis) and (pp_edge[1,i] in paper_lis):
+                paper_connect.append([pp_edge[0,i],pp_edge[1,i]])
+
+        print(len(paper_connect))
+
+        paper_connect = np.array(paper_connect).T
+        paper_connect = paper_connect[:, paper_connect[0, :].argsort()]
+        np.save(path, paper_connect)
+    else:
+        paper_connect = np.load(path)
