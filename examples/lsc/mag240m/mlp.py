@@ -226,10 +226,9 @@ if __name__ == '__main__':
         print('easy:',len(mlp_easy))
         print('hard:', len(mlp_hard))
         mlp_hard = mlp_hard[:len(mlp_easy)]
-        print('bias',model.state_dict()['module.lins.0.bias'].shape)
         feat = dataset.paper_feat
         w = torch.t(model.state_dict()['module.lins.0.weight'])
-        feat = torch.matmul(torch.from_numpy(feat),w) + torch.t(model.state_dict()['module.lins.0.bias'])
+        feat = torch.matmul(torch.from_numpy(feat).cpu(),w.cpu()) + model.state_dict()['module.lins.0.bias'].cpu()
         print(feat.shape)
 
         x_easy = feat[mlp_easy]
