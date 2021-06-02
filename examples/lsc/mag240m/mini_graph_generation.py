@@ -529,6 +529,7 @@ if __name__ == '__main__':
         paper_lis = np.sort(paper_lis)
         pair_1 = []
         paper_connect = []
+        bias = 0
         for i in tqdm(paper_lis):
             for j in range(bias,pp_edge.shape[1]):
                 if pp_edge[0,j] == i:
@@ -549,6 +550,7 @@ if __name__ == '__main__':
             pp_edge = np.load(path_)
 
         pair_1 = []
+        bias =0
         for i in tqdm(paper_lis):
             for j in range(bias, pp_edge.shape[1]):
                 if pp_edge[1, j] == i:
