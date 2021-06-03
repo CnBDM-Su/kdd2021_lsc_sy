@@ -256,22 +256,62 @@ if __name__ == '__main__':
         center_easy = []
         hard_in_dis = []
         center_hard = []
+        easy_type = []
+        hard_type = []
         for i in range(153):
             if x_easy[label_easy==i].shape[0] != 0:
-                easy_in_dis.append(np.mean(cosine_distances(x_easy[label_easy==i])))
+                easy_type.append(i)
+                # easy_in_dis.append(np.mean(cosine_distances(x_easy[label_easy==i])))
                 center_easy.append(np.mean(x_easy[label_easy==i],0))
 
         for i in range(153):
             if x_hard[label_hard==i].shape[0] != 0:
-                hard_in_dis.append(np.mean(cosine_distances(x_hard[label_hard==i])))
+                hard_type.append(i)
+                # hard_in_dis.append(np.mean(cosine_distances(x_hard[label_hard==i])))
                 center_hard.append(np.mean(x_hard[label_hard==i],0))
 
-        easy_in_dis = np.mean(easy_in_dis)
-        hard_in_dis = np.mean(hard_in_dis)
-        easy_out_dis = np.mean(cosine_distances(center_easy))
-        hard_out_dis = np.mean(cosine_distances(center_hard))
-        S_easy = (easy_out_dis - easy_in_dis) / max(easy_out_dis, easy_in_dis)
-        S_hard = (hard_out_dis - hard_in_dis) / max(hard_out_dis, hard_in_dis)
+
+        easy_in_dis = []
+        easy_out_dis = []
+        for i in range(len(easy_type)):
+            label = easy_type[i]
+            for j in x_easy[label_easy == label]:
+                easy_in_dis.append(cosine_distances([j,center_easy[i]])[0,1])
+                easy_out_dis_tmp = []
+                for k in range(len(easy_type)):
+                    if k != i:
+                        easy_out_dis_tmp.append(cosine_distances([j, center_easy[k]])[0, 1])
+                easy_out_dis.append(np.mean(easy_out_dis_tmp))
+
+        S_easy = []
+        for i in range(len(easy_in_dis)):
+            S_easy.append((easy_out_dis[i] - easy_in_dis[i]) / max(easy_out_dis[i], easy_in_dis[i]))
+        S_easy=np.mean(S_easy)
+
+        hard_in_dis = []
+        hard_out_dis = []
+        for i in range(len(hard_type)):
+            label = hard_type[i]
+            for j in x_hard[label_hard == label]:
+                hard_in_dis.append(cosine_distances([j,center_hard[i]])[0,1])
+                hard_out_dis_tmp = []
+                for k in range(len(hard_type)):
+                    if k != i:
+                        hard_out_dis_tmp.append(cosine_distances([j, center_hard[k]])[0, 1])
+                hard_out_dis.append(np.mean(hard_out_dis_tmp))
+
+        S_hard = []
+        for i in range(len(hard_in_dis)):
+            S_hard.append((hard_out_dis[i] - hard_in_dis[i]) / max(hard_out_dis[i], hard_in_dis[i]))
+        S_hard=np.mean(S_hard)
+
+
+        # easy_in_dis = np.mean(easy_in_dis)
+        # hard_in_dis = np.mean(hard_in_dis)
+        # easy_out_dis = np.mean(cosine_distances(center_easy))
+        # hard_out_dis = np.mean(cosine_distances(center_hard))
+        # S_easy = (easy_out_dis - easy_in_dis) / max(easy_out_dis, easy_in_dis)
+        # S_hard = (hard_out_dis - hard_in_dis) / max(hard_out_dis, hard_in_dis)
         print('easy Silhouette Coefficient:',S_easy)
         print('hard Silhouette Coefficient:', S_hard)
 
