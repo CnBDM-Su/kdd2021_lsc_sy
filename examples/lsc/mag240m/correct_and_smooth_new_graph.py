@@ -78,8 +78,8 @@ if __name__ == '__main__':
 
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
-    # y_pred = torch.from_numpy(np.load(save_path+'/rgat_cs_pred.npy'))
-    y_pred = torch.from_numpy(np.load(save_path + '/rgat_pred.npz')['y_pred'])
+    y_pred = torch.from_numpy(np.load(save_path+'/rgat_cs_pred.npy'))
+    # y_pred = torch.from_numpy(np.load(save_path + '/rgat_pred.npz')['y_pred'])
     # y_pred = torch.from_numpy(np.load(save_path+'/pred.npy'))
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
@@ -166,39 +166,39 @@ if __name__ == '__main__':
         'y_pred': y_pred[valid_idx].argmax(dim=-1)
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
-    y_true = y_valid.numpy()
-    y_pred = y_pred[valid_idx].argmax(dim=-1).numpy()
-    cross = np.where(y_true==y_pred)[0]
+    # y_true = y_valid.numpy()
+    # y_pred = y_pred[valid_idx].argmax(dim=-1).numpy()
+    # cross = np.where(y_true==y_pred)[0]
  #________________________________________________________
-    print('______patial_paper__________')
-    y_pred_ = model.correct(y_pred_, y_train, train_idx, adj_t_2)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
-    t = time.perf_counter()
-    print('Smoothing predictions...', end=' ', flush=True)
-    y_pred_ = model.smooth(y_pred_, y_train, train_idx, adj_t_2)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    print(y_pred_.sum())
-
-    train_acc = evaluator.eval({
-        'y_true': y_train,
-        'y_pred': y_pred_[train_idx].argmax(dim=-1)
-    })['acc']
-    valid_acc = evaluator.eval({
-        'y_true': y_valid,
-        'y_pred': y_pred_[valid_idx].argmax(dim=-1)
-    })['acc']
-    print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
-
-    y_true = y_valid.numpy()
-    y_pred_ = y_pred_[valid_idx].argmax(dim=-1).numpy()
-    cross_2 = np.where(y_true==y_pred_)[0]
-
-    print('co_author_right:',cross.shape)
-    print('partial_paper_right:', cross_2.shape)
-    print('cross right:',len(set(cross) & set(cross_2)))
-    print('share right:', len(set(cross) | set(cross_2)))
-
-    set(cross) & set(cross_2)
+    # print('______patial_paper__________')
+    # y_pred_ = model.correct(y_pred_, y_train, train_idx, adj_t_2)
+    # print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    #
+    # t = time.perf_counter()
+    # print('Smoothing predictions...', end=' ', flush=True)
+    # y_pred_ = model.smooth(y_pred_, y_train, train_idx, adj_t_2)
+    # print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    # print(y_pred_.sum())
+    #
+    # train_acc = evaluator.eval({
+    #     'y_true': y_train,
+    #     'y_pred': y_pred_[train_idx].argmax(dim=-1)
+    # })['acc']
+    # valid_acc = evaluator.eval({
+    #     'y_true': y_valid,
+    #     'y_pred': y_pred_[valid_idx].argmax(dim=-1)
+    # })['acc']
+    # print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
+    #
+    # y_true = y_valid.numpy()
+    # y_pred_ = y_pred_[valid_idx].argmax(dim=-1).numpy()
+    # cross_2 = np.where(y_true==y_pred_)[0]
+    #
+    # print('co_author_right:',cross.shape)
+    # print('partial_paper_right:', cross_2.shape)
+    # print('cross right:',len(set(cross) & set(cross_2)))
+    # print('share right:', len(set(cross) | set(cross_2)))
+    #
+    # set(cross) & set(cross_2)
     # res = {'y_pred': y_pred[test_idx].argmax(dim=-1)}
     # evaluator.save_test_submission(res, save_path)
