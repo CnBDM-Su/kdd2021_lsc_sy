@@ -471,7 +471,7 @@ if __name__ == '__main__':
     else:
         connect = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph/paper_connect_graph.npy'
+    path = f'{dataset.dir}/mini_graph/paper_connect_graph_2.npy'
     if not osp.exists(path):
         print('generating mini paper connect edge...')
 
@@ -511,12 +511,12 @@ if __name__ == '__main__':
                     break
         reliable_author = {}
         for i in tqdm(a_l.keys()):
-            if (len(a_l[i]) > 15) and (len(a_l[i]) < 50):
+            if (len(a_l[i]) > 10) and (len(a_l[i]) < 50):
                 arr = np.array(a_l[i]).astype(int)
 
                 counts = np.bincount(arr)
                 mode = np.argmax(counts)
-                if arr[arr == mode].shape[0] >= np.round(arr.shape[0] * (9 / 10)):
+                if arr[arr == mode].shape[0] >= np.round(arr.shape[0] * (4 / 5)):
                     reliable_author[i] = [mode, arr[arr == mode].shape[0]]
 
         author_lis = list(reliable_author.keys())
@@ -538,7 +538,7 @@ if __name__ == '__main__':
                     if i<pp_edge[0,j]:
                         bias = j
                         break
-        path_ = f'{dataset.dir}/mini_graph/sorted_partial_paper_paper_edge.npy'
+        path_ = f'{dataset.dir}/mini_graph/sorted_partial_paper_paper_edge_2.npy'
         if not osp.exists(path_):
             print('Generating sorted paper paper edges...')
             t = time.perf_counter()
