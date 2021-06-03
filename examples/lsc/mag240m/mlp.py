@@ -215,7 +215,7 @@ if __name__ == '__main__':
         con = []
         for i in range(feat.shape[0]//600000+1):
             end = min((i+1)*batch_size,feat.shape[0])
-            feat1 = torch.from_numpy(feat[i*batch_size:end]).gpu().to(torch.half)
+            feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
             con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
 
         con = torch.cat(con).numpy()
