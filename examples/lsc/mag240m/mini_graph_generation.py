@@ -353,7 +353,7 @@ if __name__ == '__main__':
         torch.save(full_adj_t, path)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-    path = f'{dataset.dir}/mini_graph/author_connect_graph.npy'
+    path = f'{dataset.dir}/mini_graph/author_connect_graph_2.npy'
     if not osp.exists(path):
         print('generating mini author connect edge...')
         def zero():
