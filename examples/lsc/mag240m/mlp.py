@@ -246,7 +246,8 @@ if __name__ == '__main__':
         x_hard = torch.matmul(torch.from_numpy(x_hard).cpu().to(torch.half),w.cpu().to(torch.half)) + model.state_dict()['module.lins.0.bias'].cpu().to(torch.half)
         print(x_easy.shape)
         print(x_hard.shape)
-
+        x_easy = x_easy.numpy()
+        x_hard = x_hard.numpy()
         label_easy = dataset.all_paper_label[mlp_easy]
         label_hard = dataset.all_paper_label[mlp_hard]
 
