@@ -17,7 +17,8 @@ from mag240m_mini_graph import MAG240MMINIDataset
 
 dataset = MAG240MMINIDataset(ROOT)
 co_author = np.load(f'{dataset.dir}/author_connect_graph.npy')
-paper = np.load(f'{dataset.dir}/paper_connect_graph.npy')
+# paper = np.load(f'{dataset.dir}/paper_connect_graph.npy')
+paper = dataset.edge_index('paper', 'cites', 'paper')
 sorted_paper = paper[:, paper[1, :].argsort()]
 print(paper)
 print(co_author)

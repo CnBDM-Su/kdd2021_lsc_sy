@@ -207,63 +207,65 @@ if __name__ == '__main__':
         if args.parallel == True:
             model = torch.nn.DataParallel(model, device_ids=gpus)
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
-
-        feat = dataset.paper_feat
-        w = torch.t(model.state_dict()['module.lins.0.weight'])
-        bias = model.state_dict()['module.lins.0.bias']
-        batch_size = 600000
-        con = []
-        for i in range(feat.shape[0]//600000+1):
-            end = min((i+1)*batch_size,feat.shape[0])
-            feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
-            con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
-
-        con = torch.cat(con).numpy()
-        np.save(f'{dataset.dir}/256dim/node_feat.npy')
-
-        # y_relate = np.load(f'{dataset.dir}/data_rule_result_relate.npy')
-        # y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[y_relate]
-        # y_relate_true = torch.from_numpy(label[y_relate])
-        # x_relate = torch.from_numpy(dataset.paper_feat[y_relate]).to(torch.float).to('cpu')
-        # y_mlp = model(x_relate).argmax(dim=-1).cpu().numpy()
-        # a = set(np.where(y_rule != y_relate_true.cpu().numpy())[0])
-        # b = set(np.where(y_mlp == y_relate_true.cpu().numpy())[0])
-        # c = set(np.where(y_rule == y_relate_true.cpu().numpy())[0])
-        # d = set(np.where(y_mlp != y_relate_true.cpu().numpy())[0])
-        # print('rule_right',len(c))
-        # print('rule_wrong:',len(a))
-        # print('mlp_right:', len(b))
-        # print('mlp_wrong:', len(d))
-        # mlp_easy = list(a & b)
-        # mlp_hard = list(c & d)
-        # print('easy:',len(mlp_easy))
-        # print('hard:', len(mlp_hard))
-        # mlp_hard = mlp_hard[:len(mlp_easy)]
-        # x_easy = dataset.paper_feat[mlp_easy]
-        # x_hard = dataset.paper_feat[mlp_hard]
+#___________________predict______________________________
+        # feat = dataset.paper_feat
         # w = torch.t(model.state_dict()['module.lins.0.weight'])
-        # x_easy = torch.matmul(torch.from_numpy(x_easy).cpu().to(torch.half),w.cpu().to(torch.half)) + model.state_dict()['module.lins.0.bias'].cpu().to(torch.half)
-        # x_hard = torch.matmul(torch.from_numpy(x_hard).cpu().to(torch.half),w.cpu().to(torch.half)) + model.state_dict()['module.lins.0.bias'].cpu().to(torch.half)
-        # print(x_easy.shape)
-        # print(x_hard.shape)
+        # bias = model.state_dict()['module.lins.0.bias']
+        # batch_size = 600000
+        # con = []
+        # for i in range(feat.shape[0]//600000+1):
+        #     end = min((i+1)*batch_size,feat.shape[0])
+        #     feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
+        #     con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
         #
-        # label_easy = dataset.all_paper_label[mlp_easy]
-        # label_hard = dataset.all_paper_label[mlp_hard]
-        #
-        # from sklearn.metrics.pairwise import cosine_distances
-        # easy_dis = []
-        # hard_dis = []
-        # for i in range(153):
-        #     try:
-        #         easy_dis.append(np.mean(cosine_distances(x_easy[label_easy==i])))
-        #     except:
-        #         continue
-        # for i in range(153):
-        #     try:
-        #         hard_dis.append(np.mean(cosine_distances(x_hard[label_hard==i])))
-        #     except:
-        #         continue
-        # print('easy distance:',np.mean(easy_dis))
-        # print('hard distance:', np.mean(hard_dis))
+        # con = torch.cat(con).numpy()
+        # np.save(f'{dataset.dir}/256dim/node_feat.npy')
+#____________________test___________________________
+        y_relate = np.load(f'{dataset.dir}/data_rule_result_relate.npy')
+        y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[y_relate]
+        y_relate_true = torch.from_numpy(label[y_relate])
+        x_relate = torch.from_numpy(dataset.paper_feat[y_relate]).to(torch.float).to('cpu')
+        y_mlp = model(x_relate).argmax(dim=-1).cpu().numpy()
+        a = set(np.where(y_rule != y_relate_true.cpu().numpy())[0])
+        b = set(np.where(y_mlp == y_relate_true.cpu().numpy())[0])
+        c = set(np.where(y_rule == y_relate_true.cpu().numpy())[0])
+        d = set(np.where(y_mlp != y_relate_true.cpu().numpy())[0])
+        print('rule_right',len(c))
+        print('rule_wrong:',len(a))
+        print('mlp_right:', len(b))
+        print('mlp_wrong:', len(d))
+        mlp_easy = list(a & b)
+        mlp_hard = list(c & d)
+        print('easy:',len(mlp_easy))
+        print('hard:', len(mlp_hard))
+        mlp_hard = mlp_hard[:len(mlp_easy)]
+        x_easy = dataset.paper_feat[mlp_easy]
+        x_hard = dataset.paper_feat[mlp_hard]
+        w = torch.t(model.state_dict()['module.lins.0.weight'])
+        x_easy = torch.matmul(torch.from_numpy(x_easy).cpu().to(torch.half),w.cpu().to(torch.half)) + model.state_dict()['module.lins.0.bias'].cpu().to(torch.half)
+        x_hard = torch.matmul(torch.from_numpy(x_hard).cpu().to(torch.half),w.cpu().to(torch.half)) + model.state_dict()['module.lins.0.bias'].cpu().to(torch.half)
+        print(x_easy.shape)
+        print(x_hard.shape)
+
+        label_easy = dataset.all_paper_label[mlp_easy]
+        label_hard = dataset.all_paper_label[mlp_hard]
+
+        from sklearn.metrics.pairwise import cosine_distances
+        easy_dis = []
+        center_easy = []
+        hard_dis = []
+        center_hard = []
+        for i in range(153):
+            try:
+                easy_dis.append(np.mean(cosine_distances(x_easy[label_easy==i])))
+            except:
+                continue
+        for i in range(153):
+            try:
+                hard_dis.append(np.mean(cosine_distances(x_hard[label_hard==i])))
+            except:
+                continue
+        print('easy distance:',np.mean(easy_dis))
+        print('hard distance:', np.mean(hard_dis))
 
 
