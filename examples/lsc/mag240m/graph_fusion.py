@@ -18,4 +18,4 @@ dataset = MAG240MMINIDataset(ROOT)
 co_author = np.load(f'{dataset.dir}/author_connect_graph.npy')
 paper = np.load(f'{dataset.dir}/paper_connect_graph.npy')
 for i in range(co_author.shape[1]):
-    if
+    for j in paper
