@@ -20,7 +20,7 @@ paper = np.load(f'{dataset.dir}/paper_connect_graph.npy')
 sorted_paper = paper[:, paper[1, :].argsort()]
 bias = 0
 overlap = []
-for i in range(co_author.shape[1]):
+for i in tqdm(range(co_author.shape[1])):
     for j in range(bias, paper.shape[1]):
         if co_author[0,i]==paper[0,j]:
             if co_author[1,i]==paper[1,j]:
@@ -29,7 +29,7 @@ for i in range(co_author.shape[1]):
             bias = j
             break
 
-for i in range(co_author.shape[1]):
+for i in tqdm(range(co_author.shape[1])):
     for j in range(bias, sorted_paper.shape[1]):
         if co_author[0,i]==sorted_paper[0,j]:
             if co_author[1,i]==sorted_paper[1,j]:
@@ -41,10 +41,10 @@ for i in range(co_author.shape[1]):
 print('overlap ratio:',len(overlap))
 
 new_graph = []
-for i in range(co_author.shape[1]):
+for i in tqdm(range(co_author.shape[1])):
     if i not in overlap:
         new_graph.append([co_author[0,i],co_author[1,i]])
-for i in range(paper.shape[1]):
+for i in tqdm(range(paper.shape[1])):
     new_graph.append([paper[0, i], paper[1, i]])
 
 new_graph = np.array(new_graph).T
