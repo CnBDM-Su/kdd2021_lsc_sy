@@ -221,7 +221,7 @@ if __name__ == '__main__':
         con = torch.cat(con).cpu().numpy()
         print(con.shape)
         print(con)
-        np.save(f'{dataset.dir}/256dim/node_feat.npy')
+        np.save(f'{dataset.dir}/256dim/node_feat.npy',con)
 #____________________test___________________________
         # y_relate = np.load(f'{dataset.dir}/data_rule_result_relate.npy')
         # y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[y_relate]
