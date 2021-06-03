@@ -268,6 +268,7 @@ if __name__ == '__main__':
             except:
                 continue
 
+        print(center_easy)
         easy_in_dis = np.mean(easy_in_dis)
         hard_in_dis = np.mean(hard_in_dis)
         easy_out_dis = np.mean(cosine_distances(np.array(center_easy)))
