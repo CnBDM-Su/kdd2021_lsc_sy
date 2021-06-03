@@ -20,7 +20,7 @@ class MAG240MMINI256Dataset(object):
         ('paper', 'paper'): 'cites',
     }
 
-    def __init__(self, root: str = 'dataset'):
+    def __init__(self, root: str = '/var/kdd-data/'):
         if isinstance(root, str):
             root = osp.expanduser(osp.normpath(root))
         self.root = root
