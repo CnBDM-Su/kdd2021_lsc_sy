@@ -78,22 +78,43 @@ if __name__ == '__main__':
 
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
-    y_pred = torch.from_numpy(np.load(save_path+'/rgat_cs_pred.npy'))
-    # y_pred = torch.from_numpy(np.load(save_path + '/rgat_pred.npz')['y_pred'])
+    # y_pred = torch.from_numpy(np.load(save_path+'/rgat_cs_pred.npy'))
+    y_pred = torch.from_numpy(np.load(save_path + '/rgat_pred.npz')['y_pred'])
     # y_pred = torch.from_numpy(np.load(save_path+'/pred.npy'))
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     t = time.perf_counter()
+    # print('Reading adjacency matrix...', end=' ', flush=True)
+    # path = f'{dataset.dir}/paper_to_paper_coauthor_symmetric_gcn.pt'
+    # if osp.exists(path):
+    #     adj_t = torch.load(path)
+    # else:
+    #     path_sym = f'{dataset.dir}/paper_to_paper_coauthor_symmetric.pt'
+    #     if osp.exists(path_sym):
+    #         adj_t = torch.load(path_sym)
+    #     else:
+    #         edge_index = np.load(f'{dataset.dir}/author_connect_graph.npy')
+    #         edge_index = torch.from_numpy(edge_index)
+    #         adj_t = SparseTensor(
+    #             row=edge_index[0], col=edge_index[1],
+    #             sparse_sizes=(dataset.num_papers, dataset.num_papers),
+    #             is_sorted=True)
+    #         adj_t = adj_t.to_symmetric()
+    #         torch.save(adj_t, path_sym)
+    #     adj_t = gcn_norm(adj_t, add_self_loops=True)
+    #     torch.save(adj_t, path)
+    # print(f'Done! [{time.perf_counter() - t:.2f}s]')
+
     print('Reading adjacency matrix...', end=' ', flush=True)
-    path = f'{dataset.dir}/paper_to_paper_coauthor_symmetric_gcn.pt'
+    path = f'{dataset.dir}/paper_to_paper_fusion_symmetric_gcn.pt'
     if osp.exists(path):
         adj_t = torch.load(path)
     else:
-        path_sym = f'{dataset.dir}/paper_to_paper_coauthor_symmetric.pt'
+        path_sym = f'{dataset.dir}/paper_to_paper_fusion_symmetric.pt'
         if osp.exists(path_sym):
             adj_t = torch.load(path_sym)
         else:
-            edge_index = np.load(f'{dataset.dir}/author_connect_graph.npy')
+            edge_index = np.load(f'{dataset.dir}/fused_graph.npy')
             edge_index = torch.from_numpy(edge_index)
             adj_t = SparseTensor(
                 row=edge_index[0], col=edge_index[1],
@@ -105,27 +126,27 @@ if __name__ == '__main__':
         torch.save(adj_t, path)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-    t = time.perf_counter()
-    print('Reading adjacency matrix...', end=' ', flush=True)
-    path = f'{dataset.dir}/paper_to_paper_ppaper_symmetric_gcn.pt'
-    if osp.exists(path):
-        adj_t_2 = torch.load(path)
-    else:
-        path_sym = f'{dataset.dir}/paper_to_paper_ppaper_symmetric.pt'
-        if osp.exists(path_sym):
-            adj_t_2 = torch.load(path_sym)
-        else:
-            edge_index = np.load(f'{dataset.dir}/paper_connect_graph.npy')
-            edge_index = torch.from_numpy(edge_index)
-            adj_t_2 = SparseTensor(
-                row=edge_index[0], col=edge_index[1],
-                sparse_sizes=(dataset.num_papers, dataset.num_papers),
-                is_sorted=True)
-            adj_t_2 = adj_t_2.to_symmetric()
-            torch.save(adj_t_2, path_sym)
-        adj_t_2 = gcn_norm(adj_t_2, add_self_loops=True)
-        torch.save(adj_t_2, path)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    # t = time.perf_counter()
+    # print('Reading adjacency matrix...', end=' ', flush=True)
+    # path = f'{dataset.dir}/paper_to_paper_ppaper_symmetric_gcn.pt'
+    # if osp.exists(path):
+    #     adj_t_2 = torch.load(path)
+    # else:
+    #     path_sym = f'{dataset.dir}/paper_to_paper_ppaper_symmetric.pt'
+    #     if osp.exists(path_sym):
+    #         adj_t_2 = torch.load(path_sym)
+    #     else:
+    #         edge_index = np.load(f'{dataset.dir}/paper_connect_graph.npy')
+    #         edge_index = torch.from_numpy(edge_index)
+    #         adj_t_2 = SparseTensor(
+    #             row=edge_index[0], col=edge_index[1],
+    #             sparse_sizes=(dataset.num_papers, dataset.num_papers),
+    #             is_sorted=True)
+    #         adj_t_2 = adj_t_2.to_symmetric()
+    #         torch.save(adj_t_2, path_sym)
+    #     adj_t_2 = gcn_norm(adj_t_2, add_self_loops=True)
+    #     torch.save(adj_t_2, path)
+    # print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     y_train = torch.from_numpy(paper_label[train_idx]).to(torch.long)
     y_valid = torch.from_numpy(paper_label[valid_idx]).to(torch.long)
