@@ -218,7 +218,9 @@ if __name__ == '__main__':
             feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
             con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
 
-        con = torch.cat(con).numpy()
+        con = torch.cat(con).cpu().numpy()
+        print(con.shape)
+        print(con)
         np.save(f'{dataset.dir}/256dim/node_feat.npy')
 #____________________test___________________________
         # y_relate = np.load(f'{dataset.dir}/data_rule_result_relate.npy')
