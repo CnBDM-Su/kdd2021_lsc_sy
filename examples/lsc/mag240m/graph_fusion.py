@@ -10,6 +10,7 @@ from torch_geometric.nn.conv.gcn_conv import gcn_norm
 from ogb.lsc import MAG240MDataset, MAG240MEvaluator
 from root import ROOT
 from ogb.utils.url import makedirs
+from tqdm import tqdm
 import sys
 sys.path.append('/var/ogb/ogb/lsc')
 from mag240m_mini_graph import MAG240MMINIDataset
