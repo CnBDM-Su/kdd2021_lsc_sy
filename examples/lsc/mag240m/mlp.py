@@ -264,9 +264,8 @@ if __name__ == '__main__':
         for i in range(153):
             if x_hard[label_hard==i].shape[0] != 0:
                 hard_in_dis.append(np.mean(cosine_distances(x_hard[label_hard==i])))
-                center_hard.append(np.mean(x_hard[label_easy==i],0))
+                center_hard.append(np.mean(x_hard[label_hard==i],0))
 
-        print(len(center_easy))
         easy_in_dis = np.mean(easy_in_dis)
         hard_in_dis = np.mean(hard_in_dis)
         easy_out_dis = np.mean(cosine_distances(center_easy))
