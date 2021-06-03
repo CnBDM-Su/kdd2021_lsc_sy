@@ -256,17 +256,16 @@ if __name__ == '__main__':
         hard_in_dis = []
         center_hard = []
         for i in range(153):
-            try:
+            if x_easy[label_easy==i].shape[0] != 0:
+                print(x_easy[label_easy==i])
                 easy_in_dis.append(np.mean(cosine_distances(x_easy[label_easy==i])))
                 center_easy.append(np.mean(x_easy[label_easy==i],0))
-            except:
-                continue
+
         for i in range(153):
-            try:
+            if x_hard[label_hard==i].shape[0] != 0:
+                print(i)
                 hard_in_dis.append(np.mean(cosine_distances(x_hard[label_hard==i])))
                 center_hard.append(np.mean(x_hard[label_easy==i],0))
-            except:
-                continue
 
         print(center_easy)
         easy_in_dis = np.mean(easy_in_dis)
