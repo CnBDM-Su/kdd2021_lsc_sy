@@ -208,111 +208,111 @@ if __name__ == '__main__':
             model = torch.nn.DataParallel(model, device_ids=gpus)
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
 #___________________predict______________________________
-        # feat = dataset.paper_feat
-        # w = torch.t(model.state_dict()['module.lins.0.weight'])
-        # bias = model.state_dict()['module.lins.0.bias']
-        # batch_size = 600000
-        # con = []
-        # for i in range(feat.shape[0]//600000+1):
-        #     end = min((i+1)*batch_size,feat.shape[0])
-        #     feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
-        #     con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
-        #
-        # con = torch.cat(con).numpy()
-        # np.save(f'{dataset.dir}/256dim/node_feat.npy')
-#____________________test___________________________
-        y_relate = np.load(f'{dataset.dir}/data_rule_result_relate.npy')
-        y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[y_relate]
-        y_relate_true = torch.from_numpy(label[y_relate])
-        x_relate = torch.from_numpy(dataset.paper_feat[y_relate]).to(torch.float).to('cpu')
-        y_mlp = model(x_relate).argmax(dim=-1).cpu().numpy()
-        a = set(np.where(y_rule != y_relate_true.cpu().numpy())[0])
-        b = set(np.where(y_mlp == y_relate_true.cpu().numpy())[0])
-        c = set(np.where(y_rule == y_relate_true.cpu().numpy())[0])
-        d = set(np.where(y_mlp != y_relate_true.cpu().numpy())[0])
-        print('rule_right',len(c))
-        print('rule_wrong:',len(a))
-        print('mlp_right:', len(b))
-        print('mlp_wrong:', len(d))
-        mlp_easy = list(a & b)
-        mlp_hard = list(c & d)
-        print('easy:',len(mlp_easy))
-        print('hard:', len(mlp_hard))
-        mlp_hard = mlp_hard[:len(mlp_easy)]
-        x_easy = dataset.paper_feat[mlp_easy]
-        x_hard = dataset.paper_feat[mlp_hard]
+        feat = dataset.paper_feat
         w = torch.t(model.state_dict()['module.lins.0.weight'])
-        x_easy = torch.matmul(torch.from_numpy(x_easy).cpu().to(torch.half),w.cpu().to(torch.half)) + model.state_dict()['module.lins.0.bias'].cpu().to(torch.half)
-        x_hard = torch.matmul(torch.from_numpy(x_hard).cpu().to(torch.half),w.cpu().to(torch.half)) + model.state_dict()['module.lins.0.bias'].cpu().to(torch.half)
-        print(x_easy.shape)
-        print(x_hard.shape)
-        x_easy = x_easy.numpy()
-        x_hard = x_hard.numpy()
-        label_easy = dataset.all_paper_label[mlp_easy]
-        label_hard = dataset.all_paper_label[mlp_hard]
+        bias = model.state_dict()['module.lins.0.bias']
+        batch_size = 600000
+        con = []
+        for i in range(feat.shape[0]//600000+1):
+            end = min((i+1)*batch_size,feat.shape[0])
+            feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
+            con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
 
-        from sklearn.metrics.pairwise import cosine_distances
-        easy_in_dis = []
-        center_easy = []
-        hard_in_dis = []
-        center_hard = []
-        easy_type = []
-        hard_type = []
-        for i in range(153):
-            if x_easy[label_easy==i].shape[0] != 0:
-                easy_type.append(i)
-                # easy_in_dis.append(np.mean(cosine_distances(x_easy[label_easy==i])))
-                center_easy.append(np.mean(x_easy[label_easy==i],0))
-
-        for i in range(153):
-            if x_hard[label_hard==i].shape[0] != 0:
-                hard_type.append(i)
-                # hard_in_dis.append(np.mean(cosine_distances(x_hard[label_hard==i])))
-                center_hard.append(np.mean(x_hard[label_hard==i],0))
-
-
-        easy_in_dis = []
-        easy_out_dis = []
-        for i in range(len(easy_type)):
-            label = easy_type[i]
-            for j in x_easy[label_easy == label]:
-                easy_in_dis.append(cosine_distances([j,center_easy[i]])[0,1])
-                easy_out_dis_tmp = []
-                for k in range(len(easy_type)):
-                    if k != i:
-                        easy_out_dis_tmp.append(cosine_distances([j, center_easy[k]])[0, 1])
-                easy_out_dis.append(np.mean(easy_out_dis_tmp))
-
-        S_easy = []
-        for i in range(len(easy_in_dis)):
-            S_easy.append((easy_out_dis[i] - easy_in_dis[i]) / max(easy_out_dis[i], easy_in_dis[i]))
-        S_easy=np.mean(S_easy)
-
-        hard_in_dis = []
-        hard_out_dis = []
-        for i in range(len(hard_type)):
-            label = hard_type[i]
-            for j in x_hard[label_hard == label]:
-                hard_in_dis.append(cosine_distances([j,center_hard[i]])[0,1])
-                hard_out_dis_tmp = []
-                for k in range(len(hard_type)):
-                    if k != i:
-                        hard_out_dis_tmp.append(cosine_distances([j, center_hard[k]])[0, 1])
-                hard_out_dis.append(np.mean(hard_out_dis_tmp))
-
-        S_hard = []
-        for i in range(len(hard_in_dis)):
-            S_hard.append((hard_out_dis[i] - hard_in_dis[i]) / max(hard_out_dis[i], hard_in_dis[i]))
-        S_hard=np.mean(S_hard)
-
-
-        # easy_in_dis = np.mean(easy_in_dis)
-        # hard_in_dis = np.mean(hard_in_dis)
-        # easy_out_dis = np.mean(cosine_distances(center_easy))
-        # hard_out_dis = np.mean(cosine_distances(center_hard))
-        # S_easy = (easy_out_dis - easy_in_dis) / max(easy_out_dis, easy_in_dis)
-        # S_hard = (hard_out_dis - hard_in_dis) / max(hard_out_dis, hard_in_dis)
-        print('easy Silhouette Coefficient:',S_easy)
-        print('hard Silhouette Coefficient:', S_hard)
+        con = torch.cat(con).numpy()
+        np.save(f'{dataset.dir}/256dim/node_feat.npy')
+#____________________test___________________________
+        # y_relate = np.load(f'{dataset.dir}/data_rule_result_relate.npy')
+        # y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[y_relate]
+        # y_relate_true = torch.from_numpy(label[y_relate])
+        # x_relate = torch.from_numpy(dataset.paper_feat[y_relate]).to(torch.float).to('cpu')
+        # y_mlp = model(x_relate).argmax(dim=-1).cpu().numpy()
+        # a = set(np.where(y_rule != y_relate_true.cpu().numpy())[0])
+        # b = set(np.where(y_mlp == y_relate_true.cpu().numpy())[0])
+        # c = set(np.where(y_rule == y_relate_true.cpu().numpy())[0])
+        # d = set(np.where(y_mlp != y_relate_true.cpu().numpy())[0])
+        # print('rule_right',len(c))
+        # print('rule_wrong:',len(a))
+        # print('mlp_right:', len(b))
+        # print('mlp_wrong:', len(d))
+        # mlp_easy = list(a & b)
+        # mlp_hard = list(c & d)
+        # print('easy:',len(mlp_easy))
+        # print('hard:', len(mlp_hard))
+        # mlp_hard = mlp_hard[:len(mlp_easy)]
+        # x_easy = dataset.paper_feat[mlp_easy]
+        # x_hard = dataset.paper_feat[mlp_hard]
+        # w = torch.t(model.state_dict()['module.lins.0.weight'])
+        # x_easy = torch.matmul(torch.from_numpy(x_easy).cpu().to(torch.half),w.cpu().to(torch.half)) + model.state_dict()['module.lins.0.bias'].cpu().to(torch.half)
+        # x_hard = torch.matmul(torch.from_numpy(x_hard).cpu().to(torch.half),w.cpu().to(torch.half)) + model.state_dict()['module.lins.0.bias'].cpu().to(torch.half)
+        # print(x_easy.shape)
+        # print(x_hard.shape)
+        # x_easy = x_easy.numpy()
+        # x_hard = x_hard.numpy()
+        # label_easy = dataset.all_paper_label[mlp_easy]
+        # label_hard = dataset.all_paper_label[mlp_hard]
+        #
+        # from sklearn.metrics.pairwise import cosine_distances
+        # easy_in_dis = []
+        # center_easy = []
+        # hard_in_dis = []
+        # center_hard = []
+        # easy_type = []
+        # hard_type = []
+        # for i in range(153):
+        #     if x_easy[label_easy==i].shape[0] != 0:
+        #         easy_type.append(i)
+        #         # easy_in_dis.append(np.mean(cosine_distances(x_easy[label_easy==i])))
+        #         center_easy.append(np.mean(x_easy[label_easy==i],0))
+        #
+        # for i in range(153):
+        #     if x_hard[label_hard==i].shape[0] != 0:
+        #         hard_type.append(i)
+        #         # hard_in_dis.append(np.mean(cosine_distances(x_hard[label_hard==i])))
+        #         center_hard.append(np.mean(x_hard[label_hard==i],0))
+        #
+        #
+        # easy_in_dis = []
+        # easy_out_dis = []
+        # for i in range(len(easy_type)):
+        #     label = easy_type[i]
+        #     for j in x_easy[label_easy == label]:
+        #         easy_in_dis.append(cosine_distances([j,center_easy[i]])[0,1])
+        #         easy_out_dis_tmp = []
+        #         for k in range(len(easy_type)):
+        #             if k != i:
+        #                 easy_out_dis_tmp.append(cosine_distances([j, center_easy[k]])[0, 1])
+        #         easy_out_dis.append(np.mean(easy_out_dis_tmp))
+        #
+        # S_easy = []
+        # for i in range(len(easy_in_dis)):
+        #     S_easy.append((easy_out_dis[i] - easy_in_dis[i]) / max(easy_out_dis[i], easy_in_dis[i]))
+        # S_easy=np.mean(S_easy)
+        #
+        # hard_in_dis = []
+        # hard_out_dis = []
+        # for i in range(len(hard_type)):
+        #     label = hard_type[i]
+        #     for j in x_hard[label_hard == label]:
+        #         hard_in_dis.append(cosine_distances([j,center_hard[i]])[0,1])
+        #         hard_out_dis_tmp = []
+        #         for k in range(len(hard_type)):
+        #             if k != i:
+        #                 hard_out_dis_tmp.append(cosine_distances([j, center_hard[k]])[0, 1])
+        #         hard_out_dis.append(np.mean(hard_out_dis_tmp))
+        #
+        # S_hard = []
+        # for i in range(len(hard_in_dis)):
+        #     S_hard.append((hard_out_dis[i] - hard_in_dis[i]) / max(hard_out_dis[i], hard_in_dis[i]))
+        # S_hard=np.mean(S_hard)
+        #
+        #
+        # # easy_in_dis = np.mean(easy_in_dis)
+        # # hard_in_dis = np.mean(hard_in_dis)
+        # # easy_out_dis = np.mean(cosine_distances(center_easy))
+        # # hard_out_dis = np.mean(cosine_distances(center_hard))
+        # # S_easy = (easy_out_dis - easy_in_dis) / max(easy_out_dis, easy_in_dis)
+        # # S_hard = (hard_out_dis - hard_in_dis) / max(hard_out_dis, hard_in_dis)
+        # print('easy Silhouette Coefficient:',S_easy)
+        # print('hard Silhouette Coefficient:', S_hard)
 
 
