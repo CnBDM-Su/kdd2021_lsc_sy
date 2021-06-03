@@ -219,6 +219,9 @@ if __name__ == '__main__':
             con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
 
         con = torch.cat(con).cpu().numpy()
+        from sklearn.preprocessing import MinMaxScaler
+        mm = MinMaxScaler(-1,1)
+        con =mm.fit_transform(con)
         print(con.shape)
         print(con)
         np.save(f'{dataset.dir}/256dim/node_feat.npy',con)
