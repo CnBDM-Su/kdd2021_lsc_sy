@@ -220,7 +220,7 @@ if __name__ == '__main__':
 
         con = torch.cat(con).cpu().numpy()
         from sklearn.preprocessing import MinMaxScaler
-        mm = MinMaxScaler(-1,1)
+        mm = MinMaxScaler((-1,1))
         con =mm.fit_transform(con)
         print(con.shape)
         print(con)
