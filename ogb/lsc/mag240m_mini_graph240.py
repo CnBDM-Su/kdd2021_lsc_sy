@@ -10,7 +10,7 @@ import numpy as np
 from ogb.utils.url import decide_download, download_url, extract_zip, makedirs
 
 
-class MAG240MMINIDataset(object):
+class MAG240MMINI256Dataset(object):
     version = 1
     url = 'http://ogb-data.stanford.edu/data/lsc/mag240m_kddcup2021.zip'
 
@@ -129,7 +129,7 @@ class MAG240MEvaluator:
 
 
 if __name__ == '__main__':
-    dataset = MAG240MMINIDataset()
+    dataset = MAG240MMINI256Dataset()
     print(dataset)
     print(dataset.num_papers)
     print(dataset.num_authors)
@@ -142,20 +142,5 @@ if __name__ == '__main__':
     print(split_dict['test'].shape)
 
     print(dataset.paper_feat.shape)
-    print(dataset.paper_year.shape)
-    print(dataset.paper_year[:100])
-    print(dataset.edge_index('author', 'paper').shape)
-    print(dataset.edge_index('author', 'writes', 'paper').shape)
-    print(dataset.edge_index('author', 'writes', 'paper')[:, :10])
-    print('-----------------')
+    print(dataset.paper_feat[:100])
 
-    train_idx = dataset.get_idx_split('train')
-    val_idx = dataset.get_idx_split('valid')
-    test_idx = dataset.get_idx_split('test')
-    print(len(train_idx) + len(val_idx) + len(test_idx))
-    print(dataset.paper_label[train_idx][:10])
-    print(dataset.paper_label[val_idx][:10])
-    print(dataset.paper_label[test_idx][:10])
-    print(dataset.paper_year[train_idx][:10])
-    print(dataset.paper_year[val_idx][:10])
-    print(dataset.paper_year[test_idx][:10])
