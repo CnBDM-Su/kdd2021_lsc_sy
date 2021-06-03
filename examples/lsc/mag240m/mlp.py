@@ -270,8 +270,8 @@ if __name__ == '__main__':
 
         easy_in_dis = np.mean(easy_in_dis)
         hard_in_dis = np.mean(hard_in_dis)
-        easy_out_dis = np.mean(cosine_distances(center_easy))
-        hard_out_dis = np.mean(cosine_distances(center_hard))
+        easy_out_dis = np.mean(cosine_distances(np.array(center_easy)))
+        hard_out_dis = np.mean(cosine_distances(np.array(center_hard)))
         S_easy = (easy_out_dis - easy_in_dis) / max(easy_out_dis, easy_in_dis)
         S_hard = (hard_out_dis - hard_in_dis) / max(hard_out_dis, hard_in_dis)
         print('easy Silhouette Coefficient:',S_easy)
