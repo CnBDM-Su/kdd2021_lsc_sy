@@ -19,6 +19,8 @@ dataset = MAG240MMINIDataset(ROOT)
 co_author = np.load(f'{dataset.dir}/author_connect_graph.npy')
 paper = np.load(f'{dataset.dir}/paper_connect_graph.npy')
 sorted_paper = paper[:, paper[1, :].argsort()]
+print(paper)
+print(co_author)
 bias = 0
 overlap = []
 for i in tqdm(range(co_author.shape[1])):
