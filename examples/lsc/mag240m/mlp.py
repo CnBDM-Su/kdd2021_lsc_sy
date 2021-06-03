@@ -251,21 +251,30 @@ if __name__ == '__main__':
         label_hard = dataset.all_paper_label[mlp_hard]
 
         from sklearn.metrics.pairwise import cosine_distances
-        easy_dis = []
+        easy_in_dis = []
         center_easy = []
-        hard_dis = []
+        hard_in_dis = []
         center_hard = []
         for i in range(153):
             try:
-                easy_dis.append(np.mean(cosine_distances(x_easy[label_easy==i])))
+                easy_in_dis.append(np.mean(cosine_distances(x_easy[label_easy==i])))
+                center_easy.append(np.mean(x_easy[label_easy==i],0))
             except:
                 continue
         for i in range(153):
             try:
-                hard_dis.append(np.mean(cosine_distances(x_hard[label_hard==i])))
+                hard_in_dis.append(np.mean(cosine_distances(x_hard[label_hard==i])))
+                center_hard.append(np.mean(x_hard[label_easy==i],0))
             except:
                 continue
-        print('easy distance:',np.mean(easy_dis))
-        print('hard distance:', np.mean(hard_dis))
+
+        easy_in_dis = np.mean(easy_in_dis)
+        hard_in_dis = np.mean(hard_in_dis)
+        easy_out_dis = np.mean(cosine_distances(center_easy))
+        hard_out_dis = np.mean(cosine_distances(center_hard))
+        S_easy = (easy_out_dis - easy_in_dis) / max(easy_out_dis, easy_in_dis)
+        S_hard = (hard_out_dis - hard_in_dis) / max(hard_out_dis, hard_in_dis)
+        print('easy Silhouette Coefficient:',S_easy)
+        print('hard Silhouette Coefficient:', S_hard)
 
 
