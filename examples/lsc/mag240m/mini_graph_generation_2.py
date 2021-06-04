@@ -60,7 +60,8 @@ if __name__ == '__main__':
             for key in layer_info.keys():
                 if layer_info[key] == layer:
                     search_domain.append(key)
-            for i in tqdm(range(len(search_domain))):
+            search_domain = np.sort(search_domain)
+            for i in tqdm(search_domain):
                 i = search_domain[i]
                 for j in range(bias_1, pp_edge.shape[1]):
                     if i == pp_edge[0, j]:
