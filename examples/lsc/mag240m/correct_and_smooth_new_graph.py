@@ -244,3 +244,17 @@ if __name__ == '__main__':
     # set(cross) & set(cross_2)
     # res = {'y_pred': y_pred[test_idx].argmax(dim=-1)}
     # evaluator.save_test_submission(res, save_path)
+
+    y_pred = (y_pred + y_pred_)/2
+    train_acc = evaluator.eval({
+        'y_true': y_train,
+        'y_pred': y_pred[train_idx].argmax(dim=-1)
+    })['acc']
+    valid_acc = evaluator.eval({
+        'y_true': y_valid,
+        'y_pred': y_pred[valid_idx].argmax(dim=-1)
+    })['acc']
+    print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
+    y_true = y_valid.numpy()
+    y_pred = y_pred[valid_idx].argmax(dim=-1).numpy()
+    cross = np.where(y_true==y_pred)[0]
