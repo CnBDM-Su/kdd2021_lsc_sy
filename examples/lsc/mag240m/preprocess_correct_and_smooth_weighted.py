@@ -201,7 +201,7 @@ if __name__ == '__main__':
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
         if args.parallel == True:
-            model = torch.nn.DataParallel(model, device_ids=[5,6,7])
+            model = torch.nn.DataParallel(model, device_ids=[4,5,6,7])
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
         num_params = sum([p.numel() for p in model.parameters()])
         print(f'#Params: {num_params}')
