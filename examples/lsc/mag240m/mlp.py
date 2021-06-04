@@ -217,24 +217,21 @@ if __name__ == '__main__':
         w_1 = torch.t(model.state_dict()['module.lins.1.weight'])
         bias_0 = model.state_dict()['module.lins.0.bias']
         bias_1 = model.state_dict()['module.lins.1.bias']
-        print(w_0).shape
-        print(w_1).shape
-        print(bias_0).shape
-        print(bias_1).shape
         batch_size = 600000
         con = []
         for i in range(feat.shape[0]//600000+1):
             end = min((i+1)*batch_size,feat.shape[0])
             feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
-            con.append(torch.matmul(feat1,w_0.T.to(torch.half))+bias_0.T.to(torch.half))
+            new = torch.matmul(torch.matmul(feat1,w_0.to(torch.half))+bias_0.to(torch.half),w_1.to(torch.half))+bias_1.to(torch.half)
+            con.append(new)
 
         con = torch.cat(con).cpu().numpy()
-        # from sklearn.preprocessing import MinMaxScaler
-        # mm = MinMaxScaler((-1,1))
-        # con =mm.fit_transform(con)
+        from sklearn.preprocessing import MinMaxScaler
+        mm = MinMaxScaler((-1,1))
+        con =mm.fit_transform(con)
         print(con.shape)
         print(con)
-        # np.save(f'{dataset.dir}/128dim/node_feat.npy',con)
+        np.save(f'{dataset.dir}/256dim_3layer/node_feat.npy',con)
 #____________________test___________________________
         # y_relate = np.load(f'{dataset.dir}/data_rule_result_relate.npy')
         # y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[y_relate]
