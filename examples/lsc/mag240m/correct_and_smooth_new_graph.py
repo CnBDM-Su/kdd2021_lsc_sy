@@ -175,30 +175,60 @@ if __name__ == '__main__':
     # edge_index = torch.from_numpy(edge_index)
     # adj_t = adj_t.set_value(edge_index[2], layout='coo')
 
-    model = CorrectAndSmooth(args.num_correction_layers, args.correction_alpha,
-                             args.num_smoothing_layers, args.smoothing_alpha,
-                             autoscale=True)
+    def train(adj_t, smoothing_alpha, y_pred=y_pred):
+        model = CorrectAndSmooth(args.num_correction_layers, args.correction_alpha,
+                                 args.num_smoothing_layers, args.smoothing_alpha,
+                                 autoscale=True)
 
-    t = time.perf_counter()
-    print(y_pred.sum())
-    print(y_pred.size(0))
-    print('Correcting predictions...', end=' ', flush=True)
-    assert abs((float(y_pred.sum()) / y_pred.size(0)) - 1.0) < 1e-2
+        t = time.perf_counter()
+        print(y_pred.sum())
+        print(y_pred.size(0))
+        print('Correcting predictions...', end=' ', flush=True)
+        assert abs((float(y_pred.sum()) / y_pred.size(0)) - 1.0) < 1e-2
 
-    numel = int(train_idx.sum()) if train_idx.dtype == torch.bool else train_idx.size(0)
-    assert y_train.size(0) == numel
-    y_pred_ = deepcopy(y_pred)
+        numel = int(train_idx.sum()) if train_idx.dtype == torch.bool else train_idx.size(0)
+        assert y_train.size(0) == numel
+        # y_pred_ = deepcopy(y_pred)
 
-    print('_______co_author___________')
-    y_pred = model.correct(y_pred, y_train, train_idx, adj_t)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
+        y_pred = model.correct(y_pred, y_train, train_idx, adj_t)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-    t = time.perf_counter()
-    print('Smoothing predictions...', end=' ', flush=True)
-    y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    print(y_pred.sum())
+        t = time.perf_counter()
+        print('Smoothing predictions...', end=' ', flush=True)
+        y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
+        print(f'Done! [{time.perf_counter() - t:.2f}s]')
+        print(y_pred.sum())
 
+        train_acc = evaluator.eval({
+            'y_true': y_train,
+            'y_pred': y_pred[train_idx].argmax(dim=-1)
+        })['acc']
+        # valid_acc = evaluator.eval({
+        #     'y_true': y_valid,
+        #     'y_pred': y_pred[valid_idx].argmax(dim=-1)
+        # })['acc']
+        # print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
+
+        return y_pred, train_acc
+        # y_true = y_valid.numpy()
+    # y_pred = y_pred[valid_idx].argmax(dim=-1).numpy()
+    # cross = np.where(y_true==y_pred)[0]
+    print('_______co_author__________')
+    acc_lis = []
+    alpha_lis = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0]
+    for i in alpha_lis:
+        y_pred_tmp, train_acc = train(i,adj_t)
+        acc_lis.append(train_acc)
+        if len(acc_lis)>1:
+            if acc_lis[-1]-acc_lis[-2] > 0.001:
+                y_pred_best = y_pred_tmp
+            else:
+                try:
+                    y_pred = y_pred_best
+                except:
+                    y_pred = y_pred_tmp
+                break
+    print('coauthor graph smooth alpha is',i)
     train_acc = evaluator.eval({
         'y_true': y_train,
         'y_pred': y_pred[train_idx].argmax(dim=-1)
@@ -208,20 +238,24 @@ if __name__ == '__main__':
         'y_pred': y_pred[valid_idx].argmax(dim=-1)
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
-    y_true = y_valid.numpy()
-    # y_pred = y_pred[valid_idx].argmax(dim=-1).numpy()
-    # cross = np.where(y_true==y_pred)[0]
+
  #________________________________________________________
     print('______patial_paper__________')
-    y_pred_ = model.correct(y_pred_, y_train, train_idx, adj_t_2)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
-    t = time.perf_counter()
-    print('Smoothing predictions...', end=' ', flush=True)
-    y_pred_ = model.smooth(y_pred_, y_train, train_idx, adj_t_2)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    print(y_pred_.sum())
-
+    acc_lis = []
+    alpha_lis = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0]
+    for i in alpha_lis:
+        y_pred_tmp, train_acc = train(i,adj_t_2)
+        acc_lis.append(train_acc)
+        if len(acc_lis)>1:
+            if acc_lis[-1]-acc_lis[-2] > 0.001:
+                y_pred_best = y_pred_tmp
+            else:
+                try:
+                    y_pred_ = y_pred_best
+                except:
+                    y_pred_ = y_pred_tmp
+                break
+    print('cite graph smooth alpha is',i)
     train_acc = evaluator.eval({
         'y_true': y_train,
         'y_pred': y_pred_[train_idx].argmax(dim=-1)
@@ -232,7 +266,26 @@ if __name__ == '__main__':
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
 
-    y_true = y_valid.numpy()
+    # y_pred_ = model.correct(y_pred_, y_train, train_idx, adj_t_2)
+    # print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    #
+    # t = time.perf_counter()
+    # print('Smoothing predictions...', end=' ', flush=True)
+    # y_pred_ = model.smooth(y_pred_, y_train, train_idx, adj_t_2)
+    # print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    # print(y_pred_.sum())
+    #
+    # train_acc = evaluator.eval({
+    #     'y_true': y_train,
+    #     'y_pred': y_pred_[train_idx].argmax(dim=-1)
+    # })['acc']
+    # valid_acc = evaluator.eval({
+    #     'y_true': y_valid,
+    #     'y_pred': y_pred_[valid_idx].argmax(dim=-1)
+    # })['acc']
+    # print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
+    #
+    # y_true = y_valid.numpy()
     # y_pred_ = y_pred_[valid_idx].argmax(dim=-1).numpy()
     # cross_2 = np.where(y_true==y_pred_)[0]
 
@@ -254,7 +307,7 @@ if __name__ == '__main__':
         'y_true': y_valid,
         'y_pred': y_pred.argmax(dim=-1)
     })['acc']
-    print(f'Valid: {valid_acc:.4f}')
+    print(f'fusion Valid: {valid_acc:.4f}')
     # y_true = y_valid.numpy()
     # y_pred = y_pred[valid_idx].argmax(dim=-1).numpy()
     # cross = np.where(y_true==y_pred)[0]
