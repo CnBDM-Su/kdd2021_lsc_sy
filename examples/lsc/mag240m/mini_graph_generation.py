@@ -89,7 +89,7 @@ if __name__ == '__main__':
     else:
         meaningful_idx = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy'
+    path = f'{dataset.dir}/'+save_path+'/sorted_author_paper_edge.npy'
     if not osp.exists(path):
         print('Generating sorted author paper edges...')
         t = time.perf_counter()

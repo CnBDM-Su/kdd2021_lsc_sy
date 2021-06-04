@@ -207,24 +207,25 @@ if __name__ == '__main__':
         if args.parallel == True:
             model = torch.nn.DataParallel(model, device_ids=gpus)
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
+        print(model.state_dict())
 #___________________predict______________________________
-        feat = dataset.paper_feat
-        w = torch.t(model.state_dict()['module.lins.0.weight'])
-        bias = model.state_dict()['module.lins.0.bias']
-        batch_size = 600000
-        con = []
-        for i in range(feat.shape[0]//600000+1):
-            end = min((i+1)*batch_size,feat.shape[0])
-            feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
-            con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
-
-        con = torch.cat(con).cpu().numpy()
-        from sklearn.preprocessing import MinMaxScaler
-        mm = MinMaxScaler((-1,1))
-        con =mm.fit_transform(con)
-        print(con.shape)
-        print(con)
-        np.save(f'{dataset.dir}/128dim/node_feat.npy',con)
+        # feat = dataset.paper_feat
+        # w = torch.t(model.state_dict()['module.lins.0.weight'])
+        # bias = model.state_dict()['module.lins.0.bias']
+        # batch_size = 600000
+        # con = []
+        # for i in range(feat.shape[0]//600000+1):
+        #     end = min((i+1)*batch_size,feat.shape[0])
+        #     feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
+        #     con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
+        #
+        # con = torch.cat(con).cpu().numpy()
+        # from sklearn.preprocessing import MinMaxScaler
+        # mm = MinMaxScaler((-1,1))
+        # con =mm.fit_transform(con)
+        # print(con.shape)
+        # print(con)
+        # np.save(f'{dataset.dir}/128dim/node_feat.npy',con)
 #____________________test___________________________
         # y_relate = np.load(f'{dataset.dir}/data_rule_result_relate.npy')
         # y_rule = np.load(f'{dataset.dir}/data_rule_result.npy')[y_relate]
