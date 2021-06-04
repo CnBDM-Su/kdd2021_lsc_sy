@@ -209,8 +209,8 @@ if __name__ == '__main__':
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
     y_true = y_valid.numpy()
-    y_pred = y_pred[valid_idx].argmax(dim=-1).numpy()
-    cross = np.where(y_true==y_pred)[0]
+    # y_pred = y_pred[valid_idx].argmax(dim=-1).numpy()
+    # cross = np.where(y_true==y_pred)[0]
  #________________________________________________________
     print('______patial_paper__________')
     y_pred_ = model.correct(y_pred_, y_train, train_idx, adj_t_2)
@@ -233,13 +233,13 @@ if __name__ == '__main__':
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
 
     y_true = y_valid.numpy()
-    y_pred_ = y_pred_[valid_idx].argmax(dim=-1).numpy()
-    cross_2 = np.where(y_true==y_pred_)[0]
+    # y_pred_ = y_pred_[valid_idx].argmax(dim=-1).numpy()
+    # cross_2 = np.where(y_true==y_pred_)[0]
 
-    print('co_author_right:',cross.shape)
-    print('partial_paper_right:', cross_2.shape)
-    print('cross right:',len(set(cross) & set(cross_2)))
-    print('share right:', len(set(cross) | set(cross_2)))
+    # print('co_author_right:',cross.shape)
+    # print('partial_paper_right:', cross_2.shape)
+    # print('cross right:',len(set(cross) & set(cross_2)))
+    # print('share right:', len(set(cross) | set(cross_2)))
     #
     # set(cross) & set(cross_2)
     # res = {'y_pred': y_pred[test_idx].argmax(dim=-1)}
