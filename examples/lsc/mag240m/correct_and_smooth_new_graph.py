@@ -177,7 +177,7 @@ if __name__ == '__main__':
 
     def train(adj_t, smoothing_alpha, y_pred=y_pred):
         model = CorrectAndSmooth(args.num_correction_layers, args.correction_alpha,
-                                 args.num_smoothing_layers, args.smoothing_alpha,
+                                 args.num_smoothing_layers, smoothing_alpha,
                                  autoscale=True)
 
         t = time.perf_counter()
@@ -217,7 +217,7 @@ if __name__ == '__main__':
     acc_lis = []
     alpha_lis = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0]
     for i in alpha_lis:
-        y_pred_tmp, train_acc = train(i,adj_t)
+        y_pred_tmp, train_acc = train(adj_t,i)
         acc_lis.append(train_acc)
         if len(acc_lis)>1:
             if acc_lis[-1]-acc_lis[-2] > 0.001:
@@ -244,7 +244,7 @@ if __name__ == '__main__':
     acc_lis = []
     alpha_lis = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0]
     for i in alpha_lis:
-        y_pred_tmp, train_acc = train(i,adj_t_2)
+        y_pred_tmp, train_acc = train(adj_t_2,i)
         acc_lis.append(train_acc)
         if len(acc_lis)>1:
             if acc_lis[-1]-acc_lis[-2] > 0.001:
