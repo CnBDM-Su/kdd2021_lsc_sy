@@ -143,7 +143,9 @@ if __name__ == '__main__':
     # train_idx = np.load(f'{dataset.dir}/new_train_idx.npy')
     valid_idx = dataset.get_idx_split('valid')
     test_idx = dataset.get_idx_split('test')
-    x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
+
+    # x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
+    x = np.load(f'{dataset.dir}/paper_relation_weighted_i_feat.npy')
     t = time.perf_counter()
     print('Reading training node features...', end=' ', flush=True)
     x_train = x[train_idx]
@@ -171,7 +173,7 @@ if __name__ == '__main__':
     print(args.evaluate)
     if args.evaluate ==0:
 
-        model = MLP(dataset.num_paper_features*2, args.hidden_channels,
+        model = MLP(dataset.num_paper_features*3, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
 
@@ -201,7 +203,7 @@ if __name__ == '__main__':
         # 保存
         torch.save(model.state_dict(), 'results/mlp/model.pkl')
     else:
-        model = MLP(dataset.num_paper_features*2, args.hidden_channels,
+        model = MLP(dataset.num_paper_features*3, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
         if args.parallel == True:
@@ -211,9 +213,9 @@ if __name__ == '__main__':
         feat = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
         w = torch.t(model.state_dict()['module.lins.0.weight'])
         bias = model.state_dict()['module.lins.0.bias']
-        batch_size = 300000
+        batch_size = 200000
         con = []
-        for i in range(feat.shape[0]//300000+1):
+        for i in range(feat.shape[0]//200000+1):
             end = min((i+1)*batch_size,feat.shape[0])
             feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
             con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
@@ -224,7 +226,7 @@ if __name__ == '__main__':
         con =mm.fit_transform(con)
         print(con.shape)
         print(con)
-        np.save(f'{dataset.dir}/256dim_ap/node_feat.npy',con)
+        np.save(f'{dataset.dir}/256dim_api/node_feat.npy',con)
 
 
 
