@@ -208,7 +208,7 @@ if __name__ == '__main__':
             model = torch.nn.DataParallel(model, device_ids=gpus)
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
 #___________________predict______________________________
-        feat = dataset.paper_feat
+        feat = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
         w = torch.t(model.state_dict()['module.lins.0.weight'])
         bias = model.state_dict()['module.lins.0.bias']
         batch_size = 600000
