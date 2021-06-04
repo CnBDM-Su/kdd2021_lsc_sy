@@ -14,6 +14,7 @@ from collections import defaultdict
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', type=int, default=0)
+    parser.add_argument('--save_path', type=str, default='mini_graph')
     parser.add_argument('--ignore_layer_num', type=int, default=3),
     args = parser.parse_args()
     print(args)
@@ -30,6 +31,7 @@ if __name__ == '__main__':
 
     meaningful_idx = np.concatenate([train_idx, valid_idx, test_idx], 0)
     meaningful_idx = np.sort(meaningful_idx)
+    save_path = args.save_path
 
     pp_edge = dataset.edge_index('paper', 'cites', 'paper')
 
@@ -44,7 +46,7 @@ if __name__ == '__main__':
     else:
         ipp_edge = np.load(path)
 
-    path = f'{dataset.dir}/meaningful_idx.npy'
+    path = f'{dataset.dir}/'+save_path+'/meaningful_idx.npy'
     if not osp.exists(path):
         layer_info = {}
         for i in meaningful_idx:
@@ -100,7 +102,7 @@ if __name__ == '__main__':
 
     meaningful_idx = np.sort(meaningful_idx)
     ai_edge = dataset.edge_index('author', 'affiliated_with', 'institution')
-    path = f'{dataset.dir}/meaningful_author_idx.npy'
+    path = f'{dataset.dir}/'+save_path+'/meaningful_author_idx.npy'
     if not osp.exists(path):
         print('generating author meaningful index...')
         meaningful_a = []
@@ -119,7 +121,7 @@ if __name__ == '__main__':
     else:
         meaningful_a = np.load(path)
 
-    path = f'{dataset.dir}/meaningful_institution_idx.npy'
+    path = f'{dataset.dir}/'+save_path+'/meaningful_institution_idx.npy'
     if not osp.exists(path):
         print('generating institution meaningful index...')
         meaningful_i = []
@@ -140,7 +142,7 @@ if __name__ == '__main__':
     else:
         meaningful_i = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph/meta.pt'
+    path = f'{dataset.dir}/'+save_path+'/meta.pt'
     if not osp.exists(path):
         num_dict = {}
         num_dict['paper'] = meaningful_idx.shape[0]
@@ -151,7 +153,7 @@ if __name__ == '__main__':
     else:
         num_dict = torch.load(path)
 
-    path = f'{dataset.dir}/mini_graph/processed/paper/node_feat.npy'
+    path = f'{dataset.dir}/'+save_path+'/processed/paper/node_feat.npy'
     if not osp.exists(path):
         print('generating mini graph paper features...')
         t = time.perf_counter()
@@ -163,7 +165,7 @@ if __name__ == '__main__':
         np.save(path, y)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-    path = f'{dataset.dir}/mini_graph/full_feat.npy'
+    path = f'{dataset.dir}/'+save_path+'/full_feat.npy'
     if not osp.exists(path):
         print('generating mini graph features...')
         t = time.perf_counter()
@@ -177,11 +179,9 @@ if __name__ == '__main__':
         y = np.concatenate([y, y1, y2], 0)
 
         np.save(path, y)
-        with open(f'{dataset.dir}/full_feat_done.txt', 'w') as f:
-            f.write('done')
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-    path = f'{dataset.dir}/mini_graph/processed/paper/node_label.npy'
+    path = f'{dataset.dir}/'+save_path+'/processed/paper/node_label.npy'
     if not osp.exists(path):
         print('generating mini paper label...')
         t = time.perf_counter()
@@ -192,7 +192,7 @@ if __name__ == '__main__':
     else:
         label = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph/processed/paper/node_year.npy'
+    path = f'{dataset.dir}/'+save_path+'/processed/paper/node_year.npy'
     if not osp.exists(path):
         print('generating mini paper year...')
         t = time.perf_counter()
@@ -211,7 +211,7 @@ if __name__ == '__main__':
     for i in range(meaningful_i.shape[0]):
         i_ind_dict[meaningful_i[i]] = i
 
-    path = f'{dataset.dir}/mini_graph/split_dict.pt'
+    path = f'{dataset.dir}/'+save_path+'/split_dict.pt'
     if not osp.exists(path):
         split_dict = {}
         train_idx_new = []
@@ -233,7 +233,7 @@ if __name__ == '__main__':
     else:
         split_dict = torch.load(path)
 
-    path = f'{dataset.dir}/mini_graph/processed/paper___cites___paper/edge_index.npy'
+    path = f'{dataset.dir}/'+save_path+'/processed/paper___cites___paper/edge_index.npy'
     if not osp.exists(path):
         print('generating mini graph paper_paper edge...')
         pp_edge_new = []
@@ -245,7 +245,7 @@ if __name__ == '__main__':
     else:
         pp_edge = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph/processed/author___writes___paper/edge_index.npy'
+    path = f'{dataset.dir}/'+save_path+'/processed/author___writes___paper/edge_index.npy'
     if not osp.exists(path):
         print('generating mini graph author_paper edge...')
         ap_edge = dataset.edge_index('author', 'writes', 'paper')
@@ -258,7 +258,7 @@ if __name__ == '__main__':
     else:
         ap_edge = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph/processed/author___affiliated_with___institution/edge_index.npy'
+    path = f'{dataset.dir}/'+save_path+'/processed/author___affiliated_with___institution/edge_index.npy'
     if not osp.exists(path):
         print('generating mini graph author_institution edge...')
         ai_edge_new = []
@@ -270,7 +270,7 @@ if __name__ == '__main__':
     else:
         ai_edge = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph/paper_degree.npy'
+    path = f'{dataset.dir}/'+save_path+'/paper_degree.npy'
     if not osp.exists(path):
         print('generating mini graph paper degree...')
         p_degree = np.zeros(num_dict['paper'])
@@ -281,7 +281,7 @@ if __name__ == '__main__':
     else:
         p_degree = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph/author_degree.npy'
+    path = f'{dataset.dir}/'+save_path+'/author_degree.npy'
     if not osp.exists(path):
         print('generating mini graph author degree...')
         a_degree = np.zeros(num_dict['author'])
@@ -291,7 +291,7 @@ if __name__ == '__main__':
     else:
         a_degree = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph/paper_to_paper_symmetric.pt'
+    path = f'{dataset.dir}/'+save_path+'/paper_to_paper_symmetric.pt'
     if not osp.exists(path):  # Will take approximately 5 minutes...
         t = time.perf_counter()
         print('Converting adjacency matrix...', end=' ', flush=True)
@@ -304,13 +304,13 @@ if __name__ == '__main__':
         torch.save(adj_t.to_symmetric(), path)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-    path = f'{dataset.dir}/mini_graph/full_adj_t.pt'
+    path = f'{dataset.dir}/'+save_path+'/full_adj_t.pt'
     if not osp.exists(path):  # Will take approximately 16 minutes...
         t = time.perf_counter()
         print('Merging adjacency matrices...', end=' ', flush=True)
 
         row, col, _ = torch.load(
-            f'{dataset.dir}/mini_graph/paper_to_paper_symmetric.pt').coo()
+            f'{dataset.dir}/'+save_path+'/paper_to_paper_symmetric.pt').coo()
         rows, cols = [row], [col]
 
         edge_index = ap_edge
@@ -353,7 +353,7 @@ if __name__ == '__main__':
         torch.save(full_adj_t, path)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
-    path = f'{dataset.dir}/mini_graph/author_connect_graph_2.npy'
+    path = f'{dataset.dir}/'+save_path+'/author_connect_graph_2.npy'
     if not osp.exists(path):
         print('generating mini author connect edge...')
         def zero():
@@ -367,7 +367,7 @@ if __name__ == '__main__':
 
         connect = []
         bias = 0
-        path_ = f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy'
+        path_ = f'{dataset.dir}/'+save_path+'/sorted_author_paper_edge.npy'
         if not osp.exists(path_):
             print('Generating sorted author paper edges...')
             t = time.perf_counter()
@@ -471,7 +471,7 @@ if __name__ == '__main__':
     else:
         connect = np.load(path)
 
-    path = f'{dataset.dir}/mini_graph/paper_connect_graph_2.npy'
+    path = f'{dataset.dir}/'+save_path+'/paper_connect_graph_2.npy'
     if not osp.exists(path):
         print('generating mini paper connect edge...')
 
@@ -488,7 +488,7 @@ if __name__ == '__main__':
 
         connect = []
         bias = 0
-        path_ = f'{dataset.dir}/mini_graph/sorted_author_paper_edge.npy'
+        path_ = f'{dataset.dir}/'+save_path+'/sorted_author_paper_edge.npy'
         if not osp.exists(path_):
             print('Generating sorted author paper edges...')
             t = time.perf_counter()
@@ -538,7 +538,7 @@ if __name__ == '__main__':
                     if i<pp_edge[0,j]:
                         bias = j
                         break
-        path_ = f'{dataset.dir}/mini_graph/sorted_partial_paper_paper_edge_2.npy'
+        path_ = f'{dataset.dir}/'+save_path+'/sorted_partial_paper_paper_edge_2.npy'
         if not osp.exists(path_):
             print('Generating sorted paper paper edges...')
             t = time.perf_counter()
