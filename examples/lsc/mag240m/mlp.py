@@ -208,6 +208,9 @@ if __name__ == '__main__':
             model = torch.nn.DataParallel(model, device_ids=gpus)
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
         print(model.state_dict().keys())
+        print(model.state_dict()['module.lins.0.weight'].shape)
+        print(model.state_dict()['module.lins.1.weight'].shape)
+        print(model.state_dict()['module.lins.2.weight'].shape)
 #___________________predict______________________________
         # feat = dataset.paper_feat
         # w = torch.t(model.state_dict()['module.lins.0.weight'])
