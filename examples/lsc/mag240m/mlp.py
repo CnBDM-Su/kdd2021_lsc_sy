@@ -217,6 +217,10 @@ if __name__ == '__main__':
         w_1 = torch.t(model.state_dict()['module.lins.1.weight'])
         bias_0 = model.state_dict()['module.lins.0.bias']
         bias_1 = model.state_dict()['module.lins.1.bias']
+        print(w_0).shape
+        print(w_1).shape
+        print(bias_0).shape
+        print(bias_1).shape
         batch_size = 600000
         con = []
         for i in range(feat.shape[0]//600000+1):
