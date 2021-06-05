@@ -213,9 +213,9 @@ if __name__ == '__main__':
         feat = np.load(f'{dataset.dir}/paper_relation_weighted_i_feat.npy')
         w = torch.t(model.state_dict()['module.lins.0.weight'])
         bias = model.state_dict()['module.lins.0.bias']
-        batch_size = 200000
+        batch_size = 150000
         con = []
-        for i in range(feat.shape[0]//200000+1):
+        for i in range(feat.shape[0]//150000+1):
             end = min((i+1)*batch_size,feat.shape[0])
             feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
             con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
