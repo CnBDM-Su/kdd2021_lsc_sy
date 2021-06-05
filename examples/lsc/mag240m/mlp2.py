@@ -210,23 +210,29 @@ if __name__ == '__main__':
             model = torch.nn.DataParallel(model, device_ids=gpus)
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
 #___________________predict______________________________
+        # feat = x
+        # w = torch.t(model.state_dict()['module.lins.0.weight'])
+        # bias = model.state_dict()['module.lins.0.bias']
+        # batch_size = 150000
+        # con = []
+        # for i in range(feat.shape[0]//150000+1):
+        #     end = min((i+1)*batch_size,feat.shape[0])
+        #     feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
+        #     con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
+        #
+        # con = torch.cat(con).cpu().numpy()
+        # from sklearn.preprocessing import MinMaxScaler
+        # mm = MinMaxScaler((-1,1))
+        # con =mm.fit_transform(con)
+        # print(con.shape)
+        # print(con)
+        # np.save(f'{dataset.dir}/1024dim_256/node_feat.npy',con)
+
+
+        #__________________predict_result________________
         feat = x
-        w = torch.t(model.state_dict()['module.lins.0.weight'])
-        bias = model.state_dict()['module.lins.0.bias']
-        batch_size = 150000
-        con = []
-        for i in range(feat.shape[0]//150000+1):
-            end = min((i+1)*batch_size,feat.shape[0])
-            feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
-            con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
+        y_mlp = model(x).softmax(dim=-1).cpu().numpy()
 
-        con = torch.cat(con).cpu().numpy()
-        from sklearn.preprocessing import MinMaxScaler
-        mm = MinMaxScaler((-1,1))
-        con =mm.fit_transform(con)
-        print(con.shape)
-        print(con)
-        np.save(f'{dataset.dir}/1024dim_256/node_feat.npy',con)
-
+        np.save('results/mlp_new/pred.npy',y_mlp)
 
 
