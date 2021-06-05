@@ -240,6 +240,7 @@ class MAG240M(LightningDataModule):
         self.val_idx.share_memory_()
         self.test_idx = torch.from_numpy(dataset.get_idx_split('test'))
         self.test_idx.share_memory_()
+        self.idx = torch.cat([self.train_idx,self.val_idx,self.test_idx],0)
 
         N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
 
@@ -278,6 +279,11 @@ class MAG240M(LightningDataModule):
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
                                batch_size=self.batch_size, num_workers=16)
+    def related_dataloader(self):
+        return NeighborSampler(self.adj_t, node_idx=self.idx,
+                               sizes=self.sizes, return_e_id=False,
+                               transform=self.convert_batch,
+                               batch_size=self.batch_size, num_workers=4)
 
     def val_dataloader(self):
         return NeighborSampler(self.adj_t, node_idx=self.val_idx,
@@ -544,7 +550,7 @@ if __name__ == '__main__':
 
         evaluator = MAG240MEvaluator()
         if args.cut_hidden == True:
-            loader1 = datamodule.val_dataloader()
+            loader1 = datamodule.all_dataloader()
             model.eval()
             y_preds = []
             for batch in tqdm(loader1):
@@ -554,7 +560,7 @@ if __name__ == '__main__':
                     y_preds.append(out)
             # print
             y_preds = np.concatenate(y_preds)
-            print(y_preds.shape)
+            np.save('/var/kdd-data/mag240m_kddcup2021/mini_graph/1024dim/node_feat.npy',y_preds)
 
         elif args.valid_result:
             loader = datamodule.hidden_test_dataloader()
