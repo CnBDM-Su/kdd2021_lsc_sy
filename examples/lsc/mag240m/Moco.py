@@ -194,7 +194,6 @@ if __name__ == '__main__':
     if not args.evaluate:
         model = Moco_v2
 
-        print(f'#Params {sum([p.numel() for p in model.parameters()])}')
         checkpoint_callback = ModelCheckpoint(monitor='val_acc', save_top_k=1)
         if args.parallel==True:
             gpus = [4,5,6,7]
