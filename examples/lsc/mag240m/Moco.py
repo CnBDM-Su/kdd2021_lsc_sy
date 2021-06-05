@@ -19,7 +19,7 @@ from pytorch_lightning.metrics import Accuracy
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning import (LightningDataModule, LightningModule, Trainer,
                                seed_everything)
-
+from torch.utils.data import DataLoader
 from torch_sparse import SparseTensor
 from torch_geometric.nn import SAGEConv, GATConv
 from torch_geometric.data import NeighborSampler
@@ -92,46 +92,17 @@ class MAG240M(LightningDataModule):
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     def train_dataloader(self):
-        ns = NeighborSampler(self.adj_t, node_idx=self.train_idx,
-                               sizes=self.sizes, return_e_id=False,
-                               transform=self.convert_batch,
-                               batch_size=self.batch_size, shuffle=True,
-                               num_workers=16)
-        return ns
-
-    def all_dataloader(self):
-        if self.mini:
-            dataset = MAG240MMINIDataset(self.data_dir)
-        else:
-            dataset = MAG240MDataset(self.data_dir)
-        return NeighborSampler(self.adj_t, node_idx=torch.from_numpy(np.arange(dataset.num_papers)),
-                               sizes=self.sizes, return_e_id=False,
-                               transform=self.convert_batch,
-                               batch_size=self.batch_size, num_workers=4)
+        return DataLoader(self.x[self.train_idx], batch_size=self.batch_size)
 
     def val_dataloader(self):
-        return NeighborSampler(self.adj_t, node_idx=self.val_idx,
-                               sizes=self.sizes, return_e_id=False,
-                               transform=self.convert_batch,
-                               batch_size=self.batch_size, num_workers=4)
+        return DataLoader(self.x[self.valid_idx], batch_size=self.batch_size)
 
     def test_dataloader(self):  # Test best validation model once again.
-        return NeighborSampler(self.adj_t, node_idx=self.val_idx,
-                               sizes=self.sizes, return_e_id=False,
-                               transform=self.convert_batch,
-                               batch_size=self.batch_size, num_workers=4)
+        return DataLoader(self.x[self.valid_idx], batch_size=self.batch_size)
 
     def hidden_test_dataloader(self):
-        return NeighborSampler(self.adj_t, node_idx=self.test_idx,
-                               sizes=self.sizes, return_e_id=False,
-                               transform=self.convert_batch,
-                               batch_size=self.batch_size, num_workers=4)
+        return DataLoader(self.x[self.test_idx], batch_size=self.batch_size)
 
-    def convert_batch(self, batch_size, n_id, adjs):
-
-        x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
-        y = self.y[n_id[:batch_size]].to(torch.long)
-        return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
 
 class MAG240MEvaluator:
