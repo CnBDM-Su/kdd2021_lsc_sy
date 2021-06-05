@@ -10,7 +10,7 @@ from sklearn.preprocessing import MinMaxScaler
 import sys
 from ogb.lsc import MAG240MDataset, MAG240MEvaluator
 sys.path.append('/var/ogb/ogb/lsc')
-from mag240m_mini_graph import MAG240MMINIDataset
+from mag240m_mini_graph_new import MAG240MMINIDataset
 from sklearn.metrics.pairwise import rbf_kernel, cosine_similarity
 from root import ROOT
 from joblib import Parallel, delayed
@@ -116,20 +116,20 @@ if not osp.exists(done_flag_path):  # Will take ~3 hours...
 else:
     feat = np.load(path)
 
-path = f'{dataset.dir}/weighted_paper_paper_edge.npy'
-if not osp.exists(path):
-    print('Generating mini weighted paper paper edge...')
-    edge_index = dataset.edge_index('paper', 'cites', 'paper')
-    year = dataset.all_paper_year
-
-    val = []
-    def rbf(i, edge_index=edge_index, feat=feat):
-        return rbf_kernel(feat[edge_index[0, i]].reshape(1, -1), feat[edge_index[1, i]].reshape(1, -1), 0.1)
-    def cosine_sim(i, edge_index=edge_index, feat=feat):
-        return cosine_similarity(feat[edge_index[0, i]].reshape(1, -1), feat[edge_index[1, i]].reshape(1, -1))
-    val = Parallel(n_jobs=28)(delayed(rbf)(i) for i in range(edge_index.shape[1]))
-
-    weighted_edge = np.concatenate([edge_index, np.array(val).reshape(1, -1)], 0)
-    np.save(path, weighted_edge)
-else:
-    weighted_edge = np.load(path)
+# path = f'{dataset.dir}/weighted_paper_paper_edge.npy'
+# if not osp.exists(path):
+#     print('Generating mini weighted paper paper edge...')
+#     edge_index = dataset.edge_index('paper', 'cites', 'paper')
+#     year = dataset.all_paper_year
+#
+#     val = []
+#     def rbf(i, edge_index=edge_index, feat=feat):
+#         return rbf_kernel(feat[edge_index[0, i]].reshape(1, -1), feat[edge_index[1, i]].reshape(1, -1), 0.1)
+#     def cosine_sim(i, edge_index=edge_index, feat=feat):
+#         return cosine_similarity(feat[edge_index[0, i]].reshape(1, -1), feat[edge_index[1, i]].reshape(1, -1))
+#     val = Parallel(n_jobs=28)(delayed(rbf)(i) for i in range(edge_index.shape[1]))
+#
+#     weighted_edge = np.concatenate([edge_index, np.array(val).reshape(1, -1)], 0)
+#     np.save(path, weighted_edge)
+# else:
+#     weighted_edge = np.load(path)
