@@ -392,6 +392,23 @@ class RGNN(LightningModule):
 
         return self.mlp(x)
 
+    def infer(self, x: Tensor, adjs_t: List[SparseTensor]) -> Tensor:
+        for i, adj_t in enumerate(adjs_t):
+            x_target = x[:adj_t.size(0)]
+
+            out = self.skips[i](x_target)
+            for j in range(self.num_relations):
+                edge_type = adj_t.storage.value() == j
+                subadj_t = adj_t.masked_select_nnz(edge_type, layout='coo')
+                if subadj_t.nnz() > 0:
+                    out += self.convs[i][j]((x, x_target), subadj_t)
+
+            x = self.norms[i](out)
+            x = F.elu(x) if self.model == 'rgat' else F.relu(x)
+            x = F.dropout(x, p=self.dropout, training=self.training)
+
+        return x
+
     def training_step(self, batch, batch_idx: int):
         y_hat = self(batch.x, batch.adjs_t)
         train_loss = F.cross_entropy(y_hat, batch.y)
@@ -470,6 +487,7 @@ if __name__ == '__main__':
     parser.add_argument('--valid_result', type=bool, default=False)
     parser.add_argument('--mini_graph', type=bool, default=False)
     parser.add_argument('--cs', type=bool, default=False)
+    parser.add_argument('--test', type=bool, default=False)
     args = parser.parse_args()
     args.sizes = [int(i) for i in args.sizes.split('-')]
     print(args)
@@ -525,6 +543,16 @@ if __name__ == '__main__':
         # trainer.test(model=model, datamodule=datamodule)
 
         evaluator = MAG240MEvaluator()
+        if args.test == True:
+            loader1 = datamodule.val_dataloader()
+            model.eval()
+            y_preds = []
+            for batch in tqdm(loader1):
+                batch = batch.to(int(args.device))
+                with torch.no_grad():
+                    out = model.infer(batch.x, batch.adjs_t).cpu()
+                    y_preds.append(out)
+            print(y_preds)
 
         if args.valid_result:
             loader = datamodule.hidden_test_dataloader()

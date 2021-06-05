@@ -92,7 +92,7 @@ class MAG240M(LightningDataModule):
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     def train_dataloader(self):
-        return DataLoader(self.x[self.train_idx], batch_size=self.batch_size)
+        return DataLoader(self.x[self.train_idx], batch_size=self.batch_size, transform = )
 
     def val_dataloader(self):
         return DataLoader(self.x[self.val_idx], batch_size=self.batch_size)
@@ -102,6 +102,7 @@ class MAG240M(LightningDataModule):
 
     def hidden_test_dataloader(self):
         return DataLoader(self.x[self.test_idx], batch_size=self.batch_size)
+
 
 
 
