@@ -77,7 +77,8 @@ if __name__ == '__main__':
 
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
-    y_pred = torch.from_numpy(np.load(save_path+'/rgat_pred.npz')['y_pred'])
+    y_pred = torch.from_numpy(np.load('results/rgat_cs_new/y_pred_mag240m.npz')['y_pred'])
+    # y_pred = torch.from_numpy(np.load(save_path+'/rgat_pred.npz')['y_pred'])
     # y_pred = torch.from_numpy(np.load(save_path+'/pred.npy'))
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
@@ -168,7 +169,7 @@ if __name__ == '__main__':
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
 
-    np.save('results/rgat_cs/rgat_cs_pred.npy',y_pred)
+    # np.save('results/rgat_cs/rgat_cs_pred.npy',y_pred)
 
     # res = {'y_pred': y_pred[test_idx].argmax(dim=-1)}
     # evaluator.save_test_submission(res, save_path)
