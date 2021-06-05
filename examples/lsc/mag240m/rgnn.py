@@ -253,7 +253,7 @@ class MAG240M(LightningDataModule):
         #                    chunks=(200000, self.num_features), dtype=np.float16)
         # self.x = np.memmap('/var/kdd-data/mag240m_kddcup2021/mini_graph/256dim_ap/full_feat.npy', dtype=np.float16,
         #                    mode='r', shape=(N, 256))
-        self.x = np.load('/var/kdd-data/mag240m_kddcup2021/mini_graph/256dim_ap/full_feat_2.npy'
+        self.x = np.load('/var/kdd-data/mag240m_kddcup2021/mini_graph/256dim_ap/full_feat_2.npy')
         self.y = torch.from_numpy(dataset.all_paper_label)
         self.file_batch_size = N//1000
 
