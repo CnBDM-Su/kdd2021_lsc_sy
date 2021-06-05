@@ -148,87 +148,88 @@ if __name__ == '__main__':
     x1 = np.load(f'{dataset.dir}/1024dim_256/node_feat.npy')
     x2 = np.load(f'{dataset.dir}/256dim_ap/node_feat.npy')
     x = np.concatenate([x1,x2],1)
-    t = time.perf_counter()
-    print('Reading training node features...', end=' ', flush=True)
-    x_train = x[train_idx]
-    x_train = torch.from_numpy(x_train).to(torch.float).to('cpu')
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    t = time.perf_counter()
-    print('Reading validation node features...', end=' ', flush=True)
-    x_valid = x[valid_idx]
-    x_valid = torch.from_numpy(x_valid).to(torch.float).to(device)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    t = time.perf_counter()
-    print('Reading test node features...', end=' ', flush=True)
-    x_test = x[test_idx]
-    x_test = torch.from_numpy(x_test).to(torch.float).to(device)
-    print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
-    # label = np.load(f'{dataset.dir}/new_paper_label.npy')
-    label = dataset.all_paper_label
-    # y_train = torch.from_numpy(dataset.paper_label[train_idx])
-    y_train = torch.from_numpy(label[train_idx])
-    y_train = y_train.to(device, torch.long)
-    # y_valid = torch.from_numpy(dataset.paper_label[valid_idx])
-    y_valid = torch.from_numpy(label[valid_idx])
-    y_valid = y_valid.to(device, torch.long)
-    print(args.evaluate)
-    if args.evaluate ==0:
-        # dataset.num_paper_features
-        model = MLP(512, args.hidden_channels,
-                    dataset.num_classes, args.num_layers, args.dropout,
-                    not args.no_batch_norm, args.relu_last).to(device)
-
-        if args.parallel == True:
-            model = torch.nn.DataParallel(model, device_ids=gpus)
-        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-        num_params = sum([p.numel() for p in model.parameters()])
-        print(f'#Params: {num_params}')
-
-
-        best_valid_acc = 0
-        for epoch in range(1, args.epochs + 1):
-            loss = train(model, x_train, y_train, args.batch_size, optimizer)
-            train_acc = test(model, x_train, y_train, evaluator)
-            valid_acc = test(model, x_valid, y_valid, evaluator)
-            if valid_acc > best_valid_acc:
-                best_valid_acc = valid_acc
-                with torch.no_grad():
-                    model.eval()
-                    # res = {'y_pred': model(x_test).argmax(dim=-1),'y_pred_valid': model(x_valid).argmax(dim=-1)}
-                    # evaluator.save_test_submission(res, 'results/mlp')
-            if epoch % 1 == 0:
-                print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
-                      f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
-                      f'Best: {best_valid_acc:.4f}')
-
-        # 保存
-        torch.save(model.state_dict(), 'results/mlp/model.pkl')
-    else:
-        model = MLP(512, args.hidden_channels,
-                    dataset.num_classes, args.num_layers, args.dropout,
-                    not args.no_batch_norm, args.relu_last).to(device)
-        if args.parallel == True:
-            model = torch.nn.DataParallel(model, device_ids=gpus)
-        model.load_state_dict(torch.load('results/mlp/model.pkl'))
-#___________________predict______________________________
-        feat = x
-        w = torch.t(model.state_dict()['module.lins.0.weight'])
-        bias = model.state_dict()['module.lins.0.bias']
-        batch_size = 200000
-        con = []
-        for i in range(feat.shape[0]//200000+1):
-            end = min((i+1)*batch_size,feat.shape[0])
-            feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
-            con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
-
-        con = torch.cat(con).cpu().numpy()
-        from sklearn.preprocessing import MinMaxScaler
-        mm = MinMaxScaler((-1,1))
-        con =mm.fit_transform(con)
-        print(con.shape)
-        print(con)
-        np.save(f'{dataset.dir}/512dim_concat/node_feat.npy',con)
-
-
-
+    np.save(f'{dataset.dir}/512dim_concat512/node_feat.npy', x)
+#     t = time.perf_counter()
+#     print('Reading training node features...', end=' ', flush=True)
+#     x_train = x[train_idx]
+#     x_train = torch.from_numpy(x_train).to(torch.float).to('cpu')
+#     print(f'Done! [{time.perf_counter() - t:.2f}s]')
+#     t = time.perf_counter()
+#     print('Reading validation node features...', end=' ', flush=True)
+#     x_valid = x[valid_idx]
+#     x_valid = torch.from_numpy(x_valid).to(torch.float).to(device)
+#     print(f'Done! [{time.perf_counter() - t:.2f}s]')
+#     t = time.perf_counter()
+#     print('Reading test node features...', end=' ', flush=True)
+#     x_test = x[test_idx]
+#     x_test = torch.from_numpy(x_test).to(torch.float).to(device)
+#     print(f'Done! [{time.perf_counter() - t:.2f}s]')
+#
+#     # label = np.load(f'{dataset.dir}/new_paper_label.npy')
+#     label = dataset.all_paper_label
+#     # y_train = torch.from_numpy(dataset.paper_label[train_idx])
+#     y_train = torch.from_numpy(label[train_idx])
+#     y_train = y_train.to(device, torch.long)
+#     # y_valid = torch.from_numpy(dataset.paper_label[valid_idx])
+#     y_valid = torch.from_numpy(label[valid_idx])
+#     y_valid = y_valid.to(device, torch.long)
+#     print(args.evaluate)
+#     if args.evaluate ==0:
+#         # dataset.num_paper_features
+#         model = MLP(512, args.hidden_channels,
+#                     dataset.num_classes, args.num_layers, args.dropout,
+#                     not args.no_batch_norm, args.relu_last).to(device)
+#
+#         if args.parallel == True:
+#             model = torch.nn.DataParallel(model, device_ids=gpus)
+#         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+#         num_params = sum([p.numel() for p in model.parameters()])
+#         print(f'#Params: {num_params}')
+#
+#
+#         best_valid_acc = 0
+#         for epoch in range(1, args.epochs + 1):
+#             loss = train(model, x_train, y_train, args.batch_size, optimizer)
+#             train_acc = test(model, x_train, y_train, evaluator)
+#             valid_acc = test(model, x_valid, y_valid, evaluator)
+#             if valid_acc > best_valid_acc:
+#                 best_valid_acc = valid_acc
+#                 with torch.no_grad():
+#                     model.eval()
+#                     # res = {'y_pred': model(x_test).argmax(dim=-1),'y_pred_valid': model(x_valid).argmax(dim=-1)}
+#                     # evaluator.save_test_submission(res, 'results/mlp')
+#             if epoch % 1 == 0:
+#                 print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
+#                       f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
+#                       f'Best: {best_valid_acc:.4f}')
+#
+#         # 保存
+#         torch.save(model.state_dict(), 'results/mlp/model.pkl')
+#     else:
+#         model = MLP(512, args.hidden_channels,
+#                     dataset.num_classes, args.num_layers, args.dropout,
+#                     not args.no_batch_norm, args.relu_last).to(device)
+#         if args.parallel == True:
+#             model = torch.nn.DataParallel(model, device_ids=gpus)
+#         model.load_state_dict(torch.load('results/mlp/model.pkl'))
+# #___________________predict______________________________
+#         feat = x
+#         w = torch.t(model.state_dict()['module.lins.0.weight'])
+#         bias = model.state_dict()['module.lins.0.bias']
+#         batch_size = 200000
+#         con = []
+#         for i in range(feat.shape[0]//200000+1):
+#             end = min((i+1)*batch_size,feat.shape[0])
+#             feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
+#             con.append(torch.matmul(feat1,w.to(torch.half))+bias.to(torch.half))
+#
+#         con = torch.cat(con).cpu().numpy()
+#         from sklearn.preprocessing import MinMaxScaler
+#         mm = MinMaxScaler((-1,1))
+#         con =mm.fit_transform(con)
+#         print(con.shape)
+#         print(con)
+#         np.save(f'{dataset.dir}/512dim_concat/node_feat.npy',con)
+#
+#
+#
