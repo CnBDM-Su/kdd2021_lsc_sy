@@ -192,7 +192,7 @@ if __name__ == '__main__':
     datamodule = MAG240M(ROOT, args.batch_size, args.sizes, args.mini_graph)
 
     if not args.evaluate:
-        model = Moco_v2(emb_dim=768,)
+        model = Moco_v2(emb_dim=768)
 
         checkpoint_callback = ModelCheckpoint(monitor='val_acc', save_top_k=1)
         if args.parallel==True:
