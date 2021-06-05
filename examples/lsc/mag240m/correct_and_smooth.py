@@ -15,39 +15,34 @@ from ogb.utils.url import makedirs
 import sys
 sys.path.append('/var/ogb/ogb/lsc')
 from mag240m_mini_graph import MAG240MMINIDataset
-# class MAG240MEvaluator:
-#     def eval(self, input_dict):
-#         assert 'y_pred' in input_dict and 'y_true' in input_dict
-#
-#         y_pred, y_true = input_dict['y_pred'], input_dict['y_true']
-#
-#         if not isinstance(y_pred, torch.Tensor):
-#             y_pred = torch.from_numpy(y_pred)
-#         if not isinstance(y_true, torch.Tensor):
-#             y_true = torch.from_numpy(y_true)
-#
-#         assert (y_true.numel() == y_pred.numel())
-#         assert (y_true.dim() == y_pred.dim() == 1)
-#
-#         return {'acc': int((y_true == y_pred).sum()) / y_true.numel()}
-#
-#     def save_test_submission(self, input_dict, dir_path):
-#         # assert 'y_pred' in input_dict
-#         y_pred = input_dict['y_pred']
-#         y_pred_valid = input_dict['y_pred_valid']
-#         assert y_pred.shape == (146818, )
-#
-#         if isinstance(y_pred, torch.Tensor):
-#             y_pred = y_pred.cpu().numpy()
-#         y_pred = y_pred.astype(np.short)
-#
-#         if isinstance(y_pred_valid, torch.Tensor):
-#             y_pred_valid = y_pred_valid.cpu().numpy()
-#         y_pred_valid = y_pred_valid.astype(np.short)
-#
-#         makedirs(dir_path)
-#         filename = osp.join(dir_path, 'y_pred_mag240m')
-#         np.savez_compressed(filename, y_pred=y_pred, y_pred_valid=y_pred_valid)
+class MAG240MEvaluator:
+    def eval(self, input_dict):
+        assert 'y_pred' in input_dict and 'y_true' in input_dict
+
+        y_pred, y_true = input_dict['y_pred'], input_dict['y_true']
+
+        if not isinstance(y_pred, torch.Tensor):
+            y_pred = torch.from_numpy(y_pred)
+        if not isinstance(y_true, torch.Tensor):
+            y_true = torch.from_numpy(y_true)
+
+        assert (y_true.numel() == y_pred.numel())
+        assert (y_true.dim() == y_pred.dim() == 1)
+
+        return {'acc': int((y_true == y_pred).sum()) / y_true.numel()}
+
+    def save_test_submission(self, input_dict, dir_path):
+        # assert 'y_pred' in input_dict
+        y_pred = input_dict['y_pred']
+        assert y_pred.shape == (146818, )
+
+        if isinstance(y_pred, torch.Tensor):
+            y_pred = y_pred.cpu().numpy()
+        y_pred = y_pred.astype(np.short)
+
+        makedirs(dir_path)
+        filename = osp.join(dir_path, 'y_pred_mag240m')
+        np.savez_compressed(filename, y_pred=y_pred)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -171,5 +166,5 @@ if __name__ == '__main__':
 
     # np.save('results/rgat_cs/rgat_cs_pred.npy',y_pred)
 
-    # res = {'y_pred': y_pred[test_idx].argmax(dim=-1)}
-    # evaluator.save_test_submission(res, save_path)
+    res = {'y_pred': y_pred[test_idx].argmax(dim=-1)}
+    evaluator.save_test_submission(res, save_path)
