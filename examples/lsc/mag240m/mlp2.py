@@ -241,6 +241,7 @@ if __name__ == '__main__':
                 out = model(feat1).softmax(dim=-1).cpu().numpy()
                 y_preds.append(out)
         y_preds = np.concatenate(y_preds,0)
+        print(y_preds.shape)
 
         np.save('results/mlp_new/pred.npy',y_preds)
 
