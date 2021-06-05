@@ -145,7 +145,7 @@ if __name__ == '__main__':
     test_idx = dataset.get_idx_split('test')
 
     # x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
-    x1 = np.load(f'{dataset.dir}/1024dim/node_feat.npy')
+    x1 = np.load(f'{dataset.dir}/1024dim_256/node_feat.npy')
     x2 = np.load(f'{dataset.dir}/256dim_ap/node_feat.npy')
     x = np.concatenate([x1,x2],1)
     t = time.perf_counter()
