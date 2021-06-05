@@ -44,7 +44,7 @@ if __name__ == '__main__':
     else:
         ipp_edge = np.load(path)
 
-    path = f'{dataset.dir}/meaningful_idx_2.npy'
+    path = f'{dataset.dir}/mini_graph2/meaningful_idx_2.npy'
     if not osp.exists(path):
         layer_info = {}
         for i in meaningful_idx:
@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     meaningful_idx = np.sort(meaningful_idx)
     ai_edge = dataset.edge_index('author', 'affiliated_with', 'institution')
-    path = f'{dataset.dir}/meaningful_author_idx_2.npy'
+    path = f'{dataset.dir}/mini_graph2/meaningful_author_idx_2.npy'
     if not osp.exists(path):
         print('generating author meaningful index...')
         meaningful_a = []
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     else:
         meaningful_a = np.load(path)
 
-    path = f'{dataset.dir}/meaningful_institution_idx_2.npy'
+    path = f'{dataset.dir}/mini_graph2/meaningful_institution_idx_2.npy'
     if not osp.exists(path):
         print('generating institution meaningful index...')
         meaningful_i = []
@@ -140,24 +140,29 @@ if __name__ == '__main__':
     else:
         meaningful_i = np.load(path)
 
-    ap_edge = ap_edge[:, ap_edge[0, :].argsort()]
     print('generating author related meaningful index...')
     more_meaningful_index = []
     bias_1 = 0
-    for i in tqdm(range(meaningful_a.shape[0])):
-        i = meaningful_a[i]
-        tmp = []
-        for j in range(bias_1, ap_edge.shape[1]):
-            if i == ap_edge[0, j]:
-                more_meaningful_index.append(ap_edge[1, j])
-            if i < ap_edge[0, j]:
-                bias_1 = j
-                break
+    def zero():
+        return []
+    def zero_2():
+        return 0
+    ap_dict = defaultdict(zero)
+    paper_num = defaultdict(zero_2)
+    for i in tqdm(range(ap_edge.shape[1])):
+        ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
+
+    for i in tqdm(meaningful_a):
+        for j in ap_dict[i]:
+            paper_num[j] += 1
+
+    for i,v in paper_num.items():
+        if v > 1:
+            more_meaningful_index.append(i)
     meaningful_idx = np.concatenate([meaningful_idx,np.array(more_meaningful_index)],0)
     meaningful_idx = np.unique(meaningful_idx)
-    np.save(f'{dataset.dir}/meaningful_idx_2.npy', meaningful_idx)
+    np.save(f'{dataset.dir}/mini_graph2/meaningful_idx_2.npy', meaningful_idx)
     print('meaningful paper num:', meaningful_idx.shape[0])
-    ap_edge = ap_edge[:, ap_edge[1, :].argsort()]
 
     path = f'{dataset.dir}/mini_graph2/meta.pt'
     if not osp.exists(path):
