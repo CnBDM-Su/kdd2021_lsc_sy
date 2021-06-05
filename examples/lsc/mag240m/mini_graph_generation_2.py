@@ -140,29 +140,29 @@ if __name__ == '__main__':
     else:
         meaningful_i = np.load(path)
 
-    print('generating author related meaningful index...')
-    more_meaningful_index = []
-    bias_1 = 0
-    def zero():
-        return []
-    def zero_2():
-        return 0
-    ap_dict = defaultdict(zero)
-    paper_num = defaultdict(zero_2)
-    for i in tqdm(range(ap_edge.shape[1])):
-        ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
-
-    for i in tqdm(meaningful_a):
-        for j in ap_dict[i]:
-            paper_num[j] += 1
-
-    for i,v in paper_num.items():
-        if v > 2:
-            more_meaningful_index.append(i)
-    meaningful_idx = np.concatenate([meaningful_idx,np.array(more_meaningful_index)],0)
-    meaningful_idx = np.unique(meaningful_idx)
-    np.save(f'{dataset.dir}/mini_graph2/meaningful_idx_2.npy', meaningful_idx)
-    print('meaningful paper num:', meaningful_idx.shape[0])
+    # print('generating author related meaningful index...')
+    # more_meaningful_index = []
+    # bias_1 = 0
+    # def zero():
+    #     return []
+    # def zero_2():
+    #     return 0
+    # ap_dict = defaultdict(zero)
+    # paper_num = defaultdict(zero_2)
+    # for i in tqdm(range(ap_edge.shape[1])):
+    #     ap_dict[ap_edge[0, i]].append(ap_edge[1, i])
+    #
+    # for i in tqdm(meaningful_a):
+    #     for j in ap_dict[i]:
+    #         paper_num[j] += 1
+    #
+    # for i,v in paper_num.items():
+    #     if v > 2:
+    #         more_meaningful_index.append(i)
+    # meaningful_idx = np.concatenate([meaningful_idx,np.array(more_meaningful_index)],0)
+    # meaningful_idx = np.unique(meaningful_idx)
+    # np.save(f'{dataset.dir}/mini_graph2/meaningful_idx_2.npy', meaningful_idx)
+    # print('meaningful paper num:', meaningful_idx.shape[0])
 
     path = f'{dataset.dir}/mini_graph2/meta.pt'
     if not osp.exists(path):
