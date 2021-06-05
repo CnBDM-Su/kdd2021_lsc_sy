@@ -274,7 +274,8 @@ if __name__ == '__main__':
         ap_edge_new = []
         for i in tqdm(range(ap_edge.shape[1])):
             if ap_edge[1, i] in p_ind_dict.keys():
-                ap_edge_new.append([a_ind_dict[ap_edge[0, i]], p_ind_dict[ap_edge[1, i]]])
+                if ap_edge[0, i] in a_ind_dict.keys():
+                    ap_edge_new.append([a_ind_dict[ap_edge[0, i]], p_ind_dict[ap_edge[1, i]]])
         ap_edge = np.array(ap_edge_new).T
         np.save(path, ap_edge)
     else:
