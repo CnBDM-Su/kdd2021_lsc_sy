@@ -550,9 +550,10 @@ if __name__ == '__main__':
             for batch in tqdm(loader1):
                 batch = batch.to(int(args.device))
                 with torch.no_grad():
-                    out = model.infer(batch.x, batch.adjs_t).cpu()
+                    out = model.infer(batch.x, batch.adjs_t).cpu().numpy()
                     y_preds.append(out)
-            # print(y_preds)
+            # print
+            y_preds = np.concatenate(y_preds)
             print(y_preds.shape)
 
         elif args.valid_result:
