@@ -79,7 +79,8 @@ if __name__ == '__main__':
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
     # y_pred = torch.from_numpy(np.load(save_path+'/rgat_cs_pred.npy'))
-    y_pred = torch.from_numpy(np.load(save_path + '/rgat_pred.npz')['y_pred'])
+    # y_pred = torch.from_numpy(np.load(save_path + '/rgat_pred.npz')['y_pred'])
+    y_pred = torch.from_numpy(np.load('results/rgat_cs_new/y_pred_mag240m.npz')['y_pred'])
     # y_pred = torch.from_numpy(np.load(save_path+'/pred.npy'))
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
@@ -220,7 +221,7 @@ if __name__ == '__main__':
         y_pred_tmp, train_acc = train(adj_t,i)
         acc_lis.append(train_acc)
         if len(acc_lis)>1:
-            if acc_lis[-1]-acc_lis[-2] > 0.001:
+            if acc_lis[-1]-acc_lis[-2] > 0.0001:
                 y_pred_best = y_pred_tmp
             else:
                 try:
@@ -247,7 +248,7 @@ if __name__ == '__main__':
         y_pred_tmp, train_acc = train(adj_t_2,i)
         acc_lis.append(train_acc)
         if len(acc_lis)>1:
-            if acc_lis[-1]-acc_lis[-2] > 0.001:
+            if acc_lis[-1]-acc_lis[-2] > 0.0001:
                 y_pred_best = y_pred_tmp
             else:
                 try:
