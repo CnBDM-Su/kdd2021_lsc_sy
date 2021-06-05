@@ -192,7 +192,7 @@ if __name__ == '__main__':
     datamodule = MAG240M(ROOT, args.batch_size, args.sizes, args.mini_graph)
 
     if not args.evaluate:
-        model = Moco_v2
+        model = Moco_v2(emb_dim=768,)
 
         checkpoint_callback = ModelCheckpoint(monitor='val_acc', save_top_k=1)
         if args.parallel==True:
@@ -270,7 +270,7 @@ if __name__ == '__main__':
                         # print(out)
                         y_preds.append(out)
                 res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
-                evaluator.save_test_submission(res, f'results/rgat_cs')
+                evaluator.save_test_submission(res, f'results/moco')
 
             else:
                 loader = datamodule.hidden_test_dataloader()
