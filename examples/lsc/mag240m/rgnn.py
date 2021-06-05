@@ -253,7 +253,7 @@ class MAG240M(LightningDataModule):
         #                    chunks=(200000, self.num_features), dtype=np.float16)
         # self.x = np.memmap(f'{dataset.dir}/full_feat.npy', dtype=np.float16,
         #                    mode='r', shape=(N, self.num_features))
-        self.x = np.load(f'{dataset.dir}/full_feat.npy')
+        self.x = np.load('/var/kdd-data/mag240m_kddcup2021/mini_graph/256dim_ap/full_feat.npy')
         self.y = torch.from_numpy(dataset.all_paper_label)
         self.file_batch_size = N//1000
 
@@ -277,7 +277,7 @@ class MAG240M(LightningDataModule):
         return NeighborSampler(self.adj_t, node_idx=torch.from_numpy(np.arange(dataset.num_papers)),
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
-                               batch_size=self.batch_size, num_workers=4)
+                               batch_size=self.batch_size, num_workers=8)
 
     def val_dataloader(self):
         return NeighborSampler(self.adj_t, node_idx=self.val_idx,
@@ -559,7 +559,7 @@ if __name__ == '__main__':
                         # print(out)
                         y_preds.append(out)
                 res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
-                evaluator.save_test_submission(res, f'results/rgat_cs')
+                evaluator.save_test_submission(res, f'results/rgat_cs_new')
 
             else:
                 loader = datamodule.hidden_test_dataloader()
