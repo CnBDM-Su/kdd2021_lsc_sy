@@ -145,7 +145,7 @@ if __name__ == '__main__':
     test_idx = dataset.get_idx_split('test')
 
     # x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
-    x = np.load(f'{dataset.dir}/paper_relation_weighted_i_feat.npy')
+    x = np.load(f'{dataset.dir}/1024dim/paper_feat.npy')
     t = time.perf_counter()
     print('Reading training node features...', end=' ', flush=True)
     x_train = x[train_idx]
@@ -172,8 +172,8 @@ if __name__ == '__main__':
     y_valid = y_valid.to(device, torch.long)
     print(args.evaluate)
     if args.evaluate ==0:
-
-        model = MLP(dataset.num_paper_features*3, args.hidden_channels,
+        # dataset.num_paper_features
+        model = MLP(1024, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
 
@@ -203,7 +203,7 @@ if __name__ == '__main__':
         # 保存
         torch.save(model.state_dict(), 'results/mlp/model.pkl')
     else:
-        model = MLP(dataset.num_paper_features*3, args.hidden_channels,
+        model = MLP(1024, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
         if args.parallel == True:
@@ -226,7 +226,7 @@ if __name__ == '__main__':
         con =mm.fit_transform(con)
         print(con.shape)
         print(con)
-        np.save(f'{dataset.dir}/256dim_api/node_feat.npy',con)
+        np.save(f'{dataset.dir}/1024dim_256/node_feat.npy',con)
 
 
 

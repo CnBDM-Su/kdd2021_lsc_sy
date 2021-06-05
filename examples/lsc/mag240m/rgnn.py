@@ -376,7 +376,8 @@ class RGNN(LightningModule):
             BatchNorm1d(hidden_channels),
             ReLU(inplace=True),
             Dropout(p=self.dropout),
-            Linear(hidden_channels, out_channels),
+            Linear(hidden_channels, 256),
+            Linear(256, out_channels),
         )
 
         self.acc = Accuracy()
@@ -413,7 +414,7 @@ class RGNN(LightningModule):
             x = F.elu(x) if self.model == 'rgat' else F.relu(x)
             x = F.dropout(x, p=self.dropout, training=self.training)
 
-        return x
+        return self.mlp[:-1](x)
 
     def training_step(self, batch, batch_idx: int):
         y_hat = self(batch.x, batch.adjs_t)
