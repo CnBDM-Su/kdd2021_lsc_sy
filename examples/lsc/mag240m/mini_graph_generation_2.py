@@ -157,7 +157,7 @@ if __name__ == '__main__':
             paper_num[j] += 1
 
     for i,v in paper_num.items():
-        if v > 1:
+        if v > 2:
             more_meaningful_index.append(i)
     meaningful_idx = np.concatenate([meaningful_idx,np.array(more_meaningful_index)],0)
     meaningful_idx = np.unique(meaningful_idx)

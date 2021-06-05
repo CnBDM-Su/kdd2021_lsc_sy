@@ -561,7 +561,7 @@ if __name__ == '__main__':
                     y_preds.append(out)
             # print
             y_preds = np.concatenate(y_preds)
-            np.save('/var/kdd-data/mag240m_kddcup2021/mini_graph/1024dim/node_feat.npy',y_preds)
+            np.save('/var/kdd-data/mag240m_kddcup2021/mini_graph/256dim_rgat/node_feat.npy',y_preds)
 
         elif args.valid_result:
             loader = datamodule.hidden_test_dataloader()
