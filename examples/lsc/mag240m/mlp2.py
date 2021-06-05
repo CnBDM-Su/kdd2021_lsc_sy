@@ -243,6 +243,6 @@ if __name__ == '__main__':
         # y_preds = np.concatenate(y_preds,0)
         # print(y_preds.shape)
 
-        np.save('results/mlp_new/pred.npy',y_preds)
+        # np.save('results/mlp_new/pred.npy',y_preds)
 
 
