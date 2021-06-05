@@ -552,7 +552,8 @@ if __name__ == '__main__':
                 with torch.no_grad():
                     out = model.infer(batch.x, batch.adjs_t).cpu()
                     y_preds.append(out)
-            print(y_preds)
+            # print(y_preds)
+            print(y_preds.shape)
 
         if args.valid_result:
             loader = datamodule.hidden_test_dataloader()
