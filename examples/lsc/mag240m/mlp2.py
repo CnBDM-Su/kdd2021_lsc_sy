@@ -173,7 +173,7 @@ if __name__ == '__main__':
     print(args.evaluate)
     if args.evaluate ==0:
         # dataset.num_paper_features
-        model = MLP(1024, args.hidden_channels,
+        model = MLP(dataset.num_paper_features*2, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
 
@@ -203,7 +203,7 @@ if __name__ == '__main__':
         # 保存
         torch.save(model.state_dict(), 'results/mlp/model.pkl')
     else:
-        model = MLP(1024, args.hidden_channels,
+        model = MLP(dataset.num_paper_features*2, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
         if args.parallel == True:
