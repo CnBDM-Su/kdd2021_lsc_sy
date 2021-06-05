@@ -1,6 +1,6 @@
 import time
 import argparse
-
+from tqdm import tqdm
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
@@ -231,8 +231,17 @@ if __name__ == '__main__':
 
         #__________________predict_result________________
         feat = x
-        y_mlp = model(torch.from_numpy(x).to(torch.float).to('cpu')).softmax(dim=-1).cpu().numpy()
+        model.eval()
+        y_preds = []
+        batch_size = 150000
+        for i in tqdm(range(feat.shape[0]//batch_size+1)):
+            end = min((i + 1) * batch_size, feat.shape[0])
+            feat1 = torch.from_numpy(feat[i * batch_size:end]).to(device).to(torch.float)
+            with torch.no_grad():
+                out = model(feat1).softmax(dim=-1).cpu().numpy()
+                y_preds.append(out)
+        y_preds = np.concatenate(y_preds,0)
 
-        np.save('results/mlp_new/pred.npy',y_mlp)
+        np.save('results/mlp_new/pred.npy',y_preds)
 
 
