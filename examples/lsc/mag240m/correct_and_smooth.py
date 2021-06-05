@@ -131,7 +131,7 @@ if __name__ == '__main__':
         t = time.perf_counter()
 
         print('Smoothing predictions...', end=' ', flush=True)
-        # y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
+        y_pred = model.smooth(y_pred, y_train, train_idx, adj_t)
         print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
         train_acc = evaluator.eval({
