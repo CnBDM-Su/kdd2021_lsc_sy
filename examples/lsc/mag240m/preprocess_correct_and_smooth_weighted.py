@@ -165,76 +165,76 @@ if __name__ == '__main__':
     else:
         x = np.load(path)
         print(x.shape)
-    y = dataset.all_paper_year.reshape(-1,1)
-    x = np.concatenate([x,y],1)
-    mm = MinMaxScaler((0,1))
-    x = mm.fit_transform(x)
-
-
-
-    if args.evaluate == False:
-        t = time.perf_counter()
-
-        print('Reading training node features...', end=' ', flush=True)
-        # x_train = dataset.paper_feat[train_idx]
-        x_train = x[train_idx]
-        x_train = torch.from_numpy(x_train).to(torch.float)
-        print(f'Done! [{time.perf_counter() - t:.2f}s]')
-        t = time.perf_counter()
-        print('Reading validation node features...', end=' ', flush=True)
-        x_valid = x[valid_idx]
-        # x_valid = dataset.paper_feat[valid_idx]
-        x_valid = torch.from_numpy(x_valid).to(torch.float)
-        print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
-        y_train = torch.from_numpy(paper_label[train_idx])
-        y_train = y_train.to(device, torch.long)
-        y_valid = torch.from_numpy(paper_label[valid_idx])
-        y_valid = y_valid.to(device, torch.long)
-
-        if args.mini_graph:
-            save_path = 'results/mini_cs_weighted_new'
-        else:
-            save_path = 'results/cs'
-        makedirs(save_path)
-        model = MLP(dataset.num_paper_features * 2+1, args.hidden_channels,
-                    dataset.num_classes, args.num_layers, args.dropout,
-                    not args.no_batch_norm, args.relu_last).to(device)
-        if args.parallel == True:
-            model = torch.nn.DataParallel(model, device_ids=[4,5,6,7])
-        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-        num_params = sum([p.numel() for p in model.parameters()])
-        print(f'#Params: {num_params}')
-
-        best_valid_acc = 0
-        for epoch in range(1, args.epochs + 1):
-            loss = train(model, x_train, y_train, args.batch_size, optimizer)
-            train_acc = test(model, x_train, y_train, evaluator)
-            valid_acc = test(model, x_valid, y_valid, evaluator)
-            if valid_acc > best_valid_acc:
-                best_valid_acc = valid_acc
-                torch.save(model.state_dict(), save_path + '/model.pt')
-            if epoch % 100 == 0:
-                print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
-                      f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
-                      f'Best: {best_valid_acc:.4f}')
-    else:
-        model = MLP(dataset.num_paper_features * 2+1, args.hidden_channels,
-                    dataset.num_classes, args.num_layers, args.dropout,
-                    not args.no_batch_norm, args.relu_last).to(device)
-    model.load_state_dict(torch.load(save_path + '/model.pt'))
-    model.eval()
-
-    pbar = tqdm(total=dataset.num_papers)
-    pbar.set_description('Saving model predictions')
-
-    out = []
-    for i in range(0, dataset.num_papers, args.batch_size):
-        x_ = x[i:min(i + args.batch_size, dataset.num_papers)]
-        x_ = torch.from_numpy(x_).to(torch.float).to(device)
-        with torch.no_grad():
-            out.append(model(x_).softmax(dim=-1).cpu().numpy())
-        pbar.update(x_.size(0))
-    pbar.close()
-    np.save(save_path + '/pred.npy', np.concatenate(out, axis=0))
-    # np.savez('results/cs/pred.npz', *out)
+    # y = dataset.all_paper_year.reshape(-1,1)
+    # x = np.concatenate([x,y],1)
+    # mm = MinMaxScaler((0,1))
+    # x = mm.fit_transform(x)
+    #
+    #
+    #
+    # if args.evaluate == False:
+    #     t = time.perf_counter()
+    #
+    #     print('Reading training node features...', end=' ', flush=True)
+    #     # x_train = dataset.paper_feat[train_idx]
+    #     x_train = x[train_idx]
+    #     x_train = torch.from_numpy(x_train).to(torch.float)
+    #     print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    #     t = time.perf_counter()
+    #     print('Reading validation node features...', end=' ', flush=True)
+    #     x_valid = x[valid_idx]
+    #     # x_valid = dataset.paper_feat[valid_idx]
+    #     x_valid = torch.from_numpy(x_valid).to(torch.float)
+    #     print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    #
+    #     y_train = torch.from_numpy(paper_label[train_idx])
+    #     y_train = y_train.to(device, torch.long)
+    #     y_valid = torch.from_numpy(paper_label[valid_idx])
+    #     y_valid = y_valid.to(device, torch.long)
+    #
+    #     if args.mini_graph:
+    #         save_path = 'results/mini_cs_weighted_new'
+    #     else:
+    #         save_path = 'results/cs'
+    #     makedirs(save_path)
+    #     model = MLP(dataset.num_paper_features * 2+1, args.hidden_channels,
+    #                 dataset.num_classes, args.num_layers, args.dropout,
+    #                 not args.no_batch_norm, args.relu_last).to(device)
+    #     if args.parallel == True:
+    #         model = torch.nn.DataParallel(model, device_ids=[4,5,6,7])
+    #     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    #     num_params = sum([p.numel() for p in model.parameters()])
+    #     print(f'#Params: {num_params}')
+    #
+    #     best_valid_acc = 0
+    #     for epoch in range(1, args.epochs + 1):
+    #         loss = train(model, x_train, y_train, args.batch_size, optimizer)
+    #         train_acc = test(model, x_train, y_train, evaluator)
+    #         valid_acc = test(model, x_valid, y_valid, evaluator)
+    #         if valid_acc > best_valid_acc:
+    #             best_valid_acc = valid_acc
+    #             torch.save(model.state_dict(), save_path + '/model.pt')
+    #         if epoch % 100 == 0:
+    #             print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
+    #                   f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
+    #                   f'Best: {best_valid_acc:.4f}')
+    # else:
+    #     model = MLP(dataset.num_paper_features * 2+1, args.hidden_channels,
+    #                 dataset.num_classes, args.num_layers, args.dropout,
+    #                 not args.no_batch_norm, args.relu_last).to(device)
+    # model.load_state_dict(torch.load(save_path + '/model.pt'))
+    # model.eval()
+    #
+    # pbar = tqdm(total=dataset.num_papers)
+    # pbar.set_description('Saving model predictions')
+    #
+    # out = []
+    # for i in range(0, dataset.num_papers, args.batch_size):
+    #     x_ = x[i:min(i + args.batch_size, dataset.num_papers)]
+    #     x_ = torch.from_numpy(x_).to(torch.float).to(device)
+    #     with torch.no_grad():
+    #         out.append(model(x_).softmax(dim=-1).cpu().numpy())
+    #     pbar.update(x_.size(0))
+    # pbar.close()
+    # np.save(save_path + '/pred.npy', np.concatenate(out, axis=0))
+    # # np.savez('results/cs/pred.npz', *out)
