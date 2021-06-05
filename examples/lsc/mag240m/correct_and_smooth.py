@@ -59,7 +59,7 @@ if __name__ == '__main__':
     if args.mini_graph:
         dataset = MAG240MMINIDataset(ROOT)
         # save_path = 'results/mini_cs_weighted'
-        save_path = 'results/rgat_cs_new'
+        save_path = 'results/mlp_new'
 
     else:
         dataset = MAG240MDataset(ROOT)
@@ -72,10 +72,12 @@ if __name__ == '__main__':
 
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
-    y_pred = torch.from_numpy(np.load('results/rgat_cs_new/256ap_rgat.npz')['y_pred'])
+    # y_pred = torch.from_numpy(np.load('results/rgat_cs_new/256ap_rgat.npz')['y_pred'])
     # y_pred = torch.from_numpy(np.load(save_path+'/rgat_pred.npz')['y_pred'])
     # y_pred = torch.from_numpy(np.load(save_path+'/pred.npy'))
+    y_pred = torch.from_numpy(np.load(save_path + '/pred.npy'))
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
+
 
     t = time.perf_counter()
     print('Reading adjacency matrix...', end=' ', flush=True)
@@ -166,5 +168,5 @@ if __name__ == '__main__':
 
     # np.save('results/rgat_cs/rgat_cs_pred.npy',y_pred)
 
-    res = {'y_pred': y_pred[test_idx].argmax(dim=-1)}
-    evaluator.save_test_submission(res, save_path)
+    # res = {'y_pred': y_pred[test_idx].argmax(dim=-1)}
+    # evaluator.save_test_submission(res, save_path)
