@@ -299,14 +299,14 @@ if __name__ == '__main__':
     # res = {'y_pred': y_pred[test_idx].argmax(dim=-1)}
     # evaluator.save_test_submission(res, save_path)
 
-    y_pred = (y_pred[valid_idx] + y_pred_[valid_idx])/2
+    y_pred = (y_pred + y_pred_)/2
     # train_acc = evaluator.eval({
     #     'y_true': y_train,
     #     'y_pred': y_pred[train_idx].argmax(dim=-1)
     # })['acc']
     valid_acc = evaluator.eval({
         'y_true': y_valid,
-        'y_pred': y_pred.argmax(dim=-1)
+        'y_pred': y_pred[valid_idx].argmax(dim=-1)
     })['acc']
     print(f'fusion Valid: {valid_acc:.4f}')
     # y_true = y_valid.numpy()
