@@ -277,7 +277,7 @@ class MAG240M(LightningDataModule):
         return NeighborSampler(self.adj_t, node_idx=torch.from_numpy(np.arange(dataset.num_papers)),
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
-                               batch_size=self.batch_size, num_workers=8)
+                               batch_size=self.batch_size, num_workers=16)
 
     def val_dataloader(self):
         return NeighborSampler(self.adj_t, node_idx=self.val_idx,
