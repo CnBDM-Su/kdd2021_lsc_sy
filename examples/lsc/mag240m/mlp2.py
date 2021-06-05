@@ -231,7 +231,7 @@ if __name__ == '__main__':
 
         #__________________predict_result________________
         feat = x
-        y_mlp = model(torch.from_numpy(x)).softmax(dim=-1).cpu().numpy()
+        y_mlp = model(torch.from_numpy(x).to(torch.float).to('cpu')).softmax(dim=-1).cpu().numpy()
 
         np.save('results/mlp_new/pred.npy',y_mlp)
 
