@@ -16,7 +16,7 @@ from ogb.lsc import MAG240MDataset, MAG240MEvaluator
 import sys
 from torch_sparse import SparseTensor
 sys.path.append('/var/ogb/ogb/lsc')
-from mag240m_mini_graph import MAG240MMINIDataset
+from mag240m_mini_graph_new import MAG240MMINIDataset
 from root import ROOT
 
 
@@ -193,7 +193,7 @@ if __name__ == '__main__':
         y_valid = y_valid.to(device, torch.long)
 
         if args.mini_graph:
-            save_path = 'results/mini_cs_weighted'
+            save_path = 'results/mini_cs_weighted_new'
         else:
             save_path = 'results/cs'
         makedirs(save_path)
