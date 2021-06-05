@@ -95,10 +95,10 @@ class MAG240M(LightningDataModule):
         return DataLoader(self.x[self.train_idx], batch_size=self.batch_size)
 
     def val_dataloader(self):
-        return DataLoader(self.x[self.valid_idx], batch_size=self.batch_size)
+        return DataLoader(self.x[self.val_idx], batch_size=self.batch_size)
 
     def test_dataloader(self):  # Test best validation model once again.
-        return DataLoader(self.x[self.valid_idx], batch_size=self.batch_size)
+        return DataLoader(self.x[self.val_idx], batch_size=self.batch_size)
 
     def hidden_test_dataloader(self):
         return DataLoader(self.x[self.test_idx], batch_size=self.batch_size)
@@ -193,7 +193,7 @@ if __name__ == '__main__':
         print(f'Evaluating saved model in {logdir}...')
         ckpt = glob.glob(f'{logdir}/checkpoints/*')[0]
         if args.parallel==True:
-            gpus = [4,5,6,7]
+            gpus = [7]
             trainer = Trainer(gpus=gpus, resume_from_checkpoint=ckpt)
         else:
             trainer = Trainer(gpus=args.device, resume_from_checkpoint=ckpt)
