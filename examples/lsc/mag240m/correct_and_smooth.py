@@ -150,7 +150,7 @@ if __name__ == '__main__':
         y_pred_tmp, train_acc = train(i)
         acc_lis.append(train_acc)
         if len(acc_lis)>1:
-            if acc_lis[-1]-acc_lis[-2] > 0.001:
+            if acc_lis[-1]-acc_lis[-2] > 0.0001:
                 y_pred_best = y_pred_tmp
             else:
                 try:
