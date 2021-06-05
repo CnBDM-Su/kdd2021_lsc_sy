@@ -145,7 +145,7 @@ if __name__ == '__main__':
     test_idx = dataset.get_idx_split('test')
 
     # x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
-    x = np.load(f'{dataset.dir}/1024dim/node_feat.npy')
+    x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
     t = time.perf_counter()
     print('Reading training node features...', end=' ', flush=True)
     x_train = x[train_idx]
