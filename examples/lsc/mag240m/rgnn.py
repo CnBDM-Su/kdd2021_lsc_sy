@@ -487,7 +487,7 @@ if __name__ == '__main__':
     parser.add_argument('--valid_result', type=bool, default=False)
     parser.add_argument('--mini_graph', type=bool, default=False)
     parser.add_argument('--cs', type=bool, default=False)
-    parser.add_argument('--test', type=bool, default=False)
+    parser.add_argument('--cut_hidden', type=bool, default=False)
     args = parser.parse_args()
     args.sizes = [int(i) for i in args.sizes.split('-')]
     print(args)
@@ -543,7 +543,7 @@ if __name__ == '__main__':
         # trainer.test(model=model, datamodule=datamodule)
 
         evaluator = MAG240MEvaluator()
-        if args.test == True:
+        if args.cut_hidden == True:
             loader1 = datamodule.val_dataloader()
             model.eval()
             y_preds = []
@@ -555,7 +555,7 @@ if __name__ == '__main__':
             # print(y_preds)
             print(y_preds.shape)
 
-        if args.valid_result:
+        elif args.valid_result:
             loader = datamodule.hidden_test_dataloader()
             loader1 = datamodule.val_dataloader()
 
