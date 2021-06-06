@@ -211,6 +211,7 @@ if __name__ == '__main__':
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
 #___________________predict______________________________
         feat = x
+        print(feat)
         w = torch.t(model.state_dict()['module.lins.0.weight']).to(torch.half)
         bias = model.state_dict()['module.lins.0.bias'].to(torch.half)
         print(w.shape)
