@@ -217,7 +217,7 @@ if __name__ == '__main__':
         print(bias.shape)
         batch_size = 1000
         con = []
-        for i in range(feat.shape[0]//batch_size+1):
+        for i in tqdm(range(feat.shape[0]//batch_size+1)):
             end = min((i+1)*batch_size,feat.shape[0])
             feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
             res = (torch.matmul(feat1,w)+bias).cpu()
