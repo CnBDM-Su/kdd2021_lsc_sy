@@ -213,6 +213,8 @@ if __name__ == '__main__':
         feat = x
         w = torch.t(model.state_dict()['module.lins.0.weight']).to(torch.half)
         bias = model.state_dict()['module.lins.0.bias'].to(torch.half)
+        print(w.shape)
+        print(bias.shape)
         batch_size = 100000
         con = []
         for i in range(feat.shape[0]//batch_size+1):
