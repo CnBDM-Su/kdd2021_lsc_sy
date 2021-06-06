@@ -208,7 +208,7 @@ if __name__ == '__main__':
                     not args.no_batch_norm, args.relu_last).to(device)
         if args.parallel == True:
             model = torch.nn.DataParallel(model, device_ids=gpus).to('cpu')
-        model.load_state_dict(torch.load('results/mlp/model.pkl').to('cpu'))
+        model.load_state_dict(torch.load('results/mlp/model.pkl'))
 #___________________predict______________________________
         feat = x
         print(feat)
