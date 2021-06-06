@@ -215,7 +215,7 @@ if __name__ == '__main__':
         bias = model.state_dict()['module.lins.0.bias'].to(torch.half)
         print(w.shape)
         print(bias.shape)
-        batch_size = 4000
+        batch_size = 1000
         con = []
         for i in range(feat.shape[0]//batch_size+1):
             end = min((i+1)*batch_size,feat.shape[0])
