@@ -597,7 +597,7 @@ if __name__ == '__main__':
                         # print(out)
                         y_preds.append(out)
                 res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
-                evaluator.save_test_submission(res, f'results/rgat_cs_v85')
+                evaluator.save_test_submission(res, f'results/rgat_cs_v83')
 
             else:
                 loader = datamodule.hidden_test_dataloader()
