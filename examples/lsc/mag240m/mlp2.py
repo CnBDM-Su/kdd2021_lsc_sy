@@ -126,7 +126,7 @@ if __name__ == '__main__':
     print(args)
 
     torch.manual_seed(12345)
-    gpus = [4,5,6,7]
+    gpus = [5,6,7]
     if torch.cuda.is_available():
         device = f'cuda:{args.device}'
     else:
