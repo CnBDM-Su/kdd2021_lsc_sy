@@ -376,8 +376,9 @@ class RGNN(LightningModule):
             BatchNorm1d(hidden_channels),
             ReLU(inplace=True),
             Dropout(p=self.dropout),
-            Linear(hidden_channels, 256),
-            Linear(256, out_channels),
+            Linear(hidden_channels, out_channels)
+            # Linear(hidden_channels, 256),
+            # Linear(256, out_channels),
         )
 
         self.acc = Accuracy()
