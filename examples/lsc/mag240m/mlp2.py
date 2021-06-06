@@ -212,8 +212,8 @@ if __name__ == '__main__':
 #___________________predict______________________________
         feat = x
         print(feat)
-        w = torch.t(model.state_dict()['module.lins.0.weight']).to(torch.half)
-        bias = model.state_dict()['module.lins.0.bias'].to(torch.half)
+        w = torch.t(model.state_dict()['module.lins.0.weight']).to(device).to(torch.half)
+        bias = model.state_dict()['module.lins.0.bias'].to(device).to(torch.half)
         print(w.shape)
         print(bias.shape)
         batch_size = 1000
