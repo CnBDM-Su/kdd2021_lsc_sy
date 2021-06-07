@@ -145,8 +145,10 @@ if __name__ == '__main__':
     test_idx = dataset.get_idx_split('test')
 
     # x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
-    x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
+    # x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
+    x = np.load(f'{dataset.dir}256dim_ap_new/node_feat.npy')
     t = time.perf_counter()
+
     print('Reading training node features...', end=' ', flush=True)
     x_train = x[train_idx]
     x_train = torch.from_numpy(x_train).to(torch.float).to('cpu')
@@ -173,7 +175,7 @@ if __name__ == '__main__':
     print(args.evaluate)
     if args.evaluate ==0:
         # dataset.num_paper_features
-        model = MLP(dataset.num_paper_features*2, args.hidden_channels,
+        model = MLP(256, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
 
@@ -210,26 +212,26 @@ if __name__ == '__main__':
             model = torch.nn.DataParallel(model, device_ids=gpus).to('cpu')
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
 #___________________predict______________________________
-        feat = x
-        w = torch.t(model.state_dict()['module.lins.0.weight']).to(device).to(torch.half)
-        bias = model.state_dict()['module.lins.0.bias'].to(device).to(torch.half)
-        print(w.shape)
-        print(bias.shape)
-        batch_size = 1000
-        con = []
-        for i in tqdm(range(feat.shape[0]//batch_size+1)):
-            end = min((i+1)*batch_size,feat.shape[0])
-            feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
-            res = (torch.matmul(feat1,w)+bias).cpu()
-            con.append(res)
-
-        con = torch.cat(con).cpu().numpy()
-        from sklearn.preprocessing import MinMaxScaler
-        mm = MinMaxScaler((-1,1))
-        con =mm.fit_transform(con)
-        print(con.shape)
-        print(con)
-        np.save(f'{dataset.dir}/256dim_ap_new/node_feat.npy',con)
+        # feat = x
+        # w = torch.t(model.state_dict()['module.lins.0.weight']).to(device).to(torch.half)
+        # bias = model.state_dict()['module.lins.0.bias'].to(device).to(torch.half)
+        # print(w.shape)
+        # print(bias.shape)
+        # batch_size = 1000
+        # con = []
+        # for i in tqdm(range(feat.shape[0]//batch_size+1)):
+        #     end = min((i+1)*batch_size,feat.shape[0])
+        #     feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
+        #     res = (torch.matmul(feat1,w)+bias).cpu()
+        #     con.append(res)
+        #
+        # con = torch.cat(con).cpu().numpy()
+        # from sklearn.preprocessing import MinMaxScaler
+        # mm = MinMaxScaler((-1,1))
+        # con =mm.fit_transform(con)
+        # print(con.shape)
+        # print(con)
+        # np.save(f'{dataset.dir}/256dim_ap_new/node_feat.npy',con)
 
 
         #__________________predict_result________________
