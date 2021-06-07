@@ -153,7 +153,7 @@ if __name__ == '__main__':
     else:
         valid_idx_ = np.load(f'{dataset.dir}/val_idx_'+str(ratio)+'.npy')
     train_idx = np.concatenate([train_idx,valid_idx_],0)
-    # valid_idx = np.array(list(set(valid_idx) - set(valid_idx_)))
+    valid_idx = np.array(list(set(valid_idx) - set(valid_idx_)))
 
     # x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
     x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
@@ -166,9 +166,9 @@ if __name__ == '__main__':
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
     t = time.perf_counter()
     print('Reading validation node features...', end=' ', flush=True)
-    # x_valid = x[valid_idx]
-    # x_valid = torch.from_numpy(x_valid).to(torch.float).to(device)
-    # print(f'Done! [{time.perf_counter() - t:.2f}s]')
+    x_valid = x[valid_idx]
+    x_valid = torch.from_numpy(x_valid).to(torch.float).to(device)
+    print(f'Done! [{time.perf_counter() - t:.2f}s]')
     t = time.perf_counter()
     print('Reading test node features...', end=' ', flush=True)
     x_test = x[test_idx]
@@ -182,8 +182,8 @@ if __name__ == '__main__':
     y_train = y_train.to(device, torch.long)
     # y_valid = torch.from_numpy(dataset.paper_label[valid_idx])
 
-    # y_valid = torch.from_numpy(label[valid_idx])
-    # y_valid = y_valid.to(device, torch.long)
+    y_valid = torch.from_numpy(label[valid_idx])
+    y_valid = y_valid.to(device, torch.long)
     print(args.evaluate)
     if args.evaluate ==0:
         # dataset.num_paper_features
@@ -202,17 +202,17 @@ if __name__ == '__main__':
         for epoch in range(1, args.epochs + 1):
             loss = train(model, x_train, y_train, args.batch_size, optimizer)
             train_acc = test(model, x_train, y_train, evaluator)
-            # valid_acc = test(model, x_valid, y_valid, evaluator)
-            if train_acc > best_valid_acc:
-                best_valid_acc = train_acc
+            valid_acc = test(model, x_valid, y_valid, evaluator)
+            if valid_acc > best_valid_acc:
+                best_valid_acc = valid_acc
                 with torch.no_grad():
                     model.eval()
                     # res = {'y_pred': model(x_test).argmax(dim=-1),'y_pred_valid': model(x_valid).argmax(dim=-1)}
                     # evaluator.save_test_submission(res, 'results/mlp')
             if epoch % 1 == 0:
                 print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
-                      f'Train: {train_acc:.4f}, '
-                      # f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
+                      # f'Train: {train_acc:.4f}, '
+                      f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}, '
                       f'Best: {best_valid_acc:.4f}')
 
         # 保存
