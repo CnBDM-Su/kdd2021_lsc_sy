@@ -143,7 +143,7 @@ if __name__ == '__main__':
 
     train_idx = dataset.get_idx_split('train')
     # train_idx = np.load(f'{dataset.dir}/new_train_idx.npy')
-    # valid_idx = dataset.get_idx_split('valid')
+    valid_idx = dataset.get_idx_split('valid')
     test_idx = dataset.get_idx_split('test')
 
     if args.evaluate == 0:
