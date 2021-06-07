@@ -146,6 +146,7 @@ if __name__ == '__main__':
     valid_idx = dataset.get_idx_split('valid')
     test_idx = dataset.get_idx_split('test')
 
+    np.random.seed(0)
     valid_idx_ = np.random.choice(valid_idx, size=(int(valid_idx.shape[0]*ratio),), replace=False)
     np.save(f'{dataset.dir}/val_idx_'+str(ratio)+'.npy',valid_idx_)
     train_idx = np.concatenate([train_idx,valid_idx_],0)
