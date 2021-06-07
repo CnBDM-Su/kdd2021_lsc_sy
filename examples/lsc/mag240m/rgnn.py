@@ -233,12 +233,24 @@ class MAG240M(LightningDataModule):
         else:
             dataset = MAG240MDataset(self.data_dir)
 
-        self.train_idx = torch.from_numpy(dataset.get_idx_split('train'))
+        np.random.seed(0)
+        train_idx = dataset.get_idx_split('train')
+        valid_idx = dataset.get_idx_split('valid')
+        test_idx = dataset.get_idx_split('test')
+        # valid_idx_ = np.random.choice(valid_idx, size=(int(valid_idx.shape[0] * ratio),), replace=False)
+        valid_idx_ = np.load('val_idx_0.5.npy')
+        # np.save(f'{dataset.dir}/val_idx_' + str(ratio) + '.npy', valid_idx_)
+        # valid_idx_ = np.load(f'{dataset.dir}/val_idx_' + str(ratio) + '.npy')
+
+        train_idx = np.concatenate([train_idx, valid_idx_], 0)
+        valid_idx = np.array(list(set(valid_idx) - set(valid_idx_)))
+
+        self.train_idx = torch.from_numpy(train_idx)
         self.train_idx = self.train_idx
         self.train_idx.share_memory_()
-        self.val_idx = torch.from_numpy(dataset.get_idx_split('valid'))
+        self.val_idx = torch.from_numpy(valid_idx)
         self.val_idx.share_memory_()
-        self.test_idx = torch.from_numpy(dataset.get_idx_split('test'))
+        self.test_idx = torch.from_numpy(test_idx)
         self.test_idx.share_memory_()
         self.idx = torch.cat([self.train_idx,self.val_idx,self.test_idx],0)
 
@@ -252,7 +264,7 @@ class MAG240M(LightningDataModule):
         #                       mode='r', shape=(N-1000*(N//1000), self.num_features))
         # self.x = zarr.open(f'{dataset.dir}/full_feat.zarr', mode='r',shape=(N, self.num_features) ,
         #                    chunks=(200000, self.num_features), dtype=np.float16)
-        self.x = np.memmap('/var/kdd-data/mag240m_kddcup2021/mini_graph/1024dim_256/full_feat.npy', dtype=np.float16,
+        self.x = np.memmap('/var/kdd-data/mag240m_kddcup2021/mini_graph/256dim_ap_val0.5/full_feat.npy', dtype=np.float16,
                            mode='r', shape=(N, 256))
         # self.x = np.load('/var/kdd-data/mag240m_kddcup2021/mini_graph/1024dim_256/full_feat.npy')
         self.y = torch.from_numpy(dataset.all_paper_label)
@@ -562,7 +574,7 @@ if __name__ == '__main__':
                     y_preds.append(out)
             # print
             y_preds = np.concatenate(y_preds)
-            np.save('/var/kdd-data/mag240m_kddcup2021/mini_graph/256dim_rgat_twice/node_feat.npy',y_preds)
+            np.save('/var/kdd-data/mag240m_kddcup2021/mini_graph/256dim_rgat_val/node_feat.npy',y_preds)
 
         elif args.valid_result:
             loader = datamodule.hidden_test_dataloader()
@@ -598,7 +610,7 @@ if __name__ == '__main__':
                         # print(out)
                         y_preds.append(out)
                 res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
-                evaluator.save_test_submission(res, f'results/rgat_cs_v83')
+                evaluator.save_test_submission(res, f'results/rgat_cs_v91')
 
             else:
                 loader = datamodule.hidden_test_dataloader()
