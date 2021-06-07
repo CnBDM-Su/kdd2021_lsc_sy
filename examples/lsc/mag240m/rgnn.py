@@ -238,7 +238,7 @@ class MAG240M(LightningDataModule):
         valid_idx = dataset.get_idx_split('valid')
         test_idx = dataset.get_idx_split('test')
         # valid_idx_ = np.random.choice(valid_idx, size=(int(valid_idx.shape[0] * ratio),), replace=False)
-        valid_idx_ = np.load('val_idx_0.5.npy')
+        valid_idx_ = np.load(f'{dataset.dir}/val_idx_0.5.npy')
         # np.save(f'{dataset.dir}/val_idx_' + str(ratio) + '.npy', valid_idx_)
         # valid_idx_ = np.load(f'{dataset.dir}/val_idx_' + str(ratio) + '.npy')
 
