@@ -145,6 +145,7 @@ if __name__ == '__main__':
     test_idx = dataset.get_idx_split('test')
 
     valid_idx_ = np.random.choice(valid_idx, size=(int(valid_idx.shape[0]*0.5),), replace=False)
+    np.save(f'{dataset.dir}/val_idx_0.5.npy',valid_idx_)
     train_idx = np.concatenate([train_idx,valid_idx_],0)
     valid_idx = np.array(list(set(valid_idx) - set(valid_idx_)))
 
