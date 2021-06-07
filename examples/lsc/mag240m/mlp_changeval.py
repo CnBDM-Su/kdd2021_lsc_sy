@@ -122,6 +122,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=380000)
     parser.add_argument('--epochs', type=int, default=1000)
     parser.add_argument('--evaluate', type=int, default=0)
+    parser.add_argument('--ratio', type=float, default=0)
     args = parser.parse_args()
     print(args)
 
@@ -137,6 +138,7 @@ if __name__ == '__main__':
     # dataset = MAG240MDataset(ROOT)
     dataset = MAG240MMINIDataset(ROOT)
     evaluator = MAG240MEvaluator()
+    ratio = args.ratio
 
 
     train_idx = dataset.get_idx_split('train')
@@ -144,8 +146,8 @@ if __name__ == '__main__':
     valid_idx = dataset.get_idx_split('valid')
     test_idx = dataset.get_idx_split('test')
 
-    valid_idx_ = np.random.choice(valid_idx, size=(int(valid_idx.shape[0]*0.7),), replace=False)
-    np.save(f'{dataset.dir}/val_idx_0.7.npy',valid_idx_)
+    valid_idx_ = np.random.choice(valid_idx, size=(int(valid_idx.shape[0]*ratio),), replace=False)
+    np.save(f'{dataset.dir}/val_idx_'+str(ratio)+'.npy',valid_idx_)
     train_idx = np.concatenate([train_idx,valid_idx_],0)
     valid_idx = np.array(list(set(valid_idx) - set(valid_idx_)))
 
@@ -237,7 +239,7 @@ if __name__ == '__main__':
         con =mm.fit_transform(con)
         print(con.shape)
         print(con)
-        np.save(f'{dataset.dir}/256dim_ap_val0.7/node_feat.npy',con)
+        np.save(f'{dataset.dir}/256dim_ap_val'+str(ratio)+'/node_feat.npy',con)
 
 
         #__________________predict_result________________
