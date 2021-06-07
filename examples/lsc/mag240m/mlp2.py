@@ -147,6 +147,7 @@ if __name__ == '__main__':
     # x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
     # x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
     x = np.load(f'{dataset.dir}256dim_ap_new/node_feat.npy')
+    print(x.shape)
     t = time.perf_counter()
 
     print('Reading training node features...', end=' ', flush=True)
