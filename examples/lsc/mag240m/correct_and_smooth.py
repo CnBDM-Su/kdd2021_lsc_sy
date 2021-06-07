@@ -75,6 +75,7 @@ if __name__ == '__main__':
     # y_pred = torch.from_numpy(np.load('results/rgat_cs_new/256ap_rgat.npz')['y_pred'])
     # y_pred = torch.from_numpy(np.load(save_path+'/y_pred_mag240m.npz')['y_pred'])
     y_pred = torch.from_numpy(np.load(save_path+'/pred.npy'))
+    print(y_pred.shape)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
 
@@ -99,7 +100,7 @@ if __name__ == '__main__':
         adj_t = gcn_norm(adj_t, add_self_loops=True)
         torch.save(adj_t, path)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
-    print('graph_size',adj_t)
+    # print('graph_size',adj_t)
 
     y_train = torch.from_numpy(paper_label[train_idx]).to(torch.long)
     y_valid = torch.from_numpy(paper_label[valid_idx]).to(torch.long)
