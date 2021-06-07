@@ -141,12 +141,12 @@ if __name__ == '__main__':
             'y_pred': y_pred[valid_idx].argmax(dim=-1)
         })['acc']
         print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
-        return y_pred, train_acc
+        return y_pred, valid_acc
     acc_lis = []
     alpha_lis = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0]
     for i in alpha_lis:
-        y_pred_tmp, train_acc = train(i)
-        acc_lis.append(train_acc)
+        y_pred_tmp, valid_acc = train(i)
+        acc_lis.append(valid_acc)
         if len(acc_lis)>1:
             if acc_lis[-1]-acc_lis[-2] > 0.0001:
                 y_pred_best = y_pred_tmp
