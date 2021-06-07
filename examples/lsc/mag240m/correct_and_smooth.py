@@ -60,7 +60,6 @@ if __name__ == '__main__':
         dataset = MAG240MMINIDataset(ROOT)
         # save_path = 'results/mini_cs_weighted'
         save_path = 'results/rgat_cs_v85'
-'
 
     else:
         dataset = MAG240MDataset(ROOT)
