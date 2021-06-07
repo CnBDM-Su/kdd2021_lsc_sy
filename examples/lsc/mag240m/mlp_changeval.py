@@ -217,42 +217,42 @@ if __name__ == '__main__':
             model = torch.nn.DataParallel(model, device_ids=gpus).to('cpu')
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
 #___________________predict______________________________
-        # feat = x
-        # w = torch.t(model.state_dict()['module.lins.0.weight']).to(device).to(torch.half)
-        # bias = model.state_dict()['module.lins.0.bias'].to(device).to(torch.half)
-        # print(w.shape)
-        # print(bias.shape)
-        # batch_size = 1000
-        # con = []
-        # for i in tqdm(range(feat.shape[0]//batch_size+1)):
-        #     end = min((i+1)*batch_size,feat.shape[0])
-        #     feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
-        #     res = (torch.matmul(feat1,w)+bias).cpu()
-        #     con.append(res)
-        #
-        # con = torch.cat(con).cpu().numpy()
-        # from sklearn.preprocessing import MinMaxScaler
-        # mm = MinMaxScaler((-1,1))
-        # con =mm.fit_transform(con)
-        # print(con.shape)
-        # print(con)
-        # np.save(f'{dataset.dir}/256dim_ap_new/node_feat.npy',con)
+        feat = x
+        w = torch.t(model.state_dict()['module.lins.0.weight']).to(device).to(torch.half)
+        bias = model.state_dict()['module.lins.0.bias'].to(device).to(torch.half)
+        print(w.shape)
+        print(bias.shape)
+        batch_size = 1000
+        con = []
+        for i in tqdm(range(feat.shape[0]//batch_size+1)):
+            end = min((i+1)*batch_size,feat.shape[0])
+            feat1 = torch.from_numpy(feat[i*batch_size:end]).to(device).to(torch.half)
+            res = (torch.matmul(feat1,w)+bias).cpu()
+            con.append(res)
+
+        con = torch.cat(con).cpu().numpy()
+        from sklearn.preprocessing import MinMaxScaler
+        mm = MinMaxScaler((-1,1))
+        con =mm.fit_transform(con)
+        print(con.shape)
+        print(con)
+        np.save(f'{dataset.dir}/256dim_ap_val0.5/node_feat.npy',con)
 
 
         #__________________predict_result________________
-        feat = x
-        model.eval()
-        y_preds = []
-        batch_size = 150000
-        for i in tqdm(range(feat.shape[0]//batch_size+1)):
-            end = min((i + 1) * batch_size, feat.shape[0])
-            feat1 = torch.from_numpy(feat[i * batch_size:end]).to(device).to(torch.float)
-            with torch.no_grad():
-                out = model(feat1).softmax(dim=-1).cpu().numpy()
-                y_preds.append(out)
-        y_preds = np.concatenate(y_preds,0)
-        print(y_preds.shape)
-
-        np.save('results/mlp_new/pred.npy',y_preds)
+        # feat = x
+        # model.eval()
+        # y_preds = []
+        # batch_size = 150000
+        # for i in tqdm(range(feat.shape[0]//batch_size+1)):
+        #     end = min((i + 1) * batch_size, feat.shape[0])
+        #     feat1 = torch.from_numpy(feat[i * batch_size:end]).to(device).to(torch.float)
+        #     with torch.no_grad():
+        #         out = model(feat1).softmax(dim=-1).cpu().numpy()
+        #         y_preds.append(out)
+        # y_preds = np.concatenate(y_preds,0)
+        # print(y_preds.shape)
+        #
+        # np.save('results/mlp_new/pred.npy',y_preds)
 
 
