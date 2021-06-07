@@ -14,7 +14,7 @@ from root import ROOT
 from ogb.utils.url import makedirs
 import sys
 sys.path.append('/var/ogb/ogb/lsc')
-from mag240m_mini_graph_new import MAG240MMINIDataset
+from mag240m_mini_graph import MAG240MMINIDataset
 class MAG240MEvaluator:
     def eval(self, input_dict):
         assert 'y_pred' in input_dict and 'y_true' in input_dict
@@ -59,7 +59,8 @@ if __name__ == '__main__':
     if args.mini_graph:
         dataset = MAG240MMINIDataset(ROOT)
         # save_path = 'results/mini_cs_weighted'
-        save_path = 'results/mlp_new'
+        save_path = 'results/rgat_cs_v85'
+'
 
     else:
         dataset = MAG240MDataset(ROOT)
