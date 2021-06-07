@@ -206,11 +206,11 @@ if __name__ == '__main__':
         # 保存
         torch.save(model.state_dict(), 'results/mlp/model.pkl')
     else:
-        model = MLP(dataset.num_paper_features*2, args.hidden_channels,
+        model = MLP(256, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
         if args.parallel == True:
-            model = torch.nn.DataParallel(model, device_ids=gpus)
+            model = torch.nn.DataParallel(model, device_ids=gpus).to('cpu')
         model.load_state_dict(torch.load('results/mlp/model.pkl'))
 #___________________predict______________________________
         # feat = x
