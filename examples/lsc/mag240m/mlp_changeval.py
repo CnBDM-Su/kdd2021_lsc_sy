@@ -11,7 +11,7 @@ from root import ROOT
 import numpy as np
 import sys
 sys.path.append('/var/ogb/ogb/lsc')
-from mag240m_mini_graph_new import MAG240MMINIDataset
+from mag240m_mini_graph import MAG240MMINIDataset
 from ogb.utils.url import makedirs
 
 class MLP(torch.nn.Module):
@@ -126,7 +126,7 @@ if __name__ == '__main__':
     print(args)
 
     torch.manual_seed(12345)
-    gpus = [5,6,7]
+    gpus = [4,5,6,7]
     if torch.cuda.is_available():
         device = f'cuda:{args.device}'
     else:
@@ -144,9 +144,13 @@ if __name__ == '__main__':
     valid_idx = dataset.get_idx_split('valid')
     test_idx = dataset.get_idx_split('test')
 
+    valid_idx_ = np.random.choice(valid_idx, size=(valid_idx.shape[0]*0.5,), replace=False)
+    train_idx = np.concatenate([train_idx,valid_idx_],0)
+    valid_idx = np.array(list(set(valid_idx) - set(valid_idx_)))
+
     # x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
-    # x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
-    x = np.load(f'{dataset.dir}256dim_ap_new/node_feat.npy')
+    x = np.load(f'{dataset.dir}/paper_relation_weighted_feat.npy')
+    # x = np.load(f'{dataset.dir}256dim_ap_new/node_feat.npy')
     t = time.perf_counter()
 
     print('Reading training node features...', end=' ', flush=True)
@@ -170,12 +174,13 @@ if __name__ == '__main__':
     y_train = torch.from_numpy(label[train_idx])
     y_train = y_train.to(device, torch.long)
     # y_valid = torch.from_numpy(dataset.paper_label[valid_idx])
+
     y_valid = torch.from_numpy(label[valid_idx])
     y_valid = y_valid.to(device, torch.long)
     print(args.evaluate)
     if args.evaluate ==0:
         # dataset.num_paper_features
-        model = MLP(256, args.hidden_channels,
+        model = MLP(dataset.num_paper_features*2, args.hidden_channels,
                     dataset.num_classes, args.num_layers, args.dropout,
                     not args.no_batch_norm, args.relu_last).to(device)
 
