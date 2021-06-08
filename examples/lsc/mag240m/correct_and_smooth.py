@@ -69,7 +69,7 @@ if __name__ == '__main__':
     valid_idx = dataset.get_idx_split('valid')
     test_idx = dataset.get_idx_split('test')
     valid_idx_ = np.load(f'{dataset.dir}/val_idx_1.0.npy')
-    train_idx = np.concatenate([train_idx, valid_idx_], 0)
+    # train_idx = np.concatenate([train_idx, valid_idx_], 0)
     # valid_idx = np.array(list(set(valid_idx) - set(valid_idx_)))
     train_idx = torch.from_numpy(train_idx)
     valid_idx = torch.from_numpy(valid_idx)
@@ -149,7 +149,7 @@ if __name__ == '__main__':
         print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
         return y_pred, valid_acc
     acc_lis = []
-    alpha_lis = [0.3, 0.2, 0.1, 0]
+    alpha_lis = [0.5, 0.4, 0.3, 0.2, 0.1, 0]
     for i in alpha_lis:
         y_pred_tmp, valid_acc = train(i)
         acc_lis.append(valid_acc)
