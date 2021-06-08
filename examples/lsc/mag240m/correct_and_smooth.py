@@ -149,7 +149,7 @@ if __name__ == '__main__':
         print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
         return y_pred, valid_acc
     acc_lis = []
-    alpha_lis = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0]
+    alpha_lis = [0.3, 0.2, 0.1, 0]
     for i in alpha_lis:
         y_pred_tmp, valid_acc = train(i)
         acc_lis.append(valid_acc)
