@@ -59,7 +59,7 @@ if __name__ == '__main__':
     if args.mini_graph:
         dataset = MAG240MMINIDataset(ROOT)
         # save_path = 'results/mini_cs_weighted'
-        save_path = 'results/rgat_cs_v83'
+        save_path = 'results/rgat_cs_v91'
 
     else:
         dataset = MAG240MDataset(ROOT)
