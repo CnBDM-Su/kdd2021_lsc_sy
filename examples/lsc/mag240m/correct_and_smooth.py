@@ -41,7 +41,7 @@ class MAG240MEvaluator:
         y_pred = y_pred.astype(np.short)
 
         makedirs(dir_path)
-        filename = osp.join(dir_path, 'y_pred_mag240m')
+        filename = osp.join(dir_path, 'pred_result')
         np.savez_compressed(filename, y_pred=y_pred)
 
 if __name__ == '__main__':
