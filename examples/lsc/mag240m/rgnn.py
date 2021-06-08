@@ -600,7 +600,8 @@ if __name__ == '__main__':
         else:
             if args.cs:
                 # loader = datamodule.all_dataloader()
-                loader = datamodule.val_dataloader()
+                # loader = datamodule.val_dataloader()
+                loader = datamodule.test_dataloader()
 
                 model.eval()
                 y_preds = []
