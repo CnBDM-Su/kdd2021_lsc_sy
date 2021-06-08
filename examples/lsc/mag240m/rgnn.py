@@ -601,7 +601,7 @@ if __name__ == '__main__':
             if args.cs:
                 # loader = datamodule.all_dataloader()
                 # loader = datamodule.val_dataloader()
-                loader = datamodule.test_dataloader()
+                loader = datamodule.hidden_test_dataloader()
 
                 model.eval()
                 y_preds = []
