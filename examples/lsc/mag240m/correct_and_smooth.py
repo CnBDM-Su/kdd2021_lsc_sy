@@ -59,7 +59,7 @@ if __name__ == '__main__':
     if args.mini_graph:
         dataset = MAG240MMINIDataset(ROOT)
         # save_path = 'results/mini_cs_weighted'
-        save_path = 'results/rgat_cs_v94'
+        save_path = 'results/rgat_cs_v93'
 
     else:
         dataset = MAG240MDataset(ROOT)
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     train_idx = dataset.get_idx_split('train')
     valid_idx = dataset.get_idx_split('valid')
     test_idx = dataset.get_idx_split('test')
-    valid_idx_ = np.load(f'{dataset.dir}/val_idx_0.5.npy')
+    valid_idx_ = np.load(f'{dataset.dir}/val_idx_0.8.npy')
     train_idx = np.concatenate([train_idx, valid_idx_], 0)
     valid_idx = np.array(list(set(valid_idx) - set(valid_idx_)))
     train_idx = torch.from_numpy(train_idx)
