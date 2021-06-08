@@ -238,11 +238,11 @@ class MAG240M(LightningDataModule):
         valid_idx = dataset.get_idx_split('valid')
         test_idx = dataset.get_idx_split('test')
         # valid_idx_ = np.random.choice(valid_idx, size=(int(valid_idx.shape[0] * ratio),), replace=False)
-        valid_idx_ = np.load(f'{dataset.dir}/val_idx_1.0.npy')
+        # valid_idx_ = np.load(f'{dataset.dir}/val_idx_1.0.npy')
         # np.save(f'{dataset.dir}/val_idx_' + str(ratio) + '.npy', valid_idx_)
         # valid_idx_ = np.load(f'{dataset.dir}/val_idx_' + str(ratio) + '.npy')
 
-        train_idx = np.concatenate([train_idx, valid_idx_], 0)
+        # train_idx = np.concatenate([train_idx, valid_idx_], 0)
         # valid_idx = np.array(list(set(valid_idx) - set(valid_idx_)))
 
         self.train_idx = torch.from_numpy(train_idx)
@@ -598,8 +598,8 @@ if __name__ == '__main__':
 
         else:
             if args.cs:
-                loader = datamodule.all_dataloader()
-                # loader = datamodule.val_dataloader()
+                # loader = datamodule.all_dataloader()
+                loader = datamodule.val_dataloader()
 
                 model.eval()
                 y_preds = []
@@ -610,7 +610,7 @@ if __name__ == '__main__':
                         # print(out)
                         y_preds.append(out)
                 res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
-                evaluator.save_test_submission(res, f'results/rgat_cs_v95')
+                evaluator.save_test_submission(res, f'results/rgat_cs_v3')
 
             else:
                 loader = datamodule.hidden_test_dataloader()
