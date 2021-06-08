@@ -44,46 +44,18 @@ class MAG240MEvaluator:
         filename = osp.join(dir_path, 'y_pred_mag240m')
         np.savez_compressed(filename, y_pred=y_pred)
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--num_correction_layers', type=int, default=3)
-    parser.add_argument('--correction_alpha', type=float, default=1.0)
-    parser.add_argument('--num_smoothing_layers', type=int, default=2)
-    parser.add_argument('--smoothing_alpha', type=float, default=0.8)
-    parser.add_argument('--mini_graph', type=bool, default=False)
-    args = parser.parse_args()
-    print(args)
+
+def CS(dataset, train_idx, valid_idx, test_idx, paper_label,
+       num_correction_layers, correction_alpha, num_smoothing_layers, smoothing_alpha):
 
     evaluator = MAG240MEvaluator()
 
-    if args.mini_graph:
-        dataset = MAG240MMINIDataset(ROOT)
-        # save_path = 'results/mini_cs_weighted'
-        save_path = 'results/rgat_cs_v94'
-
-    else:
-        dataset = MAG240MDataset(ROOT)
-        save_path = 'results/cs'
-
-    train_idx = dataset.get_idx_split('train')
-    valid_idx = dataset.get_idx_split('valid')
-    test_idx = dataset.get_idx_split('test')
-    valid_idx_ = np.load(f'{dataset.dir}/val_idx_0.5.npy')
-    train_idx = np.concatenate([train_idx, valid_idx_], 0)
-    valid_idx = np.array(list(set(valid_idx) - set(valid_idx_)))
-    train_idx = torch.from_numpy(train_idx)
-    valid_idx = torch.from_numpy(valid_idx)
-    test_idx = torch.from_numpy(test_idx)
-    paper_label = dataset.paper_label
+    save_path = 'results/rgat_cs_v91'
 
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
     y_pred = torch.from_numpy(np.load(save_path+'/256rgat_cs_val0.5.npz')['y_pred'])
-    # y_pred = torch.from_numpy(np.load(save_path+'/y_pred_mag240m.npz')['y_pred'])
-    # y_pred = torch.from_numpy(np.load(save_path+'/pred.npy'))
-    # print(y_pred.shape)
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
-
 
     t = time.perf_counter()
     print('Reading adjacency matrix...', end=' ', flush=True)
@@ -110,15 +82,14 @@ if __name__ == '__main__':
 
     y_train = torch.from_numpy(paper_label[train_idx]).to(torch.long)
     y_valid = torch.from_numpy(paper_label[valid_idx]).to(torch.long)
-    y_test = torch.from_numpy(paper_label[test_idx]).to(torch.long)
     # edge_index = np.load(f'{dataset.dir}/weighted_paper_paper_edge.npy')
     # edge_index = torch.from_numpy(edge_index)
     # adj_t = adj_t.set_value(edge_index[2], layout='coo')
 
-    def train(smoothing_alpha, y_pred=y_pred):
-
-        model = CorrectAndSmooth(args.num_correction_layers, args.correction_alpha,
-                                 args.num_smoothing_layers, smoothing_alpha,
+    def train(smoothing_alpha, y_pred=y_pred, num_correction_layers=num_correction_layers, correction_alpha=correction_alpha,
+              num_smoothing_layers=num_smoothing_layers):
+        model = CorrectAndSmooth(num_correction_layers, correction_alpha,
+                                 num_smoothing_layers, smoothing_alpha,
                                  autoscale=True)
 
         t = time.perf_counter()
