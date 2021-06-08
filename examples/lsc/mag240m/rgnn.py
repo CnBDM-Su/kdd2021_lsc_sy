@@ -264,9 +264,10 @@ class MAG240M(LightningDataModule):
         #                       mode='r', shape=(N-1000*(N//1000), self.num_features))
         # self.x = zarr.open(f'{dataset.dir}/full_feat.zarr', mode='r',shape=(N, self.num_features) ,
         #                    chunks=(200000, self.num_features), dtype=np.float16)
-        self.x = np.memmap('/var/kdd-data/mag240m_kddcup2021/mini_graph/full_feat.npy', dtype=np.float16,
-                           mode='r', shape=(N, 256))
-        # self.x = np.load('/var/kdd-data/mag240m_kddcup2021/mini_graph/1024dim_256/full_feat.npy')
+        # self.x = np.memmap('/var/kdd-data/mag240m_kddcup2021/mini_graph/full_feat.npy', dtype=np.float16,
+                           # mode='r', shape=(N, 256))
+        self.x = np.load('/var/kdd-data/mag240m_kddcup2021/mini_graph/full_feat.npy')
+        print(self.x.shape)
         self.y = torch.from_numpy(dataset.all_paper_label)
         self.file_batch_size = N//1000
 
