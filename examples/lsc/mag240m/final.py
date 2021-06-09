@@ -49,6 +49,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', type=int, default=0)
     parser.add_argument('--step', type=int, default=0)
+    parser.add_argument('--parallel', type=bool, default=False)
 
     #mlp_parameter
     parser.add_argument('--mlp_hidden_channels', type=int, default=256)
