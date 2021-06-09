@@ -2,7 +2,6 @@
 
 import os.path as osp
 import time
-import argparse
 from copy import deepcopy
 import torch
 import numpy as np
@@ -10,51 +9,18 @@ from torch_sparse import SparseTensor
 from torch_geometric.nn import CorrectAndSmooth
 from torch_geometric.nn.conv.gcn_conv import gcn_norm
 from ogb.lsc import MAG240MDataset, MAG240MEvaluator
-from root import ROOT
 from ogb.utils.url import makedirs
-import sys
-sys.path.append('/var/ogb/ogb/lsc')
-from mag240m_mini_graph import MAG240MMINIDataset
-class MAG240MEvaluator:
-    def eval(self, input_dict):
-        assert 'y_pred' in input_dict and 'y_true' in input_dict
 
-        y_pred, y_true = input_dict['y_pred'], input_dict['y_true']
-
-        if not isinstance(y_pred, torch.Tensor):
-            y_pred = torch.from_numpy(y_pred)
-        if not isinstance(y_true, torch.Tensor):
-            y_true = torch.from_numpy(y_true)
-
-        assert (y_true.numel() == y_pred.numel())
-        assert (y_true.dim() == y_pred.dim() == 1)
-
-        return {'acc': int((y_true == y_pred).sum()) / y_true.numel()}
-
-    def save_test_submission(self, input_dict, dir_path):
-        # assert 'y_pred' in input_dict
-        y_pred = input_dict['y_pred']
-        assert y_pred.shape == (146818, )
-
-        if isinstance(y_pred, torch.Tensor):
-            y_pred = y_pred.cpu().numpy()
-        y_pred = y_pred.astype(np.short)
-
-        makedirs(dir_path)
-        filename = osp.join(dir_path, 'y_pred_mag240m')
-        np.savez_compressed(filename, y_pred=y_pred)
-
-
-def CS(dataset, train_idx, valid_idx, test_idx, paper_label,
+def kdd_cs(dataset, train_idx, valid_idx, test_idx, paper_label,
        num_correction_layers, correction_alpha, num_smoothing_layers, smoothing_alpha):
 
     evaluator = MAG240MEvaluator()
 
-    save_path = 'results/rgat_cs_v91'
+    save_path = 'results/final_rgat_result'
 
     print('Reading MLP soft prediction...', end=' ', flush=True)
     t = time.perf_counter()
-    y_pred = torch.from_numpy(np.load(save_path+'/256rgat_cs_val0.5.npz')['y_pred'])
+    y_pred = torch.from_numpy(np.load(save_path+'/r.npz')['y_pred'])
     print(f'Done! [{time.perf_counter() - t:.2f}s]')
 
     t = time.perf_counter()
@@ -82,12 +48,9 @@ def CS(dataset, train_idx, valid_idx, test_idx, paper_label,
 
     y_train = torch.from_numpy(paper_label[train_idx]).to(torch.long)
     y_valid = torch.from_numpy(paper_label[valid_idx]).to(torch.long)
-    # edge_index = np.load(f'{dataset.dir}/weighted_paper_paper_edge.npy')
-    # edge_index = torch.from_numpy(edge_index)
-    # adj_t = adj_t.set_value(edge_index[2], layout='coo')
 
-    def train(smoothing_alpha, y_pred=y_pred, num_correction_layers=num_correction_layers, correction_alpha=correction_alpha,
-              num_smoothing_layers=num_smoothing_layers):
+    def train(smoothing_alpha, y_pred=y_pred, num_correction_layers=num_correction_layers,
+              correction_alpha=correction_alpha, num_smoothing_layers=num_smoothing_layers):
         model = CorrectAndSmooth(num_correction_layers, correction_alpha,
                                  num_smoothing_layers, smoothing_alpha,
                                  autoscale=True)
@@ -119,20 +82,10 @@ def CS(dataset, train_idx, valid_idx, test_idx, paper_label,
         })['acc']
         print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
         return y_pred, valid_acc
-    acc_lis = []
-    alpha_lis = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0]
-    for i in alpha_lis:
-        y_pred_tmp, valid_acc = train(i)
-        acc_lis.append(valid_acc)
-        if len(acc_lis)>1:
-            if acc_lis[-1]-acc_lis[-2] > 0.0001:
-                y_pred_best = y_pred_tmp
-            else:
-                try:
-                    y_pred = y_pred_best
-                except:
-                    y_pred = y_pred_tmp
-                break
+
+    y_pred_tmp, valid_acc = train(smoothing_alpha)
+    y_pred_best = y_pred_tmp
+    y_pred = y_pred_best
     print('smooth alpha is',i)
     train_acc = evaluator.eval({
         'y_true': y_train,
@@ -143,8 +96,6 @@ def CS(dataset, train_idx, valid_idx, test_idx, paper_label,
         'y_pred': y_pred[valid_idx].argmax(dim=-1)
     })['acc']
     print(f'Train: {train_acc:.4f}, Valid: {valid_acc:.4f}')
-
-    # np.save('results/rgat_cs_val0.5/rgat_cs_val0.5_pred.npy',y_pred)
 
     res = {'y_pred': y_pred[test_idx].argmax(dim=-1)}
     evaluator.save_test_submission(res, save_path)

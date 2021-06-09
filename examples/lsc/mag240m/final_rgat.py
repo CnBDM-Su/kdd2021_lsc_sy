@@ -1,10 +1,8 @@
 import os
 import time
 import glob
-import argparse
 import os.path as osp
 from tqdm import tqdm
-import sys
 from typing import Optional, List, NamedTuple
 
 import numpy as np
@@ -23,7 +21,7 @@ from torch_sparse import SparseTensor
 from torch_geometric.nn import SAGEConv, GATConv
 from torch_geometric.data import NeighborSampler
 
-from ogb.lsc import MAG240MDataset
+from ogb.lsc import MAG240MEvaluator
 from root import ROOT
 from ogb.utils.url import makedirs
 import sys
@@ -63,12 +61,11 @@ def save_col_slice(x_src, x_dst, start_row_idx, end_row_idx, start_col_idx,
 
 
 class MAG240M(LightningDataModule):
-    def __init__(self, data_dir: str, batch_size: int, sizes: List[int], mini: bool):
+    def __init__(self, data_dir: str, batch_size: int, sizes: List[int]):
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size
         self.sizes = sizes
-        self.mini = mini
         self.setup()
 
     @property
@@ -84,10 +81,7 @@ class MAG240M(LightningDataModule):
         return 5
 
     def prepare_data(self):
-        if self.mini:
-            dataset = MAG240MMINIDataset(self.data_dir)
-        else:
-            dataset = MAG240MDataset(self.data_dir)
+        dataset = MAG240MMINIDataset(self.data_dir)
 
         path = f'{dataset.dir}/paper_to_paper_symmetric.pt'
         if not osp.exists(path):  # Will take approximately 5 minutes...
@@ -228,22 +222,14 @@ class MAG240M(LightningDataModule):
     def setup(self, stage: Optional[str] = None):
         t = time.perf_counter()
         print('Reading dataset...', end=' ', flush=True)
-        if self.mini:
-            dataset = MAG240MMINIDataset(self.data_dir)
-        else:
-            dataset = MAG240MDataset(self.data_dir)
+        dataset = MAG240MMINIDataset(self.data_dir)
 
         np.random.seed(0)
         train_idx = dataset.get_idx_split('train')
         valid_idx = dataset.get_idx_split('valid')
         test_idx = dataset.get_idx_split('test')
-        # valid_idx_ = np.random.choice(valid_idx, size=(int(valid_idx.shape[0] * ratio),), replace=False)
-        valid_idx_ = np.load(f'{dataset.dir}/val_idx_1.0.npy')
-        # np.save(f'{dataset.dir}/val_idx_' + str(ratio) + '.npy', valid_idx_)
-        # valid_idx_ = np.load(f'{dataset.dir}/val_idx_' + str(ratio) + '.npy')
 
-        train_idx = np.concatenate([train_idx, valid_idx_], 0)
-        # valid_idx = np.array(list(set(valid_idx) - set(valid_idx_)))
+        train_idx = np.concatenate([train_idx, valid_idx], 0)
 
         self.train_idx = torch.from_numpy(train_idx)
         self.train_idx = self.train_idx
@@ -256,17 +242,8 @@ class MAG240M(LightningDataModule):
 
         N = dataset.num_papers + dataset.num_authors + dataset.num_institutions
 
-        # self.x = {}
-        # for i in range(1000):
-        #     self.x[i] = np.memmap(f'{dataset.dir}/full_feat_split/full_feat_'+str(i)+'.npy', dtype=np.float16,
-        #                    mode='r', shape=(N//1000, self.num_features))
-        # self.x[1000] = np.memmap(f'{dataset.dir}/full_feat_split/full_feat_' + str(i) + '.npy', dtype=np.float16,
-        #                       mode='r', shape=(N-1000*(N//1000), self.num_features))
-        # self.x = zarr.open(f'{dataset.dir}/full_feat.zarr', mode='r',shape=(N, self.num_features) ,
-        #                    chunks=(200000, self.num_features), dtype=np.float16)
-        self.x = np.memmap('/var/kdd-data/mag240m_kddcup2021/mini_graph/256dim_ap_val1.0/full_feat.npy', dtype=np.float16,
+        self.x = np.memmap('/var/kdd-data/mag240m_kddcup2021/mini_graph/final_mlp_result/full_feat.npy', dtype=np.float16,
                            mode='r', shape=(N, 256))
-        # self.x = np.load('/var/kdd-data/mag240m_kddcup2021/mini_graph/1024dim_256/full_feat.npy')
         self.y = torch.from_numpy(dataset.all_paper_label)
         self.file_batch_size = N//1000
 
@@ -283,10 +260,7 @@ class MAG240M(LightningDataModule):
         return ns
 
     def all_dataloader(self):
-        if self.mini:
-            dataset = MAG240MMINIDataset(self.data_dir)
-        else:
-            dataset = MAG240MDataset(self.data_dir)
+        dataset = MAG240MMINIDataset(self.data_dir)
         return NeighborSampler(self.adj_t, node_idx=torch.from_numpy(np.arange(dataset.num_papers)),
                                sizes=self.sizes, return_e_id=False,
                                transform=self.convert_batch,
@@ -316,19 +290,9 @@ class MAG240M(LightningDataModule):
                                batch_size=self.batch_size, num_workers=4)
 
     def convert_batch(self, batch_size, n_id, adjs):
-        # t = time.perf_counter()
-        # x = []
-        #
-        # for i in n_id.numpy():
-        #     x.append(self.x[i//self.file_batch_size][i%self.file_batch_size])
-        # x = torch.from_numpy(np.array(x)).to(torch.float)
-        # print(n_id.shape)
-        # x = torch.from_numpy(self.x.get_orthogonal_selection((n_id.numpy(), slice(None)))).to(
-        #     torch.float)
+
         x = torch.from_numpy(self.x[n_id.numpy()]).to(torch.float)
-        # print(sys.getsizeof(x.storage()))
         y = self.y[n_id[:batch_size]].to(torch.long)
-        # print(f'Done sampling! [{time.perf_counter() - t:.2f}s]')
         return Batch(x=x, y=y, adjs_t=[adj_t for adj_t, _, _ in adjs])
 
 
@@ -389,8 +353,6 @@ class RGNN(LightningModule):
             ReLU(inplace=True),
             Dropout(p=self.dropout),
             Linear(hidden_channels, out_channels)
-            # Linear(hidden_channels, 256),
-            # Linear(256, out_channels),
         )
 
         self.acc = Accuracy()
@@ -456,124 +418,46 @@ class RGNN(LightningModule):
         scheduler = StepLR(optimizer, step_size=25, gamma=0.25)
         return [optimizer], [scheduler]
 
-class MAG240MEvaluator:
-    def eval(self, input_dict):
-        assert 'y_pred' in input_dict and 'y_true' in input_dict
-
-        y_pred, y_true = input_dict['y_pred'], input_dict['y_true']
-
-        if not isinstance(y_pred, torch.Tensor):
-            y_pred = torch.from_numpy(y_pred)
-        if not isinstance(y_true, torch.Tensor):
-            y_true = torch.from_numpy(y_true)
-
-        assert (y_true.numel() == y_pred.numel())
-        assert (y_true.dim() == y_pred.dim() == 1)
-
-        return {'acc': int((y_true == y_pred).sum()) / y_true.numel()}
-
-    def save_test_submission(self, input_dict, dir_path):
-        assert 'y_pred' in input_dict
-        y_pred = input_dict['y_pred']
-        y_pred_valid = input_dict['y_pred_valid']
-        # assert y_pred.shape == (146818, )
-
-        if isinstance(y_pred, torch.Tensor):
-            y_pred = y_pred.cpu().numpy()
-        # y_pred = y_pred.astype(np.short)
-
-        if isinstance(y_pred_valid, torch.Tensor):
-            y_pred_valid = y_pred_valid.cpu().numpy()
-        # y_pred_valid = y_pred_valid.astype(np.short)
-
-        makedirs(dir_path)
-        filename = osp.join(dir_path, 'y_pred_mag240m')
-        np.savez_compressed(filename, y_pred=y_pred, y_pred_valid=y_pred_valid)
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--hidden_channels', type=int, default=1024)
-    parser.add_argument('--batch_size', type=int, default=1024)
-    parser.add_argument('--dropout', type=float, default=0.5)
-    parser.add_argument('--epochs', type=int, default=100)
-    parser.add_argument('--model', type=str, default='rgat',
-                        choices=['rgat', 'rgraphsage'])
-    parser.add_argument('--sizes', type=str, default='25-15')
-    parser.add_argument('--device', type=str, default='0')
-    parser.add_argument('--parallel', type=bool, default=False)
-    parser.add_argument('--evaluate', action='store_true')
-    parser.add_argument('--resume', type=int, default=None)
-    parser.add_argument('--valid_result', type=bool, default=False)
-    parser.add_argument('--mini_graph', type=bool, default=False)
-    parser.add_argument('--cs', type=bool, default=False)
-    parser.add_argument('--cut_hidden', type=bool, default=False)
-    args = parser.parse_args()
-    args.sizes = [int(i) for i in args.sizes.split('-')]
-    print(args)
+def kdd_rgat(dataset, train_idx, valid_idx, test_idx, paper_label,
+             hidden_channels, batch_size, dropout, epochs, model,
+             sizes, device, resume):
 
     seed_everything(42)
-    datamodule = MAG240M(ROOT, args.batch_size, args.sizes, args.mini_graph)
+    datamodule = MAG240M(ROOT, batch_size, sizes)
 
-    if not args.evaluate:
-        model = RGNN(args.model, datamodule.num_features,
-                     datamodule.num_classes, args.hidden_channels,
-                     datamodule.num_relations, num_layers=len(args.sizes),
-                     dropout=args.dropout)
-        print(f'#Params {sum([p.numel() for p in model.parameters()])}')
-        checkpoint_callback = ModelCheckpoint(monitor='val_acc', save_top_k=1)
-        if args.parallel==True:
-            gpus = [4,5,6,7]
-            trainer = Trainer(gpus=gpus, max_epochs=args.epochs,
-                              callbacks=[checkpoint_callback],
-                              default_root_dir=f'logs/{args.model}')
-        else:
-            if args.resume==None:
-                trainer = Trainer(gpus=args.device, max_epochs=args.epochs,
-                                  callbacks=[checkpoint_callback],
-                                  default_root_dir=f'logs/{args.model}')
-            else:
-                dirs = glob.glob(f'logs/{args.model}/lightning_logs/*')
-                version = args.resume
-                logdir = f'logs/{args.model}/lightning_logs/version_{version}'
-                ckpt = glob.glob(f'{logdir}/checkpoints/*')[0]
-                print('consume nodel version:',version)
-                trainer = Trainer(gpus=args.device, resume_from_checkpoint=ckpt)
+    model = RGNN(model, datamodule.num_features,
+                 datamodule.num_classes, hidden_channels,
+                 datamodule.num_relations, num_layers=len(sizes),
+                 dropout=dropout)
+    print(f'#Params {sum([p.numel() for p in model.parameters()])}')
+    checkpoint_callback = ModelCheckpoint(monitor='val_acc', save_top_k=1)
 
-        trainer.fit(model, datamodule=datamodule)
-
-    if args.evaluate:
-        dirs = glob.glob(f'logs/{args.model}/lightning_logs/*')
-        version = args.resume
-        logdir = f'logs/{args.model}/lightning_logs/version_{version}'
-        print(f'Evaluating saved model in {logdir}...')
+    if resume==None:
+        trainer = Trainer(gpus=device, max_epochs=epochs,
+                          callbacks=[checkpoint_callback],
+                          default_root_dir=f'logs/{model}')
+    else:
+        dirs = glob.glob(f'logs/{model}/lightning_logs/*')
+        version = resume
+        logdir = f'logs/{model}/lightning_logs/version_{version}'
         ckpt = glob.glob(f'{logdir}/checkpoints/*')[0]
-        if args.parallel==True:
-            gpus = [4,5,6,7]
-            trainer = Trainer(gpus=gpus, resume_from_checkpoint=ckpt)
-        else:
-            trainer = Trainer(gpus=args.device, resume_from_checkpoint=ckpt)
+        print('consume nodel version:',version)
+        trainer = Trainer(gpus=device, resume_from_checkpoint=ckpt)
 
-        model = RGNN.load_from_checkpoint(
-            checkpoint_path=ckpt, hparams_file=f'{logdir}/hparams.yaml').to(int(args.device))
+    trainer.fit(model, datamodule=datamodule)
 
-        datamodule.batch_size = 16
-        datamodule.sizes = [160] * len(args.sizes)  # (Almost) no sampling...
+    datamodule.batch_size = 16
+    datamodule.sizes = [160] * len(sizes)
 
-        # trainer.test(model=model, datamodule=datamodule)
+    evaluator = MAG240MEvaluator()
+    loader = datamodule.all_dataloader()
 
-        evaluator = MAG240MEvaluator()
-
-        loader = datamodule.all_dataloader()
-        # loader = datamodule.val_dataloader()
-
-        model.eval()
-        y_preds = []
-        for batch in tqdm(loader):
-            batch = batch.to(int(args.device))
-            with torch.no_grad():
-                out = model(batch.x, batch.adjs_t).softmax(dim=-1).cpu()
-                # print(out)
-                y_preds.append(out)
-        res = {'y_pred': torch.cat(y_preds, dim=0), 'y_pred_valid': torch.tensor([])}
-        evaluator.save_test_submission(res, f'results/rgat_cs_v95')
+    model.eval()
+    y_preds = []
+    for batch in tqdm(loader):
+        batch = batch.to(int(device))
+        with torch.no_grad():
+            out = model(batch.x, batch.adjs_t).softmax(dim=-1).cpu()
+            y_preds.append(out)
+    res = {'y_pred': torch.cat(y_preds, dim=0)}
+    evaluator.save_test_submission(res, f'results/final_rgat_result')
