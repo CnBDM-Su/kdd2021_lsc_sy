@@ -51,7 +51,7 @@ if __name__ == '__main__':
     parser.add_argument('--step', type=int, default=0)
 
     #mlp_parameter
-    parser.add_argument('--mlp_hidden_channels', type=int, default=512)
+    parser.add_argument('--mlp_hidden_channels', type=int, default=256)
     parser.add_argument('--mlp_num_layers', type=int, default=2),
     parser.add_argument('--mlp_no_batch_norm', action='store_true')
     parser.add_argument('--mlp_relu_last', action='store_true')
