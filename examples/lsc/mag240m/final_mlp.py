@@ -110,11 +110,11 @@ def kdd_mlp(dataset, train_idx, valid_idx, test_idx, paper_label,
 
     torch.manual_seed(12345)
     gpus = [4,5,6,7]
-    if torch.cuda.is_available():
-        device = f'cuda:{device}'
-    else:
-        device = 'cpu'
-        print('cpu')
+    # if torch.cuda.is_available():
+    #     device = f'cuda:{device}'
+    # else:
+    #     device = 'cpu'
+    #     print('cpu')
 
     evaluator = MAG240MEvaluator()
 
