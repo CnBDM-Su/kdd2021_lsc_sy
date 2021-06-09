@@ -47,28 +47,6 @@ class MLP(torch.nn.Module):
         return x
 
 
-def train(model, x_train, y_train, batch_size, optimizer):
-    model.train()
-
-    total_loss = 0
-    for idx in DataLoader(range(y_train.size(0)), batch_size, shuffle=True):
-        optimizer.zero_grad()
-        loss = F.cross_entropy(model(x_train[idx].to(device)), y_train[idx])
-        loss.backward()
-        optimizer.step()
-
-        total_loss += float(loss) * idx.numel()
-
-    return total_loss / y_train.size(0)
-
-
-@torch.no_grad()
-def test(model, x_eval, y_eval, evaluator):
-    model.eval()
-    y_pred = model(x_eval).argmax(dim=-1)
-    return evaluator.eval({'y_true': y_eval, 'y_pred': y_pred})['acc']
-
-
 class MAG240MEvaluator:
     def eval(self, input_dict):
         assert 'y_pred' in input_dict and 'y_true' in input_dict
@@ -107,6 +85,27 @@ class MAG240MEvaluator:
 def kdd_mlp(dataset, train_idx, valid_idx, test_idx, paper_label,
             device, parallel, hidden_channels, num_layers, no_batch_norm,
             relu_last, dropout, lr, batch_size, epochs):
+
+
+    def train(model, x_train, y_train, batch_size, optimizer):
+        model.train()
+
+        total_loss = 0
+        for idx in DataLoader(range(y_train.size(0)), batch_size, shuffle=True):
+            optimizer.zero_grad()
+            loss = F.cross_entropy(model(x_train[idx].to(device)), y_train[idx])
+            loss.backward()
+            optimizer.step()
+
+            total_loss += float(loss) * idx.numel()
+
+        return total_loss / y_train.size(0)
+
+    @torch.no_grad()
+    def test(model, x_eval, y_eval, evaluator):
+        model.eval()
+        y_pred = model(x_eval).argmax(dim=-1)
+        return evaluator.eval({'y_true': y_eval, 'y_pred': y_pred})['acc']
 
     torch.manual_seed(12345)
     gpus = [4,5,6,7]
