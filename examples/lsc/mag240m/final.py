@@ -78,7 +78,7 @@ if __name__ == '__main__':
 
 
     args = parser.parse_args()
-    args.sizes = [int(i) for i in args.sizes.split('-')]
+    args.rgat_sizes = [int(i) for i in args.rgat_sizes.split('-')]
     print(args)
 
     gpus = [4,5,6,7]
