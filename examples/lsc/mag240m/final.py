@@ -121,7 +121,6 @@ if __name__ == '__main__':
     y_train = y_train.to(device, torch.long)
     y_valid = torch.from_numpy(paper_label[valid_idx])
     y_valid = y_valid.to(device, torch.long)
-    print(args.evaluate)
 
     if args.step==0:
 
